@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgendifyApp - Avaliar Serviço</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header class="top-bar">
+        <div class="top-bar-content">
+            <a href="escolher-espaço.html" class="back-link">
+                <span class="material-symbols-outlined">arrow_back_ios</span>
+            </a>
+            <h2>Avaliar Serviço</h2>
+            <div class="header-placeholder"></div>
+        </div>
+    </header>
+
+    <main class="login-container">
+        
+        <div class="evaluation-form-container">
+            <h3>Como foi sua experiência?</h3>
+            <p class="evaluation-context">
+                Espaço: <strong id="space-name-placeholder">Carregando...</strong>
+            </p>
+
+            <form class="evaluation-form" id="evaluation-form">
+                
+                <input type="hidden" name="entry.771112235" id="space-id-input" value="">
+
+                <label class="form-label" for="rating">Nota Geral:</label>
+                <div class="star-rating" id="star-widget">
+                    <span class="material-symbols-outlined star-icon" data-value="1">star_border</span>
+                    <span class="material-symbols-outlined star-icon" data-value="2">star_border</span>
+                    <span class="material-symbols-outlined star-icon" data-value="3">star_border</span>
+                    <span class="material-symbols-outlined star-icon" data-value="4">star_border</span>
+                    <span class="material-symbols-outlined star-icon" data-value="5">star_border</span>
+                </div>
+                <input type="hidden" name="entry.1948864566" id="rating-value" value="0">
+                
+                <label class="form-label" for="purpose">Qual foi o propósito da sua reserva?</label>
+                <select id="purpose" name="entry.1958159279" class="form-select">
+                    <option value="" disabled selected>Selecione uma opção...</option>
+                    <option value="Reunião com Cliente">Reunião com Cliente</option>
+                    <option value="Reunião Interna">Reunião Interna</option>
+                    <option value="Trabalho Focado (Individual)">Trabalho Focado (Individual)</option>
+                    <option value="Treinamento / Workshop">Treinamento / Workshop</option>
+                    <option value="Outro">Outro</option>
+                </select>
+
+                <label class="form-label">Houve algum problema técnico? (Wi-Fi, projetor, etc.)</label>
+                <div class="radio-group">
+                    <input type="radio" id="problema_nao" name="entry.1106367887" value="Não" checked>
+                    <label for="problema_nao">Não</label>
+                    <input type="radio" id="problema_sim" name="entry.1106367887" value="Sim">
+                    <label for="problema_sim">Sim</label>
+                </div>
+
+                <div id="problem-details-container">
+                    <label class="form-label" for="problem_details">Por favor, descreva o problema:</label>
+                    <textarea id="problem_details" name="entry.1189940137" placeholder="Ex: O projetor não estava conectando..."></textarea>
+                </div>
+                
+                <label class="form-label" for="feedback">Sugestões de melhoria (opcional):</label>
+                <textarea id="feedback" name="entry.1480821103" placeholder="Deixe seu comentário para o gestor..."></textarea>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="anonymous" name="entry.673090461" value="Sim">
+                    <label for="anonymous">Enviar esta avaliação anonimamente</label>
+                </div>
+
+                <button type="button" class="action-button" id="submit-button">ENVIAR AVALIAÇÃO</button>
+            </form>
+        </div>
+    </main>
+    <script src="app.js"></script>
+</body>
+</html>

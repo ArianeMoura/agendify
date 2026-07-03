@@ -1,0 +1,174 @@
+﻿@page
+@model Web.Pages.AnalyticsModel
+@{
+    ViewData["Title"] = "Dashboard - Analytics";
+    var initialYear = Model.Year;
+    var initialMonth = Model.Month;
+    var initialEspacoId = Model.EspacoId ?? "";
+    var apiBaseUrl = Model.ApiBaseUrl;
+}
+
+<div class="container mt-4">
+    <h2>Relatórios e Dashboards</h2>
+
+    <div class="card my-3">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Ano</label>
+                    <input type="number" id="year" class="form-control" min="2000" max="2100" value="@initialYear" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Mês</label>
+                    <input type="number" id="month" class="form-control" min="1" max="12" value="@initialMonth" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Espaço (espacoId)</label>
+                    <input type="text" id="espacoId" class="form-control" placeholder="ex: sala-1" value="@initialEspacoId" />
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button id="btnAtualizar" class="btn btn-primary w-100">Atualizar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Horários de Pico -->
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="text-muted">
+                    Horários de Pico <span id="espacoLabel"></span>
+                </div>
+                <div id="loading" class="text-primary" style="display:none;">Carregando...</div>
+            </div>
+            <div style="height:360px;">
+                <canvas id="peakHoursChart"></canvas>
+            </div>
+            <div id="errorBox" class="text-danger mt-2" style="display:none;"></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Lê a URL base da API das configurações do servidor
+        const API_BASE = "@apiBaseUrl";
+
+        const yearInput = document.getElementById('year');
+        const monthInput = document.getElementById('month');
+        const espacoInput = document.getElementById('espacoId');
+        const btnAtualizar = document.getElementById('btnAtualizar');
+        const loading = document.getElementById('loading');
+        const errorBox = document.getElementById('errorBox');
+        const espacoLabel = document.getElementById('espacoLabel');
+        const chartCanvas = document.getElementById('peakHoursChart');
+
+        let chartInstance = null;
+
+        function showLoading(flag) {
+            loading.style.display = flag ? 'inline-block' : 'none';
+        }
+        function showError(msg) {
+            if (msg) {
+                errorBox.style.display = 'block';
+                errorBox.textContent = msg;
+            } else {
+                errorBox.style.display = 'none';
+                errorBox.textContent = '';
+            }
+        }
+
+        async function fetchJsonFlexible(resp) {
+            // Tenta JSON direto; se falhar por content-type ou formatação, tenta text + JSON.parse
+            try {
+                return await resp.json();
+            } catch {
+                const txt = await resp.text();
+                return JSON.parse(txt);
+            }
+        }
+
+        async function fetchPeakHours(year, month, espacoId) {
+            const qs = new URLSearchParams({ year: String(year), month: String(month) });
+            if (espacoId) qs.append('espacoId', espacoId);
+
+            const url = `${API_BASE}/api/analytics/peak-hours?${qs.toString()}`;
+            const resp = await fetch(url, { headers: { 'Accept': 'application/json, text/plain' } });
+            if (!resp.ok) throw new Error('HTTP ' + resp.status);
+            return fetchJsonFlexible(resp);
+        }
+
+        function renderChart(items) {
+            // items: [{ espacoId, espacoNome, hora, totalReservas }]
+            // Ordenar por hora asc para eixo X previsível
+            const data = Array.isArray(items) ? items.slice() : [];
+            data.sort((a, b) => (a.hora ?? 0) - (b.hora ?? 0));
+
+            const labels = data.map(i => `${String(i.hora).padStart(2,'0')}:00`);
+            const values = data.map(i => i.totalReservas ?? 0);
+
+            // Define título auxiliar com espacoNome/espacoId quando presentes (pelo primeiro item)
+            const first = data[0];
+            const titleSuffix = first
+                ? (first.espacoNome ? `(${first.espacoNome})` : (first.espacoId ? `(${first.espacoId})` : ''))
+                : '';
+            espacoLabel.textContent = titleSuffix;
+
+            const config = {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Total de Reservas',
+                        data: values,
+                        backgroundColor: '#34d399',
+                        borderRadius: 8,
+                        maxBarThickness: 40
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => ` ${ctx.raw} reservas`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { ticks: { maxRotation: 0, minRotation: 0 } },
+                        y: { beginAtZero: true, title: { display: true, text: 'Reservas' } }
+                    }
+                }
+            };
+
+            if (chartInstance) chartInstance.destroy();
+            chartInstance = new Chart(chartCanvas, config);
+        }
+
+        async function load() {
+            showError(null);
+            showLoading(true);
+            try {
+                const year = parseInt(yearInput.value, 10);
+                const month = parseInt(monthInput.value, 10);
+                const espacoId = (espacoInput.value || '').trim() || null;
+
+                const items = await fetchPeakHours(year, month, espacoId || undefined);
+                renderChart(items);
+            } catch (err) {
+                console.error(err);
+                showError('Falha ao carregar horários de pico.');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        btnAtualizar.addEventListener('click', load);
+        document.addEventListener('DOMContentLoaded', load);
+    </script>
+}

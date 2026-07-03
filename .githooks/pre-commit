@@ -1,0 +1,19 @@
+#!/bin/sh
+# Bloqueia commits que contenham segredos. Ative uma vez com:
+#   git config core.hooksPath .githooks
+#
+# Requer o gitleaks instalado (brew install gitleaks). Se não estiver instalado,
+# o hook avisa mas não bloqueia — instale para ter a proteção.
+
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo "⚠  gitleaks não instalado — pulando verificação de segredos (instale com 'brew install gitleaks')."
+  exit 0
+fi
+
+echo "🔎 Verificando segredos com gitleaks (staged)..."
+if ! gitleaks protect --staged --verbose; then
+  echo "❌ Commit bloqueado: possível segredo detectado. Remova-o antes de commitar."
+  exit 1
+fi
+echo "✅ Nenhum segredo detectado."
+exit 0

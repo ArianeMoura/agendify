@@ -1,0 +1,653 @@
+/* Configurações Globais e Variáveis de Cor */
+:root {
+    --primary-purple: #9345D9; /* Roxo do botão e ícone */
+    --header-purple: #6A0DAD;  /* Roxo mais escuro do header e fundo do ícone */
+    --logo-dark: #3F3C56;      /* Cor escura do texto "Agendify" */
+    --input-bg: #EEEEEE;        /* Cinza claro dos campos de input */
+    --text-color: #555555;      /* Cinza do texto "Esqueceu sua senha" */
+    --page-bg: #FFFFFF;         /* Fundo branco */
+}
+
+/* Reset básico e fonte padrão */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--page-bg);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* ----- Header (Usado por todas as páginas) ----- */
+.top-bar {
+    width: 100%;
+    height: 60px; /* Altura da barra roxa no topo */
+    background-color: var(--header-purple);
+}
+
+/* ----- Contêiner Principal (Usado por todas as páginas) ----- */
+.login-container {
+    flex-grow: 1; /* Faz o 'main' ocupar o espaço restante */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* Centraliza verticalmente o conteúdo */
+    padding: 20px;
+    box-sizing: border-box; /* Garante que o padding não estoure a tela */
+}
+
+/* ----- Logo (Login e Recuperar Senha) ----- */
+.logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 3rem; /* Espaço entre o logo e o formulário */
+}
+
+.logo-icon-wrapper {
+    background-color: var(--header-purple);
+    border-radius: 50%; /* Deixa o fundo do ícone redondo */
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;  /* Tamanho fixo */
+    height: 60px; /* Tamanho fixo */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.logo-icon-wrapper .material-symbols-outlined {
+    font-size: 50px; /* Tamanho do ícone */
+    color: white;
+    font-variation-settings: 'FILL' 1;
+}
+
+.logo-text {
+    margin-top: 1rem;
+    font-size: 2rem; /* 32px */
+    font-weight: 700;
+}
+
+.logo-part1 {
+    color: var(--logo-dark);
+}
+
+.logo-part2 {
+    color: var(--primary-purple);
+}
+
+/* ----- Formulário de Login ----- */
+.login-form {
+    width: 100%;
+    max-width: 350px; /* Largura máxima do formulário */
+    display: flex;
+    flex-direction: column;
+}
+
+.login-form input {
+    background-color: var(--input-bg);
+    border: none;
+    border-radius: 8px;
+    padding: 18px 20px; /* Altura e espaçamento interno */
+    margin-bottom: 1rem; /* 16px */
+    font-size: 1rem; /* 16px */
+    color: var(--text-color);
+}
+
+.login-form input::placeholder {
+    color: #999;
+}
+
+/* ----- BOTÃO DE AÇÃO GLOBAL ----- */
+/* Usado no login, recuperação, avaliação e obrigado */
+.action-button {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: var(--primary-purple);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 18px 20px;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    text-decoration: none; /* Para o caso de ser um link <a> */
+    text-align: center;
+}
+
+.action-button:hover {
+    background-color: #7a3bad; /* Um roxo um pouco mais escuro no hover */
+}
+
+
+/* ----- Link "Esqueceu a senha" (Login e Recuperar) ----- */
+.forgot-password {
+    margin-top: 1.5rem;
+    color: var(--text-color);
+    font-size: 0.875rem; /* 14px */
+    text-align: center;
+    max-width: 350px;
+}
+
+.forgot-password a {
+    color: var(--text-color);
+    font-weight: 500;
+    text-decoration: none; /* Tira o sublinhado */
+}
+
+.forgot-password a:hover {
+    text-decoration: underline; /* Adiciona sublinhado no hover */
+}
+
+/* ----- PÁGINA DE RECUPERAÇÃO / OBRIGADO ----- */
+/* O estilo de 'Obrigado' reutiliza o de 'Recuperação' */
+.recovery-content {
+    width: 100%;
+    max-width: 350px; /* Mesma largura do formulário */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centraliza o conteúdo */
+    text-align: center;
+}
+
+.recovery-content h2 {
+    color: var(--logo-dark);
+    font-weight: 700;
+    font-size: 1.5rem; /* 24px */
+    margin-bottom: 1rem;
+}
+
+.recovery-content p {
+    color: var(--text-color);
+    font-size: 1rem; /* 16px */
+    line-height: 1.5;
+    margin-bottom: 1rem;
+}
+
+.recovery-content .email-address {
+    font-size: 1.1rem; /* 18px */
+    font-weight: 700;
+    color: var(--primary-purple); /* Destaca o e-mail */
+    margin-bottom: 2rem;
+    word-break: break-all; /* Garante que o email quebre em telas pequenas */
+}
+
+/* ----- PÁGINA DE SELEÇÃO DE ESPAÇO ----- */
+.space-selection-container {
+    width: 100%;
+    max-width: 380px; /* Mesma largura do formulário de avaliação */
+    display: flex;
+    flex-direction: column;
+}
+
+.space-selection-container h3 {
+    color: var(--logo-dark);
+    font-size: 1.5rem; /* 24px */
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 2rem; /* Mais espaço antes da lista */
+}
+
+.space-list {
+    list-style: none; /* Remove bolinhas */
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem; /* 16px de espaço entre os itens */
+}
+
+/* Estilo do item de link único (Cabine, Auditório, etc) */
+.space-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Texto de um lado, seta do outro */
+    background-color: var(--input-bg); /* Reutiliza a cor do input */
+    border-radius: 8px;
+    padding: 20px 20px;
+    text-decoration: none;
+    color: var(--logo-dark);
+    font-size: 1rem;
+    font-weight: 500;
+    border: 2px solid var(--input-bg); /* Borda sutil */
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.space-item:hover {
+    background-color: #f7f7f7;
+    border-color: #e0e0e0;
+}
+
+.space-item .material-symbols-outlined {
+    color: var(--primary-purple); /* Seta roxa */
+    font-size: 24px;
+}
+
+
+/* *** CÓDIGO FALTANTE ESTÁ AQUI *** Estilos para o item com dois botões (Sala de Reunião A)
+*/
+
+/* O contêiner para o item "Sala de Reunião A" */
+.space-item-complex {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--input-bg);
+    border-radius: 8px;
+    padding: 16px 20px; /* Um pouco menos de padding vertical */
+    border: 2px solid var(--input-bg);
+}
+
+.space-item-complex .space-name {
+    color: var(--logo-dark);
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+/* O contêiner que segura os dois botões */
+.space-button-group {
+    display: flex;
+    gap: 0.5rem; /* 8px de espaço entre os botões */
+}
+
+/* O estilo de cada botão individual */
+.space-button {
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.875rem; /* 14px */
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+}
+
+/* Botão "Agendar" (Roxo) */
+.space-button.agenda {
+    background-color: var(--primary-purple);
+    color: white;
+}
+.space-button.agenda:hover {
+    background-color: #7a3bad;
+}
+
+/* Botão "Avaliar" (Vazado) */
+.space-button.avalia {
+    background-color: transparent;
+    color: var(--primary-purple);
+    border-color: var(--primary-purple);
+}
+.space-button.avalia:hover {
+    background-color: rgba(147, 69, 217, 0.1); /* Fundo roxo bem claro */
+}
+
+
+/* ----- PÁGINA DE AVALIAÇÃO ----- */
+
+/* --- Estilos do Header Interno (Avaliação / Agendamento) --- */
+.top-bar-content {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Isso alinha os 3 itens */
+    padding: 0 1rem; /* 16px de padding nas laterais */
+    max-width: 900px; /* Limita a largura do conteúdo do header */
+    margin: 0 auto;
+}
+
+.top-bar-content h2 {
+    color: white;
+    font-size: 1.25rem; /* 20px */
+    font-weight: 500;
+    margin: 0;
+}
+
+.top-bar-content .back-link {
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+}
+
+.top-bar-content .back-link .material-symbols-outlined {
+    font-size: 24px;
+}
+
+/* Espaço vazio para ajudar a centralizar o título */
+.top-bar-content .header-placeholder {
+    width: 40px; /* Mesmo tamanho do back-link */
+}
+
+
+/* --- Estilos do Formulário de Avaliação --- */
+.evaluation-form-container {
+    width: 100%;
+    max-width: 380px; /* Um pouco maior que o de login */
+    display: flex;
+    flex-direction: column;
+}
+
+.evaluation-form-container h3 {
+    color: var(--logo-dark);
+    font-size: 1.5rem; /* 24px */
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+
+.evaluation-context {
+    color: var(--text-color);
+    text-align: center;
+    font-size: 1rem;
+    margin-bottom: 2rem;
+}
+
+.evaluation-form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-label {
+    color: var(--text-color);
+    font-weight: 500;
+    font-size: 0.875rem; /* 14px */
+    margin-bottom: 0.5rem; /* 8px */
+}
+
+/* --- Estilo do <textarea> --- */
+.evaluation-form textarea {
+    background-color: var(--input-bg);
+    border: none;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+    color: var(--text-color);
+    font-family: 'Roboto', sans-serif;
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 120px;
+    resize: vertical;
+}
+
+.evaluation-form textarea::placeholder {
+    color: #999;
+}
+
+
+/* --- Sistema de Estrelas --- */
+.star-rating {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem; /* 8px de espaço entre as estrelas */
+    margin-bottom: 1.5rem; /* 24px */
+}
+
+.star-rating .star-icon {
+    font-size: 36px;
+    color: var(--primary-purple);
+    cursor: pointer;
+    transition: transform 0.1s ease, color 0.1s ease;
+    font-variation-settings: 'FILL' 0; /* Começa vazia */
+}
+
+.star-rating .star-icon:hover {
+    transform: scale(1.1); /* Efeito de "zoom" no hover */
+}
+
+.star-rating .star-icon.filled {
+    font-variation-settings: 'FILL' 1; /* Preenche a estrela */
+    color: var(--primary-purple);
+}
+
+/* --- Estilo do Campo <select> --- */
+.form-select {
+    background-color: var(--input-bg);
+    border: none;
+    border-radius: 8px;
+    padding: 18px 20px;
+    margin-bottom: 1.5rem; /* 24px */
+    font-size: 1rem;
+    color: var(--text-color);
+    font-family: 'Roboto', sans-serif;
+    width: 100%;
+    box-sizing: border-box;
+    -webkit-appearance: none; /* Remove a aparência padrão do S.O. */
+    -moz-appearance: none;
+    appearance: none;
+    /* Adiciona uma seta personalizada */
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23555555' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1.2em;
+}
+
+/* --- Estilo dos Radio Buttons --- */
+.radio-group {
+    display: flex;
+    gap: 1.5rem; /* Espaço entre "Sim" e "Não" */
+    margin-bottom: 1.5rem;
+}
+
+.radio-group input[type="radio"] {
+    display: none; /* Esconde o radio button padrão */
+}
+
+.radio-group label {
+    font-size: 1rem;
+    color: var(--text-color);
+    cursor: pointer;
+    position: relative;
+    padding-left: 30px; /* Espaço para o círculo personalizado */
+}
+
+/* Círculo externo */
+.radio-group label::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--input-bg);
+    background-color: var(--input-bg);
+}
+
+/* Círculo interno (quando selecionado) */
+.radio-group input[type="radio"]:checked + label::after {
+    content: '';
+    position: absolute;
+    left: 7px; /* Centraliza o círculo roxo */
+    top: 50%;
+    transform: translateY(-50%);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: var(--primary-purple);
+}
+
+/* --- Campo Condicional (Textarea) --- */
+#problem-details-container {
+    width: 100%;
+    display: none; /* JS vai mudar isso para 'flex' */
+    flex-direction: column; /* Para o label e textarea ficarem um em cima do outro */
+}
+
+/* Reutiliza o estilo do textarea principal */
+#problem-details-container textarea {
+    background-color: var(--input-bg);
+    border: none;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+    color: var(--text-color);
+    font-family: 'Roboto', sans-serif;
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 100px;
+    resize: vertical;
+}
+
+/* --- Estilo do Checkbox --- */
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.checkbox-group input[type="checkbox"] {
+    display: none; /* Esconde o checkbox padrão */
+}
+
+.checkbox-group label {
+    font-size: 0.9rem; /* Um pouco menor */
+    color: var(--text-color);
+    cursor: pointer;
+    position: relative;
+    padding-left: 30px;
+}
+
+/* Caixa externa */
+.checkbox-group label::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    border-radius: 4px; /* Caixa quadrada */
+    border: 2px solid var(--input-bg);
+    background-color: var(--input-bg);
+}
+
+/* "Check" (V) quando selecionado */
+.checkbox-group input[type="checkbox"]:checked + label::after {
+    content: '✔';
+    position: absolute;
+    left: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    color: var(--primary-purple);
+    font-weight: bold;
+}
+
+/* ----- PÁGINA DE AGENDAMENTO (CALENDLY) ----- */
+
+.calendly-container {
+    width: 100%;
+    /* Torna o contêiner mais largo que os formulários,
+      ideal para o calendário.
+    */
+    max-width: 900px; 
+    /* A altura é controlada pelo 'height:700px' do código do Calendly,
+       mas podemos definir uma altura mínima.
+    */
+    min-height: 700px; 
+    overflow: hidden; /* Esconde barras de rolagem desnecessárias */
+    border-radius: 8px; /* Borda suave */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); /* Sombra sutil */
+}
+
+/* O Calendly já define 'min-width' e 'height' no seu código,
+  então nós garantimos que ele se expanda 100% em largura.
+*/
+.calendly-inline-widget {
+    width: 100%;
+}
+
+/* ----- ADIÇÕES PARA PÁGINA DE VER AVALIAÇÕES ----- */
+
+.reviews-page-container {
+    width: 100%;
+    max-width: 900px; /* Mais largo para ver as avaliações */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centraliza a lista */
+    padding-bottom: 3rem; /* Espaço extra no final */
+}
+
+#loading-message {
+    color: var(--text-color);
+    font-size: 1.2rem;
+}
+
+#reviews-list-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem; /* Espaço entre os cards */
+}
+
+.review-card {
+    width: 100%;
+    background-color: #FAFAFA; /* Um branco-gelo, um pouco diferente do fundo */
+    border-radius: 8px;
+    padding: 1.5rem; /* 24px */
+    box-sizing: border-box;
+    border: 1px solid var(--input-bg); /* Borda cinza clara */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03); /* Sombra bem sutil */
+}
+
+.review-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #EAEAEA;
+    padding-bottom: 0.75rem; /* 12px */
+    margin-bottom: 1rem; /* 16px */
+}
+
+.review-space-name {
+    font-size: 1.25rem; /* 20px */
+    font-weight: 700;
+    color: var(--logo-dark);
+}
+
+.review-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem; /* 4px */
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary-purple);
+}
+
+.review-rating .material-symbols-outlined {
+    font-variation-settings: 'FILL' 1;
+    font-size: 20px;
+    /* Ajuste fino para alinhar a estrela com o número */
+    position: relative;
+    top: -1px; 
+}
+
+.review-feedback {
+    font-size: 1rem;
+    color: var(--text-color);
+    line-height: 1.5;
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+.review-feedback i { /* Estiliza o "(Nenhum comentário...)" */
+    color: #999;
+}
+
+.review-date {
+    font-size: 0.875rem; /* 14px */
+    color: #888;
+    display: block;
+    text-align: right; /* Alinha a data à direita */
+}

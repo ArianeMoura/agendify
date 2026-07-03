@@ -1,0 +1,174 @@
+@page
+@model web.Pages.Admin.Spaces.CreateModel
+@{
+    ViewData["Title"] = "Criar Espaço";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1>Criar Novo Espaço</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-page="/Dashboard">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a asp-page="/Admin/Spaces/Index">Espaços</a></li>
+                    <li class="breadcrumb-item active">Criar</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            @Model.ErrorMessage
+                        </div>
+                    }
+
+                    <form method="post" enctype="multipart/form-data" id="createSpaceForm">
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label">Nome do Espaço</label>
+                            <input asp-for="Name" class="form-control" placeholder="Ex: Salão de Festas" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label">Descrição</label>
+                            <textarea asp-for="Description" class="form-control" rows="3" 
+                                      placeholder="Descreva o espaço..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Capacity" class="form-label">Capacidade (pessoas)</label>
+                            <input asp-for="Capacity" type="number" class="form-control" min="1" />
+                            <span asp-validation-for="Capacity" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Image" class="form-label">Imagem do Espaço</label>
+                            <input asp-for="Image" type="file" class="form-control" accept="image/*" id="imageInput" />
+                            <small class="form-text text-muted">Formatos aceitos: JPG, PNG, GIF, WEBP (máximo 5MB)</small>
+                            <div id="imagePreview" class="mt-3" style="display: none;">
+                                <img id="previewImg" src="" alt="Preview" class="img-thumbnail" style="max-width: 300px; max-height: 300px;" />
+                            </div>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input asp-for="IsAllDayBooking" type="checkbox" class="form-check-input" id="isAllDayBooking" />
+                            <label asp-for="IsAllDayBooking" class="form-check-label">Espaço com reserva de dia inteiro</label>
+                            <small class="form-text text-muted d-block">Marque se este espaço é reservado por dia inteiro (ex: salão de festas)</small>
+                        </div>
+
+                        <div id="allDayTimesSection" style="display: none;">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label asp-for="AllDayStartTime" class="form-label">Horário de Início</label>
+                                        <input asp-for="AllDayStartTime" type="time" class="form-control" />
+                                        <small class="form-text text-muted">Horário de início da reserva (ex: 11:00)</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label asp-for="AllDayEndTime" class="form-label">Horário de Término</label>
+                                        <input asp-for="AllDayEndTime" type="time" class="form-control" />
+                                        <small class="form-text text-muted">Horário de término da reserva (ex: 22:00)</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="hourlyBookingSection" class="mb-3">
+                            <label class="form-label">Horários Disponíveis</label>
+                            <small class="form-text text-muted d-block mb-2">Selecione os horários em que o espaço estará disponível</small>
+                            <div class="row">
+                                @{
+                                    int hoursPerColumn = 4;
+                                    int totalColumns = (int)Math.Ceiling(Model.AllAvailableHours.Count / (double)hoursPerColumn);
+                                    
+                                    for (int col = 0; col < totalColumns; col++)
+                                    {
+                                        <div class="col-md-3 col-sm-6 col-12">
+                                            @for (int row = 0; row < hoursPerColumn; row++)
+                                            {
+                                                int index = col * hoursPerColumn + row;
+                                                if (index < Model.AllAvailableHours.Count)
+                                                {
+                                                    var hour = Model.AllAvailableHours[index];
+                                                    <div class="form-check mb-2">
+                                                        <input class="form-check-input" 
+                                                               type="checkbox" 
+                                                               name="SelectedHours" 
+                                                               value="@hour" 
+                                                               id="hour_@hour.Replace(":", "")" />
+                                                        <label class="form-check-label" for="hour_@hour.Replace(":", "")">
+                                                            @hour
+                                                        </label>
+                                                    </div>
+                                                }
+                                            }
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input asp-for="Availability" type="checkbox" class="form-check-input" />
+                            <label asp-for="Availability" class="form-check-label">Espaço disponível para reservas</label>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-warning">Salvar</button>
+                            <a asp-page="/Admin/Spaces/Index" class="btn btn-outline-secondary">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('imageInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImg').src = e.target.result;
+                    document.getElementById('imagePreview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                document.getElementById('imagePreview').style.display = 'none';
+            }
+        });
+        
+        document.getElementById('isAllDayBooking').addEventListener('change', function(e) {
+            const allDaySection = document.getElementById('allDayTimesSection');
+            const hourlySection = document.getElementById('hourlyBookingSection');
+            
+            if (e.target.checked) {
+                allDaySection.style.display = 'block';
+                hourlySection.style.display = 'none';
+                document.querySelectorAll('#hourlyBookingSection input[type="checkbox"]').forEach(cb => cb.checked = false);
+            } else {
+                allDaySection.style.display = 'none';
+                hourlySection.style.display = 'block';
+            }
+        });
+        
+        document.getElementById('createSpaceForm').addEventListener('submit', function(e) {
+            const isAllDay = document.getElementById('isAllDayBooking').checked;
+            const startTime = document.querySelector('input[name="AllDayStartTime"]').value;
+            const endTime = document.querySelector('input[name="AllDayEndTime"]').value;
+        });
+    </script>
+}
+

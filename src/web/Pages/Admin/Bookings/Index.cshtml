@@ -1,0 +1,96 @@
+@page
+@model web.Pages.Admin.Bookings.IndexModel
+@{
+    ViewData["Title"] = "Gerenciar Reservas";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1>Gerenciar Reservas</h1>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.Message))
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @Model.Message
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @Model.ErrorMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Usuário</th>
+                            <th>Espaço</th>
+                            <th>Data/Hora Início</th>
+                            <th>Data/Hora Fim</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var booking in Model.Bookings)
+                        {
+                            var isPast = booking.EndDateTime < DateTime.UtcNow;
+                            var isFuture = booking.StartDateTime > DateTime.UtcNow;
+                            
+                            <tr>
+                                <td>@(booking.User?.Name ?? "N/A")</td>
+                                <td>@(booking.Space?.Name ?? "N/A")</td>
+                                <td>@booking.StartDateTime.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>@booking.EndDateTime.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>
+                                    @if (isPast)
+                                    {
+                                        <span class="badge bg-secondary">Concluído</span>
+                                    }
+                                    else if (isFuture)
+                                    {
+                                        <span class="badge bg-primary">Agendado</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success">Em andamento</span>
+                                    }
+                                </td>
+                                <td>
+                                    <form method="post" asp-page-handler="Delete" asp-route-id="@booking.Id" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                                onclick="return confirm('Tem certeza que deseja cancelar esta reserva?')">
+                                            <i class="bi bi-x-circle"></i> Cancelar
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    @if (!Model.Bookings.Any())
+    {
+        <div class="text-center py-5">
+            <p class="text-muted">Nenhuma reserva encontrada.</p>
+        </div>
+    }
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+}
+

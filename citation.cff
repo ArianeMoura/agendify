@@ -1,0 +1,11 @@
+message: Please cite this software using these metadata.
+title: Agendify
+authors:
+  - family-names: Silveira Almeida Moura
+    given-names: Ariane
+keywords:
+  - Reservas
+  - Espaços
+repository-code: https://github.com/ArianeMoura/agendify
+version: 6.0.0
+date-released: 2025-12-07

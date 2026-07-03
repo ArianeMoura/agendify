@@ -1,0 +1,10 @@
+# Test Results and Coverage Reports
+TestResults/
+coverage.cobertura.xml
+*.coverage
+*.coveragexml
+
+# Build outputs
+bin/
+obj/
+

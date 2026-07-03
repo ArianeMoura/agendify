@@ -1,0 +1,96 @@
+@page
+@model web.Pages.Admin.Spaces.IndexModel
+@{
+    ViewData["Title"] = "Gerenciar Espaços";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1>Gerenciar Espaços</h1>
+                <a asp-page="/Admin/Spaces/Create" class="btn btn-warning">
+                    <i class="bi bi-plus-circle"></i> Novo Espaço
+                </a>
+            </div>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.Message))
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @Model.Message
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @Model.ErrorMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row g-4">
+        @foreach (var space in Model.Spaces)
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    @if (!string.IsNullOrEmpty(space.ImageUrl))
+                    {
+                        <img src="@($"{Model.ApiBaseUrl}{space.ImageUrl}")" 
+                             class="card-img-top" 
+                             alt="@space.Name" 
+                             style="height: 200px; object-fit: cover;" />
+                    }
+                    else
+                    {
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                             style="height: 200px;">
+                            <i class="bi bi-image" style="font-size: 3rem; color: #dee2e6;"></i>
+                        </div>
+                    }
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h5 class="card-title">@space.Name</h5>
+                            <span class="badge @(space.Availability ? "bg-success" : "bg-danger")">
+                                @(space.Availability ? "Disponível" : "Indisponível")
+                            </span>
+                        </div>
+                        <p class="card-text text-muted">@(space.Description ?? "Sem descrição")</p>
+                        <div class="mb-2">
+                            <small class="text-muted">
+                                <i class="bi bi-people"></i> Capacidade: @space.Capacity pessoas
+                            </small>
+                        </div>
+                        <div class="d-flex gap-2 mt-3">
+                            <a asp-page="/Admin/Spaces/Edit" asp-route-id="@space.Id" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-pencil"></i> Editar
+                            </a>
+                            <form method="post" asp-page-handler="Delete" asp-route-id="@space.Id" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                        onclick="return confirm('Tem certeza que deseja excluir este espaço?')">
+                                    <i class="bi bi-trash"></i> Excluir
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    @if (!Model.Spaces.Any())
+    {
+        <div class="text-center py-5">
+            <p class="text-muted">Nenhum espaço cadastrado.</p>
+            <a asp-page="/Admin/Spaces/Create" class="btn btn-warning">Criar Primeiro Espaço</a>
+        </div>
+    }
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+}
+

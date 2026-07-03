@@ -1,1 +1,40 @@
-/.DS_Store
+# ── SO / editores ─────────────────
+.DS_Store
+Thumbs.db
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# ── Saída de build .NET ───────────
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+artifacts/
+project.lock.json
+
+# ── SEGREDOS / config local ───────
+# Config por-ambiente pode conter segredos: nunca commitar.
+appsettings.Development.json
+appsettings.Production.json
+appsettings.*.Local.json
+**/Properties/launchSettings.json
+# user-secrets nunca ficam no repo, mas por garantia:
+secrets.json
+.env
+.env.*
+# exceção: os templates (sem valores reais) PODEM ser commitados:
+!.env.example
+
+# ── Node / Expo (web, mobile) ─────
+node_modules/
+.expo/
+dist/
+*.log
+
+# ── Testes / cobertura ────────────
+[Tt]est[Rr]esult*/
+coverage*.xml
+*.coverage
