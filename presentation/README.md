@@ -8,28 +8,6 @@ Com uma API estruturada em padrões REST, o Agendify promove uma comunicação c
 
 O resultado é uma solução completa e flexível, capaz de atender diferentes contextos e proporcionando uma experiência confiável, moderna e eficiente para a gestão de reservas e espaços compartilhados.
 
-## Hospedagem
-
-`🔗 Link de Acesso:`
-
-**Documentação da API:** https://agendify-api-hcakacdneufubggc.canadacentral-01.azurewebsites.net/swagger/index.html
-
-**API URL:** https://agendify-web-efcneeeya4hkfse2.canadacentral-01.azurewebsites.net/Login
-
-`🔐 Credenciais de Acesso:` 
-
-- Administrador Demo:
-
-**E-mail:** admin@agendify.com
-
-**Senha:** 12345678
-
-- Usúario Demo:
-
-**E-mail:** usuario@agendify.com
-
-**Senha:** 12345678
-
 ## ▶️ Como Rodar o App Mobile no Simulador com Expo
 
 Siga os passos abaixo para executar o Agendify em um emulador ou dispositivo físico via Expo:
@@ -48,7 +26,7 @@ Siga os passos abaixo para executar o Agendify em um emulador ou dispositivo fí
 
 **Clone** o repositório oficial:
 
-`git clone https://github.com/ICEI-PUC-Minas-PMV-ADS/pmv-ads-2025-2-e4-infra-t1-agendify/tree/main`
+`git clone https://github.com/ICEI-PUC-Minas-PMV-ADS/pmv-ads-2025-2-e4-infra-t1-agendify.git`
 
 **Navegue** até a pasta do projeto mobile:
 

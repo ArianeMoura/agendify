@@ -9,15 +9,7 @@ A metodologia incentiva a troca de conhecimento e o debate construtivo de ideias
 
 ## Relação de Ambientes de Trabalho
 
-Os artefatos do projeto foram desenvolvidos utilizando **ASP.NET (Razor Pages)** para a construção da aplicação web, enquanto o aplicativo mobile foi construído com **React Native**. Os testes e validações são realizados em desktops (browsers), dispositivos móveis físicos e emuladores. A tabela abaixo apresenta os ambientes de trabalho e suas respectivas plataformas:
-
-| Ambiente | Plataforma | Link de Acesso |
-|---------------|----------------------------------------------|----------------|
-| Design e Prototipação | Figma | https://www.figma.com/design/dcBmCPWXIaXNYU4aihH6JV/Agendify?node-id=0-1&t=8IibpANYSN4dxQAU-1 |
-| Documentação do Projeto | Github | https://github.com/ICEI-PUC-Minas-PMV-ADS/pmv-ads-2025-2-e4-infra-t1-agendify |
-| Repositório do Código Fonte | Github | https://github.com/ICEI-PUC-Minas-PMV-ADS/pmv-ads-2025-2-e4-infra-t1-agendify/tree/main/src |
-| Gerenciamento de Tarefas do Projeto | GitHub Projects | https://github.com/orgs/ICEI-PUC-Minas-PMV-ADS/projects/2246 |
-| Hospedagem | Docker (execução local) / Azure App Service (ambiente de demonstração descontinuado) | — |
+Os artefatos do projeto foram desenvolvidos utilizando **ASP.NET (Razor Pages)** para a construção da aplicação web, enquanto o aplicativo mobile foi construído com **React Native**. O design e a prototipação são feitos no **Figma**, o versionamento do código e o gerenciamento de tarefas ficam no **GitHub** (com GitHub Projects) e a hospedagem é executada localmente via **Docker**. Os testes e validações são realizados em desktops (browsers), dispositivos móveis físicos e emuladores.
 
 Durante o desenvolvimento, utilizamos **Expo** para facilitar a criação e teste da aplicação móvel, permitindo a execução em dispositivos físicos por meio do aplicativo **Expo Go**. Além disso, os emuladores são utilizados para validação do funcionamento da aplicação em diferentes cenários.
 
@@ -261,4 +253,4 @@ Para garantir um desenvolvimento eficiente e colaborativo, adotamos diversas fer
 Cada membro da equipe utiliza seu próprio computador ou notebook como ambiente de desenvolvimento configurado para suportar as tecnologias adotadas. O sistema operacional varia de acordo com a preferência individual, desde que compatível com as ferramentas utilizadas.
 
 ## Estratégia de Organização de Codificação
-Todos os artefatos relacionados à implementação e visualização dos conteúdos do projeto da aplicação estão organizados no [Código Fonte](https://github.com/ICEI-PUC-Minas-PMV-ADS/pmv-ads-2025-2-e4-infra-t1-agendify/blob/main/README.md).
+Todos os artefatos relacionados à implementação e visualização dos conteúdos do projeto da aplicação estão organizados no [Código Fonte](../src/README.md).

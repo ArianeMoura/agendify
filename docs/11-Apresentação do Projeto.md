@@ -75,10 +75,6 @@ Para textos corridos, descrições, parágrafos e conteúdos mais extensos, opta
 
 [Agendify - Apresentacao Final.pdf](https://github.com/user-attachments/files/24020521/Agendify.-.Apresentacao.Final.pdf)
 
-**Apresentação Final (vídeo):**
-
-[Vídeo de apresentação do Agendify](https://github.com/user-attachments/assets/bf534b03-1d1a-4bac-aa7f-9eb02ee9c4e7)
-
 ## Slides
 
 [Agendify Apresentacao Final.pptx](https://github.com/user-attachments/files/24020519/Agendify.Apresentacao.Final.pptx)

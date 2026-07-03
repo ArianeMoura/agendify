@@ -190,7 +190,7 @@ O projeto está **restrito** pelos itens apresentados na tabela a seguir:
 ## Diagrama de Casos de Uso
 
 <div align="center">
-<img width="700" alt="Diagrama de casos de uso" src="https://github.com/user-attachments/assets/a4f3da60-fac0-4117-a320-9f431f20b918" />
+<img width="1000" alt="Diagrama de casos de uso" src="https://github.com/user-attachments/assets/a4f3da60-fac0-4117-a320-9f431f20b918" />
 </div>
 
 <h4 align="center">FIGURA 03</h4>
