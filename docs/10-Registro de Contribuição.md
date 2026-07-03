@@ -1,8 +1,8 @@
-# Documentação do Projeto de Trabalho em Equipe
+# Registro de Contribuição
 
 ## Visão Geral
 
-Este documento apresenta, de forma detalhada, as etapas, atividades e responsabilidades da equipe no desenvolvimento do projeto **Agendify**. A construção do sistema foi organizada em cinco etapas principais, cada uma contendo tarefas específicas, prazos definidos e artefatos obrigatórios.
+Este documento apresenta, de forma detalhada, as etapas, atividades e responsabilidades da equipe no desenvolvimento do projeto **Agendify**. A construção do sistema foi organizada em cinco etapas principais, cada uma contendo tarefas específicas, prazos definidos e artefatos entregues.
 
 ## Etapa 1: Concepção, Proposta de Solução e Início da Elaboração do Projeto da Solução
 
@@ -23,7 +23,7 @@ Formar a equipe, definir o problema a ser trabalhado, e iniciar o projeto da sol
 
 ### Prazo
 
-- **Data de conclusão**: 07/09/25
+- **Data de conclusão**: 07/09/2025
 
 ---
 
@@ -55,7 +55,7 @@ Desenvolver o Back-end da aplicação distribuída, implementando uma Web API Re
 
 ### Prazo
 
-- **Data de conclusão**: 05/10/25
+- **Data de conclusão**: 05/10/2025
 
 ---
 
@@ -73,7 +73,7 @@ Desenvolver o primeiro Front-end do projeto (Web), trabalhando com modelagem de 
 - Documentação do projeto de interface e do fluxo de telas do sistema (aplicação web).
 - Implementação do projeto de interface e fluxo de telas (aplicação web).
 - Implementação e documentação dos testes de integração.
-- (Relatórios de gestão: "retrato" do Github Projects e contribuições).
+- Relatórios de gestão: "retrato" do GitHub Projects e das contribuições.
 
 ### Tarefas Específicas
 
@@ -81,12 +81,12 @@ Desenvolver o primeiro Front-end do projeto (Web), trabalhando com modelagem de 
 - Elaboração da documentação da Modelagem do Processo de Negócio e Indicadores de Desempenho.
 - Desenvolvimento e implementação da Tela de Gerenciamento de Reservas (Administrador) e da Tela de Reservas (Usuários).
 - Criação e documentação do Projeto de Interface e do Template Padrão da Aplicação, incluindo definição do design, logo, identidade visual, tipografia e elaboração dos wireframes das telas.
-- Desenvolvimento da Tela de Perfil e Dashbaord.
+- Desenvolvimento da Tela de Perfil e Dashboard.
 - Criação do Diagrama de Casos de Uso.
 
 ### Prazo
 
-- **Data de conclusão**: 26/10/25
+- **Data de conclusão**: 26/10/2025
 
 ---
 
@@ -104,7 +104,7 @@ Desenvolver o segundo Front-end do projeto (Mobile), adaptando a modelagem de pr
 - Documentação do projeto de interface e fluxo de telas (aplicação mobile).
 - Implementação do projeto de interface e fluxo de telas (aplicação mobile).
 - Implementação e documentação dos testes de sistema.
-- (Relatórios de gestão: "retrato" do Github Projects e contribuições).
+- Relatórios de gestão: "retrato" do GitHub Projects e das contribuições.
 
 ### Tarefas Específicas
 
@@ -120,7 +120,7 @@ Desenvolver o segundo Front-end do projeto (Mobile), adaptando a modelagem de pr
 
 ### Prazo
 
-- **Data de conclusão**: 16/11/25
+- **Data de conclusão**: 16/11/2025
 
 ---
 
@@ -128,7 +128,7 @@ Desenvolver o segundo Front-end do projeto (Mobile), adaptando a modelagem de pr
 
 ### Objetivo
 
-Finalizar o ciclo de desenvolvimento do projeto através da consolidação de todos os artefatos e da solução tecnológica (Web, Mobile e API). Esta etapa foca na análise crítica do processo, na avaliação das tecnologias utilizadas, na produção do documento de "Considerações Finais" e na preparação da apresentação final (vídeo e slides) para a banca examinadora.
+Finalizar o ciclo de desenvolvimento do projeto através da consolidação de todos os artefatos e da solução tecnológica (Web, Mobile e API). Esta etapa foca na análise crítica do processo, na avaliação das tecnologias utilizadas, na produção do documento de "Considerações Finais" e na preparação da apresentação final (vídeo e slides) do projeto.
 
 ### Tarefas
 
@@ -149,13 +149,10 @@ Finalizar o ciclo de desenvolvimento do projeto através da consolidação de to
 
 - **GitHub:** Para versionamento de código e revisão de pull requests.
 - **GitHub Projects:** Para gerenciamento de tarefas e acompanhamento do progresso.
-- **Whatsapp:** Para comunicação diária e rápida.
+- **WhatsApp:** Para comunicação diária e rápida.
 - **Microsoft Teams:** Para reuniões e discussões detalhadas.
 
 ### Reuniões Regulares
 
 - **Reunião semanal**: Toda segunda-feira às 22h.
 - **Reunião de revisão**: Sempre que necessário e ao final de cada etapa para revisar o progresso e ajustar o plano.
-
-
-

@@ -9,7 +9,7 @@ A metodologia incentiva a troca de conhecimento e o debate construtivo de ideias
 
 ## Relação de Ambientes de Trabalho
 
-Os artefatos do projeto serão desenvolvidos utilizando **ASP NET (Razor Pages)** para a construção da aplicação web e mobile será utilizado o **React Native**. Os testes e validações serão realizados em desktops (browsers), dispositivos móveis físicos e emuladores. A tabela abaixo apresenta os ambientes de trabalho e suas respectivas plataformas:
+Os artefatos do projeto foram desenvolvidos utilizando **ASP.NET (Razor Pages)** para a construção da aplicação web, enquanto o aplicativo mobile foi construído com **React Native**. Os testes e validações são realizados em desktops (browsers), dispositivos móveis físicos e emuladores. A tabela abaixo apresenta os ambientes de trabalho e suas respectivas plataformas:
 
 | Ambiente | Plataforma | Link de Acesso |
 |---------------|----------------------------------------------|----------------|
@@ -17,9 +17,9 @@ Os artefatos do projeto serão desenvolvidos utilizando **ASP NET (Razor Pages)*
 | Documentação do Projeto | Github | https://github.com/ICEI-PUC-Minas-PMV-ADS/pmv-ads-2025-2-e4-infra-t1-agendify |
 | Repositório do Código Fonte | Github | https://github.com/ICEI-PUC-Minas-PMV-ADS/pmv-ads-2025-2-e4-infra-t1-agendify/tree/main/src |
 | Gerenciamento de Tarefas do Projeto | GitHub Projects | https://github.com/orgs/ICEI-PUC-Minas-PMV-ADS/projects/2246 |
-| Hospedagem | a definir | https://agendify-web-efcneeeya4hkfse2.canadacentral-01.azurewebsites.net/Login |
+| Hospedagem | Docker (execução local) / Azure App Service (ambiente de demonstração descontinuado) | — |
 
-Durante o desenvolvimento, utilizaremos **Expo** para facilitar a criação e teste da aplicação móvel, permitindo a execução em dispositivos físicos por meio do aplicativo **Expo Go**. Além disso, os emuladores serão utilizados para validação do funcionamento da aplicação em diferentes cenários.
+Durante o desenvolvimento, utilizamos **Expo** para facilitar a criação e teste da aplicação móvel, permitindo a execução em dispositivos físicos por meio do aplicativo **Expo Go**. Além disso, os emuladores são utilizados para validação do funcionamento da aplicação em diferentes cenários.
 
 ## Controle de Versão
 
@@ -101,13 +101,13 @@ Durante essa fase, a equipe estruturou toda a documentação de contexto e espec
 
 **Evidências:**
 
-- Documento de contexto consolidado, com definição clara do problema edos objetivos do projeto;
+- Documento de contexto consolidado, com definição clara do problema e dos objetivos do projeto;
 - Primeiras versões dos diagramas UML e matriz de rastreabilidade concluídas;
 - Planejamento detalhado do gerenciamento do projeto, incluindo cronograma e divisão de papéis.
   
 <h4 align="center">Etapa 2:</h4>
 
-![FIGURA 02 - Quadro de Kanban](https://github.com/user-attachments/assets/94336e48-b975-4825-870e-5740c2684145)
+![Quadro Kanban da Etapa 2](https://github.com/user-attachments/assets/94336e48-b975-4825-870e-5740c2684145)
 
 <h4 align="center">FIGURA 08 - Quadro Kanban</h4>
 
@@ -123,7 +123,7 @@ Na segunda etapa, o foco esteve na continuidade da elaboração do projeto e no 
 
 Com a estrutura do projeto bem definida, a equipe iniciou as implementações essenciais, focando na organização e consistência da aplicação. As principais ações realizadas foram:
 - Definição e construção das collections necessárias no modelo NoSQL.
-- Desenvolvimento do backend (API), garantindo a estrutura para gerenciar espaços e seus recursos, reservas, usuários, autenticação alinhada as necessidades do projeto;
+- Desenvolvimento do backend (API), garantindo a estrutura para gerenciar espaços e seus recursos, reservas, usuários, autenticação alinhada às necessidades do projeto;
 
 **Evidências:**
 
@@ -134,7 +134,7 @@ Com a estrutura do projeto bem definida, a equipe iniciou as implementações es
 
 <h4 align="center">Etapa 3:</h4>
 
-![FIGURA 03 - Quadro de Kanban](https://github.com/user-attachments/assets/a1e1f442-1601-41ef-a7f7-aa647ccc921a)
+![Quadro Kanban da Etapa 3](https://github.com/user-attachments/assets/a1e1f442-1601-41ef-a7f7-aa647ccc921a)
 
 <h4 align="center">FIGURA 09 - Quadro Kanban</h4>
 
@@ -159,12 +159,12 @@ Com a estrutura do projeto bem definida, a equipe iniciou as implementações es
 
 - Modelagem de processos de negócio finalizada (BPMN);
 - Wireframes e diagramas de fluxo concluídos, representando a jornada do usuário na aplicação;
-- Atualizado a arquitetura da aplicação documentada e validada, garantindo alinhamento com os requisitos do projeto;
+- Atualização da arquitetura da aplicação, documentada e validada, garantindo alinhamento com os requisitos do projeto;
 - Código fonte da implementação referente ao Front-end Web;
 
 <h4 align="center">Etapa 4:</h4>
 
-![WhatsApp Image 2025-11-16 at 23 46 29](https://github.com/user-attachments/assets/fdc68bfa-8201-42cf-b454-e22a3e2c2736)
+![Quadro Kanban da Etapa 4](https://github.com/user-attachments/assets/fdc68bfa-8201-42cf-b454-e22a3e2c2736)
 
 <h4 align="center">FIGURA 10 - Quadro Kanban</h4>
 
@@ -228,11 +228,11 @@ Para garantir um desenvolvimento eficiente e colaborativo, adotamos diversas fer
 
 *1. Ferramentas de Desenvolvimento*
 
-> **GitHub**: Plataforma essencial para o versionamento do código e colaboração entre os membros da equipe. No GitHub, utilizamos     repositórios privados para armazenar o código-fonte, garantindo organização e controle das versões. Além disso, realizamos commits frequentes e trabalhamos com branches para desenvolver novas funcionalidades ou corrigir bugs de forma isolada antes da integração ao código principal. O GitHub também é usado para gerenciamento ágil por meio do Quadro Kanban, facilitando a distribuição e acompanhamento das tarefas.
+> **GitHub**: Plataforma essencial para o versionamento do código e colaboração entre os membros da equipe. No GitHub, utilizamos repositórios para armazenar o código-fonte, garantindo organização e controle das versões. Além disso, realizamos commits frequentes e trabalhamos com branches para desenvolver novas funcionalidades ou corrigir bugs de forma isolada antes da integração ao código principal. O GitHub também é usado para gerenciamento ágil por meio do Quadro Kanban, facilitando a distribuição e acompanhamento das tarefas.
  
 > **C# / .NET (ASP.NET Core)**: Framework de desenvolvimento backend baseado na linguagem C#. Utilizado para construir APIs e serviços no lado do servidor, oferecendo desempenho, escalabilidade e suporte a operações assíncronas.
 
-> **ASP NET (Razor Pages)**: Razor Pages é um recurso do ASP.NET Core para construir aplicações web orientadas a páginas usando a sintaxe Razor (HTML + C#).
+> **ASP.NET (Razor Pages)**: Razor Pages é um recurso do ASP.NET Core para construir aplicações web orientadas a páginas usando a sintaxe Razor (HTML + C#).
 
 > **React Native**: Biblioteca baseada no React, utilizada para o desenvolvimento do aplicativo móvel. Foi escolhida por permitir a criação de aplicativos nativos para iOS e Android com uma única base de código, otimizando tempo e recursos da equipe.
 
@@ -261,4 +261,4 @@ Para garantir um desenvolvimento eficiente e colaborativo, adotamos diversas fer
 Cada membro da equipe utiliza seu próprio computador ou notebook como ambiente de desenvolvimento configurado para suportar as tecnologias adotadas. O sistema operacional varia de acordo com a preferência individual, desde que compatível com as ferramentas utilizadas.
 
 ## Estratégia de Organização de Codificação
-Todos os artefatos relacionados à implementação e visualização dos conteúdos do projeto da aplicação serão inseridos no [Código Fonte](https://github.com/ICEI-PUC-Minas-PMV-ADS/pmv-ads-2025-2-e4-infra-t1-agendify/blob/main/README.md).
+Todos os artefatos relacionados à implementação e visualização dos conteúdos do projeto da aplicação estão organizados no [Código Fonte](https://github.com/ICEI-PUC-Minas-PMV-ADS/pmv-ads-2025-2-e4-infra-t1-agendify/blob/main/README.md).

@@ -2,16 +2,21 @@
 
 <br>
 
-<img width="1920" height="1080" alt="agendify-arch" src="https://github.com/user-attachments/assets/bab45620-af3e-41f2-b982-700e34355752" />
+<div align="center">
+<img width="800" alt="agendify-arch" src="https://github.com/user-attachments/assets/bab45620-af3e-41f2-b982-700e34355752" />
+</div>
+
 <h4 align="center">FIGURA 18 - Fluxo de Interação do Usuário com o Sistema</h4>
 
 ## Diagrama de Classes
 
-O diagrama de classes ilustra graficamente como será a estrutura do software, e
-como cada uma das classes da sua estrutura estarão interligadas. Essas classes
-servem de modelo para materializar os objetos que executarão na memória.
+O diagrama de classes ilustra graficamente como é a estrutura do software e
+como cada uma das classes da sua estrutura se interliga. Essas classes
+servem de modelo para materializar os objetos que executam na memória.
 
-<img width="3840" height="2765" alt="agendify-architecture" src="https://github.com/user-attachments/assets/8a4f1fc2-fedd-4d8a-b8a5-31a2bde55a31" />
+<div align="center">
+<img width="800" alt="agendify-architecture" src="https://github.com/user-attachments/assets/8a4f1fc2-fedd-4d8a-b8a5-31a2bde55a31" />
+</div>
 
 <h4 align="center">FIGURA 19</h4>
 
@@ -30,7 +35,7 @@ Armazena as informações dos usuários do sistema.
 
 #### Estrutura do Documento
 
-```Json
+```json
 {
     "_id": "ObjectId('5f7e1bbf9b2a4f1a9c38b9a1')",
     "name": "John Doe",
@@ -62,7 +67,7 @@ reservados pelos usuários.
 
 #### Estrutura do Documento
 
-```Json
+```json
 {
     "_id": "ObjectId('60b8d6d2f1c2a2a9e4d1b2a3')",
     "name": "Salão de Festas",
@@ -145,9 +150,9 @@ Armazena os recursos disponíveis nos espaços do condomínio.
 > - **createdAt:** Data e hora de criação do registro do recurso.  
 > - **updatedAt:** Data e hora da última atualização dos dados do recurso.
 
-## Relações entre as Collections
+## Relações entre as Coleções
 
-Embora o MongoDB seja um banco de dados não relacional, as collections deste sistema se relacionam por meio de **referências entre IDs**, garantindo integridade e coerência dos dados.
+Embora o MongoDB seja um banco de dados não relacional, as coleções deste sistema se relacionam por meio de **referências entre IDs**, garantindo integridade e coerência dos dados.
 
 ### users ↔ bookings  
 Cada reserva (`booking`) é sempre associada a um usuário (`user`).
@@ -199,7 +204,7 @@ Cada espaço (`space`) pode conter uma lista de recursos (`resources`) disponív
 
 ## Resumo
 
-| Collection   | Finalidade Principal                                | Relacionamentos                        |
+| Coleção      | Finalidade Principal                                | Relacionamentos                        |
 |--------------|------------------------------------------------------|----------------------------------------|
 | **users**     | Armazena dados dos usuários.                        | Relaciona-se com `bookings`            |
 | **spaces**    | Representa os espaços disponíveis no condomínio.    | Relaciona-se com `bookings` e `resources` |
@@ -209,9 +214,9 @@ Cada espaço (`space`) pode conter uma lista de recursos (`resources`) disponív
 
 ## Tecnologias Utilizadas
 
-Para o desenvolvimento do Agendify, uma solução para gerenciamento de espaços, utilizaremos um conjunto de tecnologias modernas que garantem eficiência, escalabilidade e uma experiência de usuário fluida. A seguir, apresentamos as **principais ferramentas** e **tecnologias** adotadas, abrangendo desde o design do aplicativo até a estrutura de banco de dados e o back-end da solução:
+Para o desenvolvimento do Agendify, uma solução para gerenciamento de espaços, utilizamos um conjunto de tecnologias modernas que garantem eficiência, escalabilidade e uma experiência de usuário fluida. A seguir, apresentamos as **principais ferramentas** e **tecnologias** adotadas, abrangendo desde o design do aplicativo até a estrutura de banco de dados e o back-end da solução:
 
-> **ASP NET (Razor Pages)**: Razor Pages é um recurso do ASP.NET Core para construir aplicações web orientadas a páginas usando a sintaxe Razor (HTML + C#).
+> **ASP.NET (Razor Pages)**: Razor Pages é um recurso do ASP.NET Core para construir aplicações web orientadas a páginas usando a sintaxe Razor (HTML + C#).
 
 > **React Native:**  Framework utilizado para o desenvolvimento do aplicativo mobile, permitindo a criação de interfaces nativas para Android e iOS a partir de um único código, proporcionando uma experiência fluida e responsiva.
 
@@ -235,15 +240,19 @@ Para o desenvolvimento do Agendify, uma solução para gerenciamento de espaços
 
 A qualidade de software pode ser definida como um conjunto de características que garantem que um produto atenda às expectativas dos usuários e stakeholders. Para assegurar um alto nível de qualidade no desenvolvimento do Agendify, um sistema de reservas de espaços em condomínios, utilizamos como base a norma internacional **ISO/IEC 25010**, que define características e subcaracterísticas essenciais para um software confiável, eficiente e intuitivo. As subcaracterísticas selecionadas e suas respectivas justificativas são apresentadas a seguir:
 
-**1. Funcionalidade**
+**1. Adequação Funcional**
 
-- **Adequação Funcional:** O Agendify deve atender plenamente às necessidades dos usuários, garantindo que todas as funcionalidades de reserva e gerenciamento de espaços sejam implementadas corretamente e de forma eficiente.
+- **Completude Funcional:** O Agendify deve atender plenamente às necessidades dos usuários, garantindo que todas as funcionalidades de reserva e gerenciamento de espaços sejam implementadas.
 
-- **Precisão:** O processamento de disponibilidade, conflitos de agendamento e regras de uso deve ser exato, evitando inconsistências que possam comprometer a confiabilidade das informações.
+- **Correção Funcional:** O processamento de disponibilidade, conflitos de agendamento e regras de uso deve ser exato, evitando inconsistências que possam comprometer a confiabilidade das informações.
 
-- **Segurança:** Como o aplicativo lida com dados pessoais de moradores e registros de reservas, é essencial garantir proteção contra acessos não autorizados e vazamento de informações.
+**2. Segurança**
 
-**2. Confiabilidade**
+- **Confidencialidade e Integridade:** Como o aplicativo lida com dados pessoais dos usuários e registros de reservas, é essencial garantir proteção contra acessos não autorizados e vazamento de informações.
+
+- **Autenticidade:** O sistema deve assegurar que cada ação seja atribuída a um usuário devidamente autenticado, apoiando auditoria e responsabilização.
+
+**3. Confiabilidade**
 
 - **Maturidade:** O Agendify deve ser testado rigorosamente para minimizar falhas e evitar interrupções no serviço.
 
@@ -251,7 +260,7 @@ A qualidade de software pode ser definida como um conjunto de características q
 
 - **Tolerância a Falhas:** Em caso de falhas ou erros, o sistema deve ser capaz de se recuperar rapidamente, minimizando impactos para o usuário.
 
-**3. Usabilidade**
+**4. Usabilidade**
 
 - **Apreensibilidade:** A interface do Agendify deve ser intuitiva, facilitando o aprendizado e a navegação para usuários com diferentes níveis de experiência.
 
@@ -259,13 +268,13 @@ A qualidade de software pode ser definida como um conjunto de características q
 
 - **Acessibilidade:** Deve-se garantir que o app seja utilizável por pessoas com diferentes necessidades, incluindo suporte para acessibilidade digital.
 
-**4. Eficiência de Desempenho**
+**5. Eficiência de Desempenho**
 
 - **Tempo de Resposta:** O Agendify deve apresentar respostas rápidas nas interações, evitando lentidões que possam prejudicar a experiência do usuário.
 
 - **Utilização de Recursos:** A aplicação deve ser otimizada para consumir o mínimo de recursos do dispositivo, garantindo um funcionamento eficiente sem sobrecarga de processamento ou memória.
 
-**5. Manutenibilidade**
+**6. Manutenibilidade**
 
 - **Modularidade:** A estrutura do código deve ser organizada de forma modular, permitindo a implementação e atualização de funcionalidades sem comprometer o restante do sistema.
 
@@ -273,7 +282,7 @@ A qualidade de software pode ser definida como um conjunto de características q
 
 - **Analisabilidade:** O sistema deve permitir diagnósticos rápidos para identificar falhas e otimizar o processo de correção de erros.
 
-**6. Portabilidade**
+**7. Portabilidade**
 
 - **Adaptabilidade:** O Agendify deve ser compatível com diferentes dispositivos móveis e sistemas operacionais, proporcionando uma experiência consistente.
 
@@ -281,7 +290,7 @@ A qualidade de software pode ser definida como um conjunto de características q
 
 **Métricas para Avaliação da Qualidade**
 
-Para garantir que as subcaracterísticas selecionadas sejam atendidas, algumas métricas serão utilizadas:
+Para garantir que as subcaracterísticas selecionadas sejam atendidas, algumas métricas são utilizadas:
 
 - *Índice de satisfação do usuário:* Coletada por meio de feedbacks e avaliações na loja de aplicativos.
 - *Taxa de erros funcionais e falhas:* Avalia a frequência de falhas críticas e erros reportados pelos usuários.
@@ -293,27 +302,13 @@ Para garantir que as subcaracterísticas selecionadas sejam atendidas, algumas m
 - *Consumo de Recursos:* Monitoramento da utilização e memória do dispositivo.
 - *Taxa de Acessibilidade:* Percentual de conformidade com diretrizes de acessibilidade.
 
-Ao adotar essas práticas e a implementação e monitoramento contínuo dessas métricas, o Agendify garantirá um alto padrão de qualidade, proporcionando aos usuários uma experiência confiável, segura e eficiente na gestão de reservas condominiais.
+Ao adotar essas práticas e o monitoramento contínuo dessas métricas, o Agendify busca um alto padrão de qualidade, proporcionando aos usuários uma experiência confiável, segura e eficiente na gestão de reservas.
 
 ## Hospedagem
 
-`🔗 Link de Acesso:`
+A aplicação foi implantada em um ambiente de demonstração no **Azure App Service** (API e Web) durante o desenvolvimento. Esse ambiente foi **descontinuado**, e a documentação da API (Swagger) e as interfaces Web/Mobile passam a ser executadas localmente.
 
-**Documentação da API:** https://agendify-api-hcakacdneufubggc.canadacentral-01.azurewebsites.net/swagger/index.html
+Para execução local, o projeto disponibiliza um `docker-compose.yml` (ver diretório `docker/`) que sobe a API, o banco de dados MongoDB e os serviços de apoio. As instruções de execução estão no [Código Fonte](../src/README.md).
 
-**API URL:** https://agendify-web-efcneeeya4hkfse2.canadacentral-01.azurewebsites.net/Login
-
-`🔐 Credenciais de Acesso:` 
-
-- Administrador:
-
-**E-mail:** admin@agendify.com
-
-**Senha:** 12345678
-
-- Usúario:
-
-**E-mail:** usuario@agendify.com
-
-**Senha:** 12345678
+> As credenciais de acesso de demonstração (perfis de administrador e usuário) são fornecidas sob solicitação e devem ser configuradas via *seed* local — não são versionadas no repositório por segurança.
 

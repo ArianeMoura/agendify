@@ -4,7 +4,7 @@ O uso compartilhado de espaços — como salas de reunião, quadras esportivas, 
 
 O fenômeno dos chamados condomínios-clube, empreendimentos residenciais que oferecem ampla infraestrutura de lazer e serviços, ilustra essa tendência de valorização de ambientes coletivos (Firpo, 2023). Nesse cenário, cresce a demanda por soluções digitais capazes de simplificar a reserva, o monitoramento e a gestão desses espaços de maneira integrada e eficiente.
 
-É nesse contexto que surge o Agendify, uma plataforma distribuída (Web, Mobile e API) projetada para modernizar o gerenciamento de ambientes compartilhados. Com arquitetura escalável e camadas robustas de segurança, o sistema oferecerá reservas em tempo real, aplicação automática de regras de uso, alertas personalizados e painéis analíticos que transformam dados de ocupação em insights estratégicos. Voltado a condomínios, empresas, universidades, centros esportivos, bibliotecas, coworkings, centros culturais e órgãos públicos, o Agendify garantirá fluidez operacional, prevenção de conflitos e otimização no aproveitamento de cada espaço.
+É nesse contexto que surge o Agendify, uma plataforma distribuída (Web, Mobile e API) projetada para modernizar o gerenciamento de ambientes compartilhados. Com arquitetura escalável e camadas robustas de segurança, o sistema oferece reservas em tempo real, aplicação automática de regras de uso, alertas personalizados e painéis analíticos que transformam dados de ocupação em insights estratégicos. Voltado a condomínios, empresas, universidades, centros esportivos, bibliotecas, coworkings, centros culturais e órgãos públicos, o Agendify busca fluidez operacional, prevenção de conflitos e otimização no aproveitamento de cada espaço.
 
 ## Problema
 
@@ -31,7 +31,7 @@ Desenvolver o **Agendify**, uma plataforma para gerenciamento e reserva de espa�
 - Integrar notificações para confirmações, lembretes e alterações de reserva;
 - Disponibilizar relatórios e dashboards com métricas (taxa de ocupação, horários de pico, volume de reservas);
 - Garantir segurança (autenticação, autorização, logs de auditoria);
-- Adotar arquitetura distribuída e escalável (API em C#, armazenamento híbrido, front em React/React Native).
+- Adotar arquitetura distribuída e escalável (API em C#/.NET, banco de dados MongoDB, web em ASP.NET Razor Pages e mobile em React Native).
 
 ## Justificativa
 
@@ -45,43 +45,10 @@ No âmbito social e econômico, o Agendify tem potencial para gerar impactos pos
 
 ## Público-Alvo
 
-O Agendify destina-se aos seguintes públicos: 
+O Agendify destina-se aos seguintes públicos:
 
 - **Gestores e administradores de espaços:** síndicos, facilities managers, gerentes de campus, responsáveis por operação e manutenção.
 - **Usuários finais:** moradores, funcionários, estudantes, visitantes e profissionais que reservam e utilizam espaços.
 - **Prestadores de serviço e terceiros:** professores, instrutores, prestadores de eventos e fornecedores que ofertam serviços agregados.
 - **Operadores comerciais de espaços compartilhados:** gestores de coworkings, centros esportivos e culturais.
 - **Órgãos públicos e instituições de ensino:** para reserva de salas, auditórios e laboratórios.
-
-<!-- Versão Antiga 
-
-# Introdução
-
-Os chamados condomínios-clube vêm se consolidando como tendência do mercado imobiliário no Brasil, oferecendo aos moradores uma ampla gama de serviços e espaços de lazer sem a necessidade de deslocamento. Piscinas, academias, quadras poliesportivas, coworkings, feiras semanais, minimercados como o Honest Market e até serviços pet fazem parte dessa realidade. A pandemia acelerou esse movimento, transformando os empreendimentos em verdadeiras mini-cidades que combinam segurança, conveniência e qualidade de vida.
-
-https://veja.abril.com.br/coluna/real-estate/os-condominios-clubes-dominam-a-cena-no-mercado-imobiliario/
-
-## Problema
-
-Apesar da diversidade de espaços e serviços, muitos condomínios enfrentam dificuldades no gerenciamento e na organização do uso coletivo. Conflitos de agendamento em quadras, excesso de demanda em coworkings e academias, além da falta de um controle digital centralizado, podem comprometer a experiência do morador e a eficiência da administração condominial.
-
-## Objetivos
-
-> Desenvolver uma plataforma de reservas (web e mobile) exclusiva para moradores e administradores de condomínios-clube.
-> Permitir a reserva de espaços como quadras, salões de festa, brinquedotecas, coworkings, academias e até serviços extras (como barbeiros e aulas esportivas).
-> Oferecer consulta em tempo real, com bloqueio automático de horários já ocupados.
-> Fornecer ferramentas administrativas para cadastro de ambientes, regras de uso, limites de capacidade e relatórios de utilização.
-> Garantir uma arquitetura distribuída segura e escalável (API em C#, banco MongoDB, front em React Native/Web).
-> Integrar notificações (push/email) para confirmações, lembretes e comunicados condominiais.
- 
-## Justificativa
-
-O sistema é necessário para aprimorar a vida comunitária em condomínios-clube, melhorando a eficiência no uso dos espaços comuns e evitando conflitos. Além disso, facilita o trabalho dos síndicos, administradoras e zeladorias, trazendo transparência e comodidade para moradores, em sintonia com o conceito de condomínios inteligentes que o mercado imobiliário está valorizando.
-
-## Público-Alvo
-
-> Administradores/Síndicos: responsáveis pela gestão das áreas comuns e pela comunicação com moradores.
-> Moradores de condomínios-clube: famílias, estudantes e profissionais em home-office que utilizam as áreas de lazer e serviços.
-> Prestadores de Serviço: professores de esportes, cabeleireiros, monitores de recreação, que podem usar a plataforma para agendamento.
-
--->

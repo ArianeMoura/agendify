@@ -10,30 +10,31 @@ Eles garantem que:
 
 O objetivo destes testes é simular o comportamento real dos aplicativos Front-end (Web e Mobile) consumindo a API, garantindo que fluxos complexos de negócio — como a tentativa de reserva em horário conflitante — resultem nas respostas adequadas para o usuário final.
 
-## Configuração do Ambiente de Testes 
+## Configuração do Ambiente de Testes
 
-Para a execução dos testes de sistema em .NET, utilizamos a biblioteca `Microsoft.AspNetCore.Mvc.Testing.` Ela permite criar um servidor de teste em memória (TestServer) que sobe a aplicação Agendify inteira, permitindo chamadas HTTP reais sem a necessidade de hospedar a API externamente.
+Para a execução dos testes de sistema em .NET, utilizamos a biblioteca `Microsoft.AspNetCore.Mvc.Testing`. Ela permite criar um servidor de teste em memória (TestServer) que sobe a aplicação Agendify inteira, permitindo chamadas HTTP reais sem a necessidade de hospedar a API externamente.
 
 **Tecnologias Utilizadas:**
 
-**Framework:** .NET 9.0 </br>
-**Test Runner:** xUnit </br>
-**Client Simulator:** `WebApplicationFactory<Program>` </br>
-**Banco de Dados:** MongoDB Atlas </br>
+**Framework:** .NET 9.0 <br/>
+**Test Runner:** NUnit 4.2.2 <br/>
+**Client Simulator:** `WebApplicationFactory<Program>` <br/>
+**Banco de Dados:** MongoDB (execução local via Docker) <br/>
 
 **Estrutura do Projeto de Testes:**
 
-    
-    tests/
-    └── Agendify.SystemTests/
+```
+src/
+└── api.Tests/
     ├── Setup/
-    │   └── CustomWebApplicationFactory.cs  # Configura o servidor de teste
+    │   └── CustomWebApplicationFactory.cs   # Configura o servidor de teste
     ├── Scenarios/
-    │   ├── Bookings.cs            # Fluxos de Reservas
-    │   └── Spaces.cs              # Fluxos de Espaços
+    │   ├── BookingsSystemTests.cs           # Fluxos de Reservas
+    │   └── SpacesSystemTests.cs             # Fluxos de Espaços
     └── Utils/
-        └── HttpHelper.cs                   # Auxiliares para JSON  
-    
+        └── HttpHelper.cs                    # Auxiliares para JSON
+```
+
 
 ## Cenários de Teste de Sistema
 
@@ -54,6 +55,7 @@ Baseado nos testes unitários (lógica de `IsSpaceAvailable`) e de integração 
 **Implementação (C#):**
 
 ```csharp
+[Test]
 public async Task Flow_CreateSpaceAndBooking_ShouldReturnSuccess()
 {
     var client = _factory.CreateClient();
@@ -75,11 +77,11 @@ public async Task Flow_CreateSpaceAndBooking_ShouldReturnSuccess()
     };
     var bookingResponse = await client.PostAsJsonAsync("/api/bookings", bookingPayload);
 
-    Assert.Equal(HttpStatusCode.Created, bookingResponse.StatusCode);
-    
+    Assert.That(bookingResponse.StatusCode, Is.EqualTo(HttpStatusCode.Created));
+
     var createdBooking = await bookingResponse.Content.ReadFromJsonAsync<Booking>();
-    Assert.NotNull(createdBooking.Id);
-    Assert.Equal(createdSpace.Id, createdBooking.SpaceId);
+    Assert.That(createdBooking.Id, Is.Not.Null);
+    Assert.That(createdBooking.SpaceId, Is.EqualTo(createdSpace.Id));
 }
 ```
 
@@ -96,6 +98,7 @@ public async Task Flow_CreateSpaceAndBooking_ShouldReturnSuccess()
 **Implementação (C#):**
 
 ```csharp
+[Test]
 public async Task Flow_BookingConflict_ShouldReturnBadRequest()
 {
     var client = _factory.CreateClient();
@@ -117,12 +120,12 @@ public async Task Flow_BookingConflict_ShouldReturnBadRequest()
     var responseA = await client.PostAsJsonAsync("/api/bookings", bookingA);
     var responseB = await client.PostAsJsonAsync("/api/bookings", bookingB);
 
-    Assert.Equal(HttpStatusCode.Created, responseA.StatusCode); 
-    
-    Assert.Equal(HttpStatusCode.BadRequest, responseB.StatusCode); 
-    
+    Assert.That(responseA.StatusCode, Is.EqualTo(HttpStatusCode.Created));
+
+    Assert.That(responseB.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+
     var errorContent = await responseB.Content.ReadAsStringAsync();
-    Assert.Contains("conflito", errorContent.ToLower());
+    Assert.That(errorContent.ToLower(), Does.Contain("conflito"));
 }
 ```
 
@@ -139,9 +142,9 @@ public async Task Flow_BookingConflict_ShouldReturnBadRequest()
 **Implementação (C#):**
 
 ```csharp
+[Test]
 public async Task Flow_DisabledSpace_ShouldBlockNewBookings()
 {
-
     var client = _factory.CreateClient();
     var space = await CreateSpaceAsync(client); 
 
@@ -156,24 +159,24 @@ public async Task Flow_DisabledSpace_ShouldBlockNewBookings()
     };
     var bookingResponse = await client.PostAsJsonAsync("/api/bookings", booking);
 
-    Assert.Equal(HttpStatusCode.BadRequest, bookingResponse.StatusCode);
-    
+    Assert.That(bookingResponse.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+
     var errorMsg = await bookingResponse.Content.ReadAsStringAsync();
-    Assert.Contains("não está disponível", errorMsg);
+    Assert.That(errorMsg, Does.Contain("não está disponível"));
 }
 ```
 
 ## Matriz de Cobertura dos Testes de Sistema
 
-Abaixo, relacionamos os testes de sistema propostos com os componentes que eles validam integralmente.
+Abaixo, relacionamos os testes de sistema com os componentes que eles validam integralmente. Os cenários **TS-01 a TS-03 estão implementados** (código acima); **TS-04 e TS-05 estão planejados** para a próxima iteração.
 
-| ID | Cenário de Teste | Componentes Envolvidos | Status HTTP Esperado |
-| :--- | :--- | :--- | :--- |
-| **TS-01** | Criação de Espaço e Reserva (Caminho Feliz) | `SpacesController` -> `BookingsController` -> `DB` | 201 (Created) |
-| **TS-02** | Tentativa de Reserva com Conflito de Horário | `BookingsController` -> `Services (Lógica)` -> `DB` | 400 (Bad Request) |
-| **TS-03** | Tentativa de Reserva em Espaço Desativado | `SpacesController (Update)` -> `BookingsController` | 400 (Bad Request) |
-| **TS-04** | Consulta de Histórico de Reservas | `BookingsController (Get)` -> `DB` | 200 (OK) |
-| **TS-05** | Exclusão de Reserva e Liberação de Horário | `BookingsController (Delete)` -> `Create (Novo)` | 204 -> 201 |
+| ID | Cenário de Teste | Componentes Envolvidos | Status HTTP Esperado | Situação |
+| :--- | :--- | :--- | :--- | :--- |
+| **TS-01** | Criação de Espaço e Reserva (Caminho Feliz) | `SpacesController` -> `BookingsController` -> `DB` | 201 (Created) | Implementado |
+| **TS-02** | Tentativa de Reserva com Conflito de Horário | `BookingsController` -> `Services (Lógica)` -> `DB` | 400 (Bad Request) | Implementado |
+| **TS-03** | Tentativa de Reserva em Espaço Desativado | `SpacesController (Update)` -> `BookingsController` | 400 (Bad Request) | Implementado |
+| **TS-04** | Consulta de Histórico de Reservas | `BookingsController (Get)` -> `DB` | 200 (OK) | Planejado |
+| **TS-05** | Exclusão de Reserva e Liberação de Horário | `BookingsController (Delete)` -> `Create (Novo)` | 204 -> 201 | Planejado |
 
 ## Conclusão
 

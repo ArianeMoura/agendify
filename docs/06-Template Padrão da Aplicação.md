@@ -1,6 +1,6 @@
 # Template Padrão da Aplicação
 
-O **Agendify** é uma aplicação distribuída que integrará Web, Mobile e API para facilitar o processo de **reservas de espaços** de forma simples e eficiente. Seu objetivo será oferecer uma solução prática, escalável e segura para o gerenciamento de ambientes compartilhados.
+O **Agendify** é uma aplicação distribuída que integra Web, Mobile e API para facilitar o processo de **reservas de espaços** de forma simples e eficiente. Seu objetivo é oferecer uma solução prática, escalável e segura para o gerenciamento de ambientes compartilhados.
 
 Para alcançar esse objetivo, desenvolvemos uma identidade visual consistente e alinhada aos valores e à proposta da aplicação. A seguir, apresentamos os principais elementos que compõem essa identidade.
 
@@ -29,7 +29,7 @@ Para alcançar esse objetivo, desenvolvemos uma identidade visual consistente e 
 ### Paleta de Cores:
 
 <div align="center">
-<img width="400" height="4840" alt="Frame 1" src="https://github.com/user-attachments/assets/51a9a38b-7632-473a-ab2e-357d03d7a1f6" />
+<img width="280" alt="Frame 1" src="https://github.com/user-attachments/assets/51a9a38b-7632-473a-ab2e-357d03d7a1f6" />
 </div>
 
 <h4 align="center">FIGURA 21</h4>
@@ -54,7 +54,7 @@ O amarelo é usado estrategicamente para guiar o usuário, destacando botões de
 
 O equilíbrio entre o roxo (cor fria) e o amarelo/laranja (cores quentes) cria uma interface dinâmica que é, ao mesmo tempo, séria e convidativa.
 
-### Tipografia
+## Tipografia
 
 **Fonte da Logomarca:**
 

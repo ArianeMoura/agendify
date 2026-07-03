@@ -4,63 +4,49 @@ Esta seção detalha as especificações do projeto **Agendify**, apresentando u
 
 ## Personas
 
-| Sofia Almeida | <div align="center">![pexels-olly-774909](https://github.com/user-attachments/assets/92cc7311-eba7-4a05-acd8-db85f54a6384)</div> |
+As personas a seguir representam os principais arquétipos de usuário do Agendify, cobrindo tanto o uso residencial (condomínios) quanto o uso comercial (operadores de espaços compartilhados).
+
+| Sofia Almeida | <div align="center"><img width="200" alt="Foto de Sofia Almeida" src="https://github.com/user-attachments/assets/92cc7311-eba7-4a05-acd8-db85f54a6384" /></div> |
 | :--- | :--- |
 | **Idade:** | 38 |
-| **Ocupação:** | Arquiteta e mãe |
-| **Motivações:** | Quer otimizar o tempo e organizar as atividades da família (aulas de natação dos filhos, churrasco no fim de semana) de forma prática e centralizada, aproveitando ao máximo a estrutura do condomínio. |
+| **Ocupação:** | Arquiteta (moradora) |
+| **Perfil:** | Mãe de dois filhos, mora em um condomínio-clube e coordena a rotina de lazer da família. |
+| **Objetivos:** | Reservar piscina, brinquedoteca e salão de festas de forma centralizada, aproveitando a estrutura do condomínio sem conflitos de horário. |
 | **Frustrações:** | O sistema atual de agendamento é ineficiente e já causou conflitos de horário com outros moradores. A comunicação sobre interdição de áreas é falha. |
-| **Hobbies:** | Dar festas, praticar ioga e ler perto da piscina. |
 
-| Bruno Guedes | <div align="center">![pexels-italo-melo-881954-2379004](https://github.com/user-attachments/assets/9f241350-4b40-4d99-b9e5-43f7a4e2fbeb)</div> |
+| Bruno Guedes | <div align="center"><img width="200" alt="Foto de Bruno Guedes" src="https://github.com/user-attachments/assets/9f241350-4b40-4d99-b9e5-43f7a4e2fbeb" /></div> |
 | :--- | :--- |
 | **Idade:** | 26 |
-| **Ocupação:** | Desenvolvedor de Software (Home Office) |
-| **Motivações:** | Precisa de um ambiente de trabalho funcional e sem interrupções no coworking do condomínio e quer usar a quadra de tênis e a academia nos horários de pico sem ter que esperar. |
-| **Frustrações:** | Muitas vezes, o coworking está lotado e ele perde tempo de trabalho. Achar um horário livre para a quadra de tênis depois das 18h é quase impossível sem um sistema claro de agendamento. |
-| **Hobbies:** | Jogar tênis, frequentar a academia e ir ao cinema |
+| **Ocupação:** | Desenvolvedor de Software (morador, home office) |
+| **Perfil:** | Trabalha remotamente e usa a infraestrutura do condomínio para trabalhar e treinar ao longo da semana. |
+| **Objetivos:** | Encontrar e reservar com antecedência horários no coworking, na quadra e na academia, inclusive nos horários de pico. |
+| **Frustrações:** | O coworking fica lotado sem previsibilidade e ele perde tempo de trabalho. Achar um horário livre para a quadra depois das 18h é quase impossível sem um sistema claro de agendamento. |
 
-| Carlos Vasconcelos | <div align="center">![pexels-rdne-8124213](https://github.com/user-attachments/assets/29bf1ef4-17e7-461e-b000-a9086dd5819c)</div> |
+| Carlos Vasconcelos | <div align="center"><img width="200" alt="Foto de Carlos Vasconcelos" src="https://github.com/user-attachments/assets/29bf1ef4-17e7-461e-b000-a9086dd5819c" /></div> |
 | :--- | :--- |
 | **Idade:** | 52 |
-| **Ocupação:** | Síndico Profissional |
-| **Motivações:** | Deseja modernizar a gestão do condomínio, reduzir os conflitos entre moradores, ter dados concretos sobre a utilização das áreas comuns para planejar melhorias e comunicar-se de forma eficiente com todos. |
+| **Ocupação:** | Síndico Profissional (administrador) |
+| **Perfil:** | Gerencia múltiplos condomínios e busca profissionalizar a operação das áreas comuns. |
+| **Objetivos:** | Centralizar regras, limites de capacidade e comunicação, além de obter dados concretos de utilização para planejar melhorias e reduzir conflitos. |
 | **Frustrações:** | Gasta muito tempo resolvendo disputas por agendamentos. A comunicação é pulverizada (grupos de WhatsApp, e-mails, murais) e ele não tem controle sobre quem recebeu os comunicados. |
-| **Hobbies:** | Jardinagem, assistir a jogos de futebol e organizar planilhas. |
 
-| Helena Martins | <div align="center">![pexels-mastercowley-1153369](https://github.com/user-attachments/assets/12db0c3b-6d42-4d88-a327-e4eea1d60bb2)</div> |
+| Helena Martins | <div align="center"><img width="200" alt="Foto de Helena Martins" src="https://github.com/user-attachments/assets/12db0c3b-6d42-4d88-a327-e4eea1d60bb2" /></div> |
 | :--- | :--- |
 | **Idade:** | 31 |
-| **Ocupação:** | Personal Trainer (Prestadora de Serviço) |
-| **Motivações:** | Quer oferecer seus serviços de forma oficial aos moradores, gerenciar sua agenda de aulas particulares na academia e aulas em grupo no salão multiuso de maneira profissional e integrada ao sistema do condomínio. |
-| **Frustrações:** | A dificuldade em divulgar seu trabalho para os moradores e a confusão para conciliar sua agenda com a disponibilidade dos espaços, muitas vezes resultando em cancelamentos. |
-| **Hobbies:** | Correr no parque, criar novos treinos funcionais e ouvir podcasts sobre bem-estar. |
+| **Ocupação:** | Prestadora de Serviço (Personal Trainer) |
+| **Perfil:** | Oferece aulas particulares e em grupo aos moradores e precisa conciliar sua agenda profissional com a disponibilidade dos espaços. |
+| **Objetivos:** | Reservar horários recorrentes na academia e no salão multiuso, com confirmação e alerta de conflitos, divulgando seus serviços de forma oficial. |
+| **Frustrações:** | A dificuldade em divulgar o trabalho e a confusão para conciliar a agenda com a disponibilidade dos espaços, muitas vezes resultando em cancelamentos. |
 
-| Mariana Costa | <div align="center"> <img width="220" alt="image" src="https://github.com/user-attachments/assets/e455a47a-09a8-4bb4-82fa-dc45428aaffb" /> </div> |
+| Rafael Nunes | <div align="center"><img width="200" alt="Foto de Rafael Nunes" src="https://github.com/user-attachments/assets/e38c3ff5-7e5e-45aa-b5c8-0be12aebdb42" /></div> |
 | :--- | :--- |
-| **Idade:** | 30 |
-| **Ocupação:** | Professora de inglês |
-| **Motivações:** | Quer organizar suas aulas particulares, garantindo que os horários não entrem em conflito com suas outras atividades de rotina. |
-| **Frustrações:** | Falta de visibilidade sobre a disponibilidade dos espaços e dificuldade em reorganizar horários de última hora. |
-| **Hobbies:** | Ler e estudar idiomas. |
+| **Idade:** | 40 |
+| **Ocupação:** | Gerente de Operações de Coworking (operador comercial) |
+| **Perfil:** | Administra um espaço de coworking com salas de reunião e estações compartilhadas alugadas a empresas e profissionais autônomos. |
+| **Objetivos:** | Controlar a ocupação em tempo real, aplicar regras por tipo de plano e extrair relatórios de uso e receita para apoiar decisões de operação. |
+| **Frustrações:** | Ferramentas isoladas que não previnem reservas duplicadas (double booking) nem consolidam métricas de ocupação e faturamento. |
 
-| Lucas Pereira | <div align="center"> <img width="220" alt="image" src="https://github.com/user-attachments/assets/e38c3ff5-7e5e-45aa-b5c8-0be12aebdb42" /> </div> |
-| :--- | :--- |
-| **Idade:** | 27 |
-| **Ocupação:** | Designer gráfico freelancer |
-| **Motivações:** | Precisa de um um espaço coworking silencioso e quadras esportivas para equilibrar trabalho e lazer. |
-| **Frustrações:** | Perde muito tempo tentando encontrar horários disponíveis para trabalhar ou se exercitar, especialmente nos horários de pico. |
-| **Hobbies:** | Desenhar e acompanhar influenciadores de arte digital. |
-
-| Beatriz Almeida | <div align="center"> <img width="220" alt="image" src="https://github.com/user-attachments/assets/ba4d0409-1a4b-4325-9646-3918412d95e2" /> </div> |
-| :--- | :--- |
-| **Idade:** | 35 |
-| **Ocupação:** | Nutricionista |
-| **Motivações:** | Quer reservar a sala de reuniões e espaços para workshops de nutrição, garantindo organização e boa comunicação com os participantes. |
-| **Frustrações:** | Reservas duplicadas ou confusas que atrapalham os eventos e geram reclamações dos participantes. |
-| **Hobbies:** | Cozinhar, fazer trilhas e meditar. |
-
-## Histórias de Usuários 
+## Histórias de Usuários
 
 | EU COMO... `PERSONA` | QUERO/PRECISO ... `FUNCIONALIDADE` | PARA ... `MOTIVO/VALOR` |
 | :--- | :--- | :--- |
@@ -68,9 +54,7 @@ Esta seção detalha as especificações do projeto **Agendify**, apresentando u
 | **Bruno Guedes** | Consultar horários livres no coworking, quadra de tênis e academia e reservar com antecedência | Garantir que meus compromissos de trabalho e treinos não se sobreponham e otimizar meu tempo diário. |
 | **Carlos Vasconcelos** | Visualizar e gerenciar todos os horários de uso das áreas comuns, definindo regras, limites de capacidade e notificando os moradores | Evitar conflitos de agendamento, melhorar a eficiência do condomínio e assegurar que todos os moradores recebam informações de forma centralizada. |
 | **Helena Martins** | Ter acesso a horários disponíveis para minhas aulas e poder reservar horários recorrentes | Planejar minhas turmas de forma organizada, evitando sobreposição de aulas e otimizar minha agenda profissional. |
-| **Mariana Costa** | Consultar a disponibilidade de salas de estudo e reservar horários para minhas aulas particulares | Garantir que meus compromissos não conflitem com outras atividades da minha rotina e organizar minhas aulas de forma eficiente. |
-| **Lucas Pereira** | Ver horários livres no coworking e nas quadras esportivas e reservar com antecedência | Conseguir equilibrar trabalho e lazer, evitando perder tempo procurando espaço disponível durante os horários de pico. |
-| **Beatriz Almeida** | Reservar salas de reuniões e espaços para workshops, com confirmação e alertas de conflito | Garantir que meus eventos ocorram sem problemas de sobreposição, mantendo a organização e boa comunicação com os participantes. |
+| **Rafael Nunes** | Gerenciar a ocupação das salas e estações em tempo real, aplicando regras por plano e emitindo relatórios | Maximizar a ocupação do espaço, evitar reservas duplicadas e acompanhar métricas de uso e receita. |
 
 ## Modelagem do Processo de Negócio - Agendify
 
@@ -112,7 +96,9 @@ O sistema de gestão de reservas **Agendify** é uma solução mobile e web para
 
 #### Fluxograma 1 — Registro de Reserva
 
-<img width="3041" height="979" alt="Processo 1 - Registro de reserva" src="https://github.com/user-attachments/assets/f47a1bc3-7561-4320-a7b1-e970fb1652df" />
+<div align="center">
+<img width="900" alt="Fluxograma do processo de registro de reserva" src="https://github.com/user-attachments/assets/f47a1bc3-7561-4320-a7b1-e970fb1652df" />
+</div>
 
 <h4 align="center">FIGURA 01</h4>
 
@@ -129,7 +115,9 @@ O sistema de gestão de reservas **Agendify** é uma solução mobile e web para
 
 #### Fluxograma 2 — Gerenciamento de Reservas
 
-<img width="3041" height="979" alt="Processo 2 - Gerenciamento de reservas" src="https://github.com/user-attachments/assets/03252803-ab6c-4b07-ac84-55e97d82ee88" />
+<div align="center">
+<img width="900" alt="Fluxograma do processo de gerenciamento de reservas" src="https://github.com/user-attachments/assets/03252803-ab6c-4b07-ac84-55e97d82ee88" />
+</div>
 
 <h4 align="center">FIGURA 02</h4>
 
@@ -192,18 +180,18 @@ O projeto está **restrito** pelos itens apresentados na tabela a seguir:
 
 |ID| Restrição                                             |
 |--|-------------------------------------------------------|
-|01| O projeto deverá ser entregue até o final do semestre |
-|02| Não pode ser desenvolvido um módulo de backend        |
-|03| A aplicação deve ter um controle de acesso de usuários|
-|04| A aplicação deve integrar Web e Mobile                |
-|05| A aplicação deve funcionar online                     |
-|06| A aplicação deve funcionar nos sistemas Android e iOS |
+|01| A aplicação deve ter um controle de acesso de usuários|
+|02| A aplicação deve integrar Web e Mobile                |
+|03| A aplicação deve funcionar online                     |
+|04| A aplicação deve funcionar nos sistemas Android e iOS |
 
 </div>
 
 ## Diagrama de Casos de Uso
 
-![caso de uso_pages-to-jpg-0001](https://github.com/user-attachments/assets/a4f3da60-fac0-4117-a320-9f431f20b918)
+<div align="center">
+<img width="700" alt="Diagrama de casos de uso" src="https://github.com/user-attachments/assets/a4f3da60-fac0-4117-a320-9f431f20b918" />
+</div>
 
 <h4 align="center">FIGURA 03</h4>
 
@@ -211,27 +199,29 @@ O projeto está **restrito** pelos itens apresentados na tabela a seguir:
 
 A matriz de rastreabilidade tem como objetivo estabelecer a relação entre os requisitos definidos e os objetivos de negócio do projeto, garantindo que cada requisito atenda a uma necessidade real e mensurável. Essa ferramenta permite acompanhar a consistência do desenvolvimento, facilitando a verificação, validação e o controle de mudanças ao longo do ciclo de vida do sistema. Além disso, contribui para assegurar que não haja requisitos esquecidos ou desalinhados com os propósitos do **Agendify**.
 
-| ID | Descrição Resumida | Gestão de Usuários | Autenticação | Recuperação de Senha|Gestão de Espaços| Gestão de Reservas | Prevenção de Conflitos | Calendário/Agenda | Disponibilidade em Tempo Real | Notificações | Relatórios/Dashboards| Serviços Adicionais| Pesquisa de Espaços | Avaliação/Feedback | 
-|---------------------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|--------|
-| RF-001 |  Perfis com permissões   |   X    |       |        |        |        |        |        |        |        |        |        |        |        |   
-| RF-002 |   Login com e-mail e senha   |       |   X     |        |        |        |        |        |        |        |        |        |        |        |       
-| RF-003 |Recuperação de senha|       |       |    X    |        |        |        |        |        |        |        |        |        |        |        
-| RF-004 |    Cadastro de espaços    |        |        |       |    X    |        |        |        |        |        |        |        |        |        |       
-| RF-005 |    Criar, visualizar, editar e cancelar reservas    |        |        |        |       |    X   |        |        |        |        |        |        |        |        |        
-| RF-006 |  Impedir conflitos de agendamento      |        |        |        |       |       |    X    |        |        |        |        |        |        |        |        
-| RF-007 |   Exibir calendário/agenda     |        |        |        |        |        |       |   X     |        |        |        |        |        |        |        
-| RF-008 |   Visualizar disponibilidade em tempo real     |        |        |        |        |        |      |       |   X     |        |        |        |        |        |        
-| RF-009 |  Notificações de confirmações, lembretes e alterações      |        |        |        |        |        |        |        |      |    X    |        |        |        |        |       
-| RF-010 |  Relatórios e dashboards      |        |        |        |        |        |        |        |       |      |     X   |        |        |        |     
-| RF-011 |    Reserva de serviços adicionais	    |        |        |        |        |   X     |        |        |        |        |      |   X   |       |        |    
-| RF-012 | Pesquisa de espaços       |        |        |        |        |        |        |        |        |        |     |      |  X    |        | 
-| RF-013 |   Avaliação de espaços e serviços     |        |        |        |        |        |        |        |        |        |      |      |      |   X     |
+| ID | Descrição Resumida | Gestão de Usuários | Autenticação | Recuperação de Senha | Gestão de Espaços | Gestão de Reservas | Prevenção de Conflitos | Calendário/Agenda | Disponibilidade em Tempo Real | Notificações | Relatórios/Dashboards | Pesquisa de Espaços | Avaliação/Feedback |
+|--------|--------------------|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
+| RF-001 | Perfis com permissões | X | | | | | | | | | | | |
+| RF-002 | Login com e-mail e senha | | X | | | | | | | | | | |
+| RF-003 | Recuperação de senha | | | X | | | | | | | | | |
+| RF-004 | Cadastro de espaços | | | | X | | | | | | | | |
+| RF-005 | Criar, visualizar, editar e cancelar reservas | | | | | X | | | | | | | |
+| RF-006 | Impedir conflitos de agendamento | | | | | | X | | | | | | |
+| RF-007 | Exibir calendário/agenda | | | | | | | X | | | | | |
+| RF-008 | Visualizar disponibilidade em tempo real | | | | | | | | X | | | | |
+| RF-009 | Notificações de confirmações, lembretes e alterações | | | | | | | | | X | | | |
+| RF-010 | Relatórios e dashboards | | | | | | | | | | X | | |
+| RF-011 | Gestão de usuários, espaços e reservas pelo administrador | X | | | X | X | | | | | | | |
+| RF-012 | Pesquisa de espaços | | | | | | | | | | | X | |
+| RF-013 | Avaliação de espaços e serviços | | | | | | | | | | | | X |
+| RF-014 | Edição de perfil do usuário | X | | | | | | | | | | | |
+| RF-015 | Dashboard inicial personalizada | | | | | | | | | | X | | |
 
 # Gerenciamento de Projeto
 
-Para o desenvolvimento do **Agendify**, adotamos como referência as práticas do **PMBoK v6 (Project Management Body of Knowledge),** assegurando uma abordagem estruturada, ágil e eficiente. O gerenciamento do projeto foi organizado em áreas-chave — **tempo, equipe e orçamento** — com o objetivo de garantir entregas dentro do prazo estabelecido, alinhadas aos requisitos funcionais e à qualidade esperada.
+Para o desenvolvimento do **Agendify**, adotamos como referência as práticas do **PMBoK v7 (Project Management Body of Knowledge),** assegurando uma abordagem estruturada, ágil e eficiente. O gerenciamento do projeto foi organizado em áreas-chave — **tempo, equipe e orçamento** — com o objetivo de garantir entregas dentro do prazo estabelecido, alinhadas aos requisitos funcionais e à qualidade esperada.
 
-Essa metodologia permite uma visão integrada do ciclo de vida do projeto, favorecendo o planejamento detalhado, a definição clara de responsabilidades e o acompanhamento contínuo de cada etapa. Com isso, o **Agendify** será conduzido de forma colaborativa, reduzindo riscos, otimizando recursos e assegurando que o produto final atenda plenamente às necessidades do usuário e aos objetivos estratégicos da equipe.
+Essa abordagem proporciona uma visão integrada do ciclo de vida do projeto, favorecendo o planejamento detalhado, a definição clara de responsabilidades e o acompanhamento contínuo de cada etapa. Com isso, o **Agendify** foi conduzido de forma colaborativa, reduzindo riscos, otimizando recursos e assegurando que o produto final atendesse às necessidades do usuário e aos objetivos estratégicos da equipe.
 
 ## Gerenciamento de Tempo
 
@@ -243,7 +233,9 @@ O gerenciamento do tempo do **Agendify** foi otimizado pelo uso do **Diagrama de
 
 Com essa abordagem, o desenvolvimento do **Agendify** pode ser conduzido de maneira **organizada, ágil e alinhada aos objetivos do projeto**, assegurando maior eficiência na entrega dos resultados.
 
-<img width="3377" height="1684" alt="image" src="https://github.com/user-attachments/assets/7ff96a08-e6eb-4b37-be4a-438c17f67de8" />
+<div align="center">
+<img width="900" alt="Diagrama de Gantt do projeto" src="https://github.com/user-attachments/assets/7ff96a08-e6eb-4b37-be4a-438c17f67de8" />
+</div>
 
 <h4 align="center">FIGURA 04 - Diagrama de Gantt</h4>
 
@@ -255,7 +247,7 @@ O principal objetivo é sincronizar todas as fases do projeto, garantindo itera�
 
 <br>
 
-<img width="2790" height="1227" alt="image" src="https://github.com/user-attachments/assets/dfa4ecfe-b992-45be-90b5-2cae8a9d1160" />
+<img width="900" alt="Cronograma do projeto" src="https://github.com/user-attachments/assets/dfa4ecfe-b992-45be-90b5-2cae8a9d1160" />
 
 <h4 align="center">FIGURA 05 - Cronograma do Projeto</h4>
 
@@ -263,7 +255,7 @@ O principal objetivo é sincronizar todas as fases do projeto, garantindo itera�
 
 O orçamento do projeto **Agendify** foi estruturado para contemplar os principais recursos necessários ao desenvolvimento e implantação da plataforma (Web, Mobile e API). 
 
-O planejamento financeiro considera um ciclo de **6 meses de desenvolvimento** e uma equipe formada por **6 desenvolvedores full-stack**, que se dividirão entre atividades de back-end, front-end, mobile, DevOps e design.
+O planejamento financeiro considera um ciclo de **6 meses de desenvolvimento** e uma equipe formada por **6 desenvolvedores full-stack**, divididos entre atividades de back-end, front-end, mobile, DevOps e design.
 
 **Resumo por categoria:**
 
@@ -271,7 +263,7 @@ O planejamento financeiro considera um ciclo de **6 meses de desenvolvimento** e
 - **Hardware:** aquisição mínima de dispositivos para testes (como smartphones), periféricos e licenças pontuais de ferramentas de teste. A estratégia prevê o aproveitamento dos equipamentos pessoais da equipe para reduzir custos.
 - **Rede e Infraestrutura:** despesas de conectividade e suporte a ferramentas de colaboração e versionamento do código.
 - **Software, Licenças e Ferramentas:** licenças essenciais não cobertas por versões gratuitas, ferramentas de design e produtividade em planos limitados e soluções de gestão do projeto.
-- **Serviços em Nuvem:** instâncias de hospedagem da API, banco de dados gerenciado, armazenamento e backups. A configuração será otimizada para manter custos baixos sem comprometer a performance.
+- **Serviços em Nuvem:** instâncias de hospedagem da API, banco de dados gerenciado, armazenamento e backups. A configuração é otimizada para manter custos baixos sem comprometer a performance.
 - **Marketing e Vendas:** ações iniciais para lançamento, incluindo landing page, materiais digitais básicos e anúncios experimentais para validação de mercado.
 - **Recursos Adicionais:** reserva destinada a imprevistos operacionais ou contratação pontual de serviços específicos.
 
@@ -280,7 +272,7 @@ Esse planejamento financeiro visa garantir que o projeto seja executado com qual
 <br>
 
 <p align="center">
-<img  src="https://github.com/user-attachments/assets/e112d384-7a6b-4395-801b-89ce26c67f45"width="460">
+<img width="460" alt="Quadro de gestão de custos" src="https://github.com/user-attachments/assets/e112d384-7a6b-4395-801b-89ce26c67f45" />
 </p>
 
 <h4 align="center"> FIGURA 06 - Quadro de Gestão de Custos</h4>

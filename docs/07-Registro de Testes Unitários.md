@@ -173,4 +173,4 @@ Os testes do método `IsSpaceAvailable` cobrem:
 - **Validações de dados:** datas inválidas
 - **Casos limite:** reservas adjacentes, múltiplos espaços
 
-Esta cobertura abrangente garante que o método funcione corretamente em todos os cenários possíveis, protegendo o sistema contra bugs e comportamentos inesperados
+Esta cobertura abrangente garante que o método funcione corretamente em todos os cenários possíveis, protegendo o sistema contra bugs e comportamentos inesperados.

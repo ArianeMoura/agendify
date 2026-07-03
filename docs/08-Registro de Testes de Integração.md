@@ -4,14 +4,14 @@
 
 Testes de integração verificam se diferentes componentes do sistema funcionam
 corretamente quando integrados, testando a interação entre classes, banco de
-dados e serviços. No Agendify, testamos as operações CRUD com MongoDB Atlas.
+dados e serviços. No Agendify, testamos as operações CRUD com o MongoDB.
 
 ## Configuração Rápida
 
 **Tecnologias:**
 
 - .NET 9.0 + NUnit 4.2.2
-- MongoDB Atlas (banco: `test-agendify`)
+- MongoDB — execução local via Docker (banco: `test-agendify`)
 
 **Estrutura:**
 
@@ -238,9 +238,9 @@ public void TearDown()
 
 ## Resumo dos Testes
 
-**Total: 39 testes de integração**
+**Total: 32 testes de integração** (os 8 exemplos acima ilustram os principais casos CRUD; a suíte completa cobre os demais).
 
-| Serviço  | CREATE | READ | UPDATE | DELETE | Validações |
-| -------- | ------ | ---- | ------ | ------ | ---------- |
-| Bookings | 3      | 3    | 2      | 2      | 2          |
-| Spaces   | 5      | 6    | 3      | 3      | 3          |
+| Serviço  | CREATE | READ | UPDATE | DELETE | Validações | Subtotal |
+| -------- | ------ | ---- | ------ | ------ | ---------- | -------- |
+| Bookings | 3      | 3    | 2      | 2      | 2          | 12       |
+| Spaces   | 5      | 6    | 3      | 3      | 3          | 20       |

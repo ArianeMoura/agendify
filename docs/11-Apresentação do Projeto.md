@@ -20,12 +20,12 @@ Apresentamos a seguir os elementos que sustentam a personalidade do Agendify:
 
 - Linhas suaves e orgânicas;
 - O ícone principal é um calendário, representando organização, planejamento e tempo;
-- O detalhe do check (✓) com circulo amarelo/alaranjado no centro do calendário simboliza a confirmação, o sucesso e a eficiência da reserva. Transmite a ideia de que a tarefa foi concluída com sucesso: "Está agendado!".
+- O detalhe do check (✓) com círculo amarelo/alaranjado no centro do calendário simboliza a confirmação, o sucesso e a eficiência da reserva. Transmite a ideia de que a tarefa foi concluída com sucesso: "Está agendado!".
 
 <br>
 
 <div align="center">
-<img width="296" alt="image" src="https://github.com/user-attachments/assets/c71546c5-2aed-4291-875b-896eb04ce015"/>
+<img width="296" alt="Logomarca do Agendify" src="https://github.com/user-attachments/assets/c71546c5-2aed-4291-875b-896eb04ce015" />
 </div>
 
 <h4 align="center">FIGURA 23 - Logomarca</h4>
@@ -42,7 +42,7 @@ Utilizamos o roxo como cor principal do Agendify, com o amarelo e o laranja como
 <br>
 
 <div align="center">
-<img width="316" alt="image" src="https://github.com/user-attachments/assets/a976cde6-e070-4f81-94b4-ffbeb0135ed2"/>
+<img width="316" alt="Paleta de cores do Agendify" src="https://github.com/user-attachments/assets/a976cde6-e070-4f81-94b4-ffbeb0135ed2" />
 </div>
 
 <h4 align="center">FIGURA 24 - Paleta de Cores do Agendify</h4>
@@ -62,10 +62,10 @@ Font-family: **Inter**
 Para textos corridos, descrições, parágrafos e conteúdos mais extensos, optamos pela Inter. Trata-se de uma fonte projetada especificamente para interfaces digitais (UI), garantindo excelente legibilidade e conforto de leitura em diferentes tamanhos de tela, sendo crucial para a usabilidade do app e do site web.
 
 <div align="center">
-<img width="206" height="803" alt="image" src="https://github.com/user-attachments/assets/654f9d05-79fe-4d3a-91e4-486e7190226a" />
+<img width="240" alt="Tipografia aplicada na tela de login do Agendify Mobile" src="https://github.com/user-attachments/assets/654f9d05-79fe-4d3a-91e4-486e7190226a" />
 </div>
 
-<h4 align="center">FIGURA 25 - Tela de Login do Agendify Mobile</h4>
+<h4 align="center">FIGURA 25 - Tipografia aplicada na tela de login do Agendify Mobile</h4>
 
 <br>
 
@@ -75,9 +75,9 @@ Para textos corridos, descrições, parágrafos e conteúdos mais extensos, opta
 
 [Agendify - Apresentacao Final.pdf](https://github.com/user-attachments/files/24020521/Agendify.-.Apresentacao.Final.pdf)
 
-**Apresentação Final:**
+**Apresentação Final (vídeo):**
 
-https://github.com/user-attachments/assets/bf534b03-1d1a-4bac-aa7f-9eb02ee9c4e7
+[Vídeo de apresentação do Agendify](https://github.com/user-attachments/assets/bf534b03-1d1a-4bac-aa7f-9eb02ee9c4e7)
 
 ## Slides
 
