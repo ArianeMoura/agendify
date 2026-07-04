@@ -23,11 +23,6 @@ O Agendify é um sistema **distribuído** organizado em três aplicações indep
                  │     MongoDB       │  users · spaces · bookings · resources
                  └───────────────────┘
 ```
-
-<div align="center">
-<img width="800" alt="Fluxo de interação do usuário com o sistema" src="https://github.com/user-attachments/assets/bab45620-af3e-41f2-b982-700e34355752" />
-</div>
-
 <h4 align="center">Fluxo de interação do usuário com o sistema</h4>
 
 ## Camadas e responsabilidades

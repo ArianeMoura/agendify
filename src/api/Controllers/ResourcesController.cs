@@ -1,7 +1,6 @@
 using api.Services;
 using api.Models;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Bson;
 using Microsoft.AspNetCore.Authorization;
 
 namespace api.Controllers
@@ -22,7 +21,7 @@ namespace api.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Get(string id)
         {
-            var resource = await _resourcesService.GetById(ObjectId.Parse(id).ToString());
+            var resource = await _resourcesService.GetById(id);
 
             if (resource == null)
             {
@@ -42,7 +41,7 @@ namespace api.Controllers
         {
             var newResource = new Resource
             {
-                Id = ObjectId.GenerateNewId().ToString(),
+                Id = Guid.NewGuid().ToString(),
                 Name = resource.Name,
                 Description = resource.Description,
             };

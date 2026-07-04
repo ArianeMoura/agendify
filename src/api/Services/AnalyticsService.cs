@@ -1,15 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using api.Models;
-using Microsoft.Extensions.Options;
-using MongoDB.Bson;
-using MongoDB.Driver;
+using api.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace api.Services
 {
-    // DTOs junto do Service para evitar erros de referência/namespace
+    // DTOs junto do Service para evitar erros de referência/namespace.
     public class PeakHourRequest
     {
         public int Year { get; set; }        // ex.: 2025
@@ -24,70 +18,45 @@ namespace api.Services
         public int ReservationsCount { get; set; } // contagem
     }
 
-    // Projeção mínima sobre a coleção Bookings para as métricas de analytics.
-    // Os campos refletem exatamente os do documento no Mongo (ObjectId + datas UTC).
-    public class BookingRecord
-    {
-        public ObjectId Id { get; set; }
-        public ObjectId UserId { get; set; }
-        public ObjectId SpaceId { get; set; }
-        public DateTime StartDateTime { get; set; }
-        public DateTime EndDateTime { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
-    }
-
     public class AnalyticsService
     {
-        private readonly IMongoCollection<BookingRecord> _bookings;
+        private readonly AppDbContext _db;
 
-        public AnalyticsService(IMongoDatabase database, IOptions<DatabaseSettings> databaseSettings)
+        public AnalyticsService(AppDbContext db)
         {
-            _bookings = database.GetCollection<BookingRecord>(databaseSettings.Value.BookingsCollectionName);
+            _db = db;
         }
 
         public async Task<List<PeakHourResult>> GetMonthlyPeakHoursAsync(PeakHourRequest req, CancellationToken ct = default)
         {
-            // Intervalo do mês [start, end)
+            // Intervalo do mês [start, end) em UTC.
             var start = new DateTime(req.Year, req.Month, 1, 0, 0, 0, DateTimeKind.Utc);
             var end = start.AddMonths(1);
 
-            var builder = Builders<BookingRecord>.Filter;
-
-            var filter = builder.Gte(x => x.StartDateTime, start) &
-                         builder.Lt(x => x.StartDateTime, end);
+            // Filtro por período (e espaço, se informado) executado no banco.
+            var query = _db.Bookings.AsNoTracking()
+                .Where(b => b.StartDateTime >= start && b.StartDateTime < end);
 
             if (!string.IsNullOrWhiteSpace(req.SpaceId))
-            {
-                if (ObjectId.TryParse(req.SpaceId, out var spaceObjId))
-                    filter &= builder.Eq(x => x.SpaceId, spaceObjId);
-                else
-                    // fallback para string, caso algum documento guarde como string
-                    filter &= builder.Eq("SpaceId", req.SpaceId);
-            }
+                query = query.Where(b => b.SpaceId == req.SpaceId);
 
-            var results = await _bookings.Aggregate()
-                .Match(filter)
-                .Project(x => new
-                {
-                    Hour = x.StartDateTime.Hour,
-                    SpaceId = x.SpaceId
-                })
-                .Group(
-                    key => new { key.SpaceId, key.Hour },
-                    g => new PeakHourResult
-                    {
-                        SpaceId = g.Key.SpaceId.ToString(),
-                        Hour = g.Key.Hour,
-                        ReservationsCount = g.Count()
-                    }
-                )
-                .SortByDescending(r => r.ReservationsCount)
-                .ThenBy(r => r.SpaceId)
-                .ThenBy(r => r.Hour)
+            var rows = await query
+                .Select(b => new { b.SpaceId, b.StartDateTime })
                 .ToListAsync(ct);
 
-            return results;
+            // Agrupamento por (espaço, hora) — dataset mensal é pequeno, feito em memória.
+            return rows
+                .GroupBy(x => new { x.SpaceId, Hour = x.StartDateTime.Hour })
+                .Select(g => new PeakHourResult
+                {
+                    SpaceId = g.Key.SpaceId ?? string.Empty,
+                    Hour = g.Key.Hour,
+                    ReservationsCount = g.Count()
+                })
+                .OrderByDescending(r => r.ReservationsCount)
+                .ThenBy(r => r.SpaceId)
+                .ThenBy(r => r.Hour)
+                .ToList();
         }
     }
 }

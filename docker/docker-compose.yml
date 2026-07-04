@@ -1,19 +1,24 @@
-version: '3.8'
-
 services:
-  mongodb:
-    image: mongo:latest
-    container_name: mongodb
+  postgres:
+    image: postgres:16
+    container_name: agendify-postgres
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:?defina MONGO_ROOT_PASSWORD no arquivo docker/.env}
+      POSTGRES_USER: ${POSTGRES_USER:-agendify}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD no arquivo docker/.env}
+      POSTGRES_DB: ${POSTGRES_DB:-agendify}
     ports:
-      - "27017:27017"
+      - "5432:5432"
     volumes:
-      - mongodb_data:/data/db
-      - mongodb_config:/data/configdb
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      # A extensão btree_gist e o schema são criados pela migração da API
+      # (Database.Migrate no boot em Development). Aqui só garantimos que o
+      # banco está pronto para aceitar conexões.
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-agendify} -d ${POSTGRES_DB:-agendify}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
 volumes:
-  mongodb_data:
-  mongodb_config:
+  postgres_data:

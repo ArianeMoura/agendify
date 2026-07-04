@@ -1,104 +1,91 @@
+using api.Data;
 using api.Models;
-using MongoDB.Driver;
-using Microsoft.Extensions.Options;
-using MongoDB.Bson;
+using Microsoft.EntityFrameworkCore;
 
 namespace api.Services
 {
     public class SpacesService
     {
-        private readonly IMongoCollection<Space> _spacesCollection;
-        private readonly IMongoCollection<Resource> _resourcesCollection;
+        private readonly AppDbContext _db;
         private readonly ILogger<SpacesService> _logger;
 
-        public SpacesService(IMongoDatabase database, IOptions<DatabaseSettings> databaseSettings, ILogger<SpacesService> logger)
+        public SpacesService(AppDbContext db, ILogger<SpacesService> logger)
         {
-            var settings = databaseSettings.Value;
-            _spacesCollection = database.GetCollection<Space>(settings.SpacesCollectionName);
-            _resourcesCollection = database.GetCollection<Resource>(settings.ResourcesCollectionName);
+            _db = db;
             _logger = logger;
         }
 
-        public async Task<Space> GetById(string id) {
-            var space = await _spacesCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
+        public async Task<Space?> GetById(string id)
+        {
+            var space = await _db.Spaces.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+            if (space is null) return null;
 
-            var resourceIds = space.Resources
-                .Select(r => r.ResourceId)
-                .Where(id => id != null)
-                .Distinct()
-                .ToList();
-
-            if (resourceIds.Count == 0)
-            {
-                return space;
-            }
-            
-            var resources = await _resourcesCollection.Find(x => resourceIds.Contains(x.Id)).ToListAsync();
-
-            space.Resources = [.. space.Resources.Select(r => {
-                r.Resource = resources.FirstOrDefault(x => x.Id == r.ResourceId);
-                
-                return r;
-            })];
-
+            await EnrichResourcesAsync(new[] { space });
             return space;
         }
 
         public async Task<List<Space>> GetAsync()
         {
-            var spaces = await _spacesCollection.Find(FilterDefinition<Space>.Empty).ToListAsync();
+            var spaces = await _db.Spaces.AsNoTracking().ToListAsync();
+            await EnrichResourcesAsync(spaces);
+            return spaces;
+        }
 
+        // Os recursos ficam embutidos em `spaces` (jsonb) só com ResourceId + Quantity.
+        // Aqui resolvemos o objeto Resource completo a partir da tabela `resources`,
+        // preservando o comportamento anterior de "join" em código.
+        private async Task EnrichResourcesAsync(IEnumerable<Space> spaces)
+        {
             var resourceIds = spaces
-                .SelectMany(s => s.Resources ?? Enumerable.Empty<SpaceResources>())
+                .SelectMany(s => s.Resources ?? new List<SpaceResources>())
                 .Select(r => r.ResourceId)
-                .Where(id => id != null)
+                .Where(id => !string.IsNullOrEmpty(id))
                 .Distinct()
                 .ToList();
 
-            if (resourceIds.Count == 0)
-            {
-                return spaces;
-            }
+            if (resourceIds.Count == 0) return;
 
-            var resourcesFilter = Builders<Resource>.Filter.In(r => r.Id, resourceIds);
-            var resources = await _resourcesCollection.Find(resourcesFilter).ToListAsync();
+            var resources = await _db.Resources.AsNoTracking()
+                .Where(r => resourceIds.Contains(r.Id!))
+                .ToListAsync();
 
-            var resourcesById = resources.ToDictionary(r => r.Id, r => r);
+            var resourcesById = resources.ToDictionary(r => r.Id!, r => r);
 
             foreach (var space in spaces)
             {
-                if (space.Resources == null) continue;
-
+                if (space.Resources is null) continue;
                 foreach (var sr in space.Resources)
                 {
-                    if (sr == null) continue;
-                    resourcesById.TryGetValue(sr.ResourceId, out var found);
-                    sr.Resource = found;
+                    if (sr is null) continue;
+                    if (resourcesById.TryGetValue(sr.ResourceId, out var found))
+                        sr.Resource = found;
                 }
             }
-
-            return spaces;
         }
 
         public async Task Create(Space space)
         {
-            _logger.LogInformation("Creating space: {Space}", space);
+            _logger.LogInformation("Creating space: {SpaceName}", space.Name);
             if (string.IsNullOrWhiteSpace(space.Id))
-            {
-                space.Id = ObjectId.GenerateNewId().ToString();
-            }
+                space.Id = Guid.NewGuid().ToString();
 
-            await _spacesCollection.InsertOneAsync(space);
+            _db.Spaces.Add(space);
+            await _db.SaveChangesAsync();
         }
 
         public async Task Update(string id, Space space)
         {
-            await _spacesCollection.ReplaceOneAsync(x => x.Id == id, space);
+            space.Id = id;
+            _db.Spaces.Update(space);
+            await _db.SaveChangesAsync();
         }
 
         public async Task Delete(string id)
         {
-            await _spacesCollection.DeleteOneAsync(x => x.Id == id);
+            var space = await _db.Spaces.FirstOrDefaultAsync(x => x.Id == id);
+            if (space is null) return;
+            _db.Spaces.Remove(space);
+            await _db.SaveChangesAsync();
         }
     }
 }

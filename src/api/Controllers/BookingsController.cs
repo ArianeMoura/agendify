@@ -1,8 +1,9 @@
 using api.Services;
 using api.Models;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Bson;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using System.Text.Json;
 
 namespace api.Controllers
 {
@@ -12,17 +13,19 @@ namespace api.Controllers
     public class BookingsController : ControllerBase
     {
         private readonly BookingsService _bookingsService;
+        private readonly IdempotencyService _idempotencyService;
 
-        public BookingsController(BookingsService bookingsService)
+        public BookingsController(BookingsService bookingsService, IdempotencyService idempotencyService)
         {
             _bookingsService = bookingsService;
+            _idempotencyService = idempotencyService;
         }
 
         [HttpGet("{id}")]
         [Authorize(Roles = "Administrator, Common")]
         public async Task<IActionResult> Get(string id)
         {
-            var booking = await _bookingsService.GetById(ObjectId.Parse(id).ToString());
+            var booking = await _bookingsService.GetById(id);
 
             if (booking == null)
             {
@@ -36,13 +39,7 @@ namespace api.Controllers
         [Authorize(Roles = "Administrator, Common")]
         public async Task<IActionResult> GetByUserId(string userId)
         {
-            var bookings = await _bookingsService.GetByUserId(ObjectId.Parse(userId).ToString());
-
-            if (bookings == null)
-            {
-                return NotFound();
-            }
-
+            var bookings = await _bookingsService.GetByUserId(userId);
             return Ok(bookings);
         }
 
@@ -54,32 +51,60 @@ namespace api.Controllers
         [Authorize(Roles = "Administrator, Common")]
         public async Task<IActionResult> Post(Booking booking)
         {
-            var startUtc = booking.StartDateTime.Kind == DateTimeKind.Utc 
-                ? booking.StartDateTime 
-                : DateTime.SpecifyKind(booking.StartDateTime, DateTimeKind.Utc);
-            var endUtc = booking.EndDateTime.Kind == DateTimeKind.Utc 
-                ? booking.EndDateTime 
-                : DateTime.SpecifyKind(booking.EndDateTime, DateTimeKind.Utc);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? booking.UserId ?? string.Empty;
+
+            // Idempotência (RNF-014): replay com a mesma chave devolve a resposta original.
+            var idemKey = Request.Headers["Idempotency-Key"].FirstOrDefault();
+            if (!string.IsNullOrWhiteSpace(idemKey))
+            {
+                var prior = await _idempotencyService.GetAsync(idemKey, userId);
+                if (prior != null)
+                {
+                    return new ContentResult
+                    {
+                        StatusCode = prior.ResponseStatus,
+                        ContentType = "application/json",
+                        Content = prior.ResponseBody
+                    };
+                }
+            }
 
             var newBooking = new Booking
             {
-                Id = ObjectId.GenerateNewId().ToString(),
+                Id = Guid.NewGuid().ToString(),
                 UserId = booking.UserId,
                 SpaceId = booking.SpaceId,
-                StartDateTime = startUtc,
-                EndDateTime = endUtc,
+                StartDateTime = ToUtc(booking.StartDateTime),
+                EndDateTime = ToUtc(booking.EndDateTime),
             };
 
-            await _bookingsService.Create(newBooking);
+            try
+            {
+                await _bookingsService.Create(newBooking);
+            }
+            catch (BookingConflictException ex)
+            {
+                // O banco arbitrou o double-booking (exclusion constraint) → 409.
+                return Conflict(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
 
-            newBooking = await _bookingsService.GetById(newBooking.Id!);
-
-            if (newBooking == null)
+            var created = await _bookingsService.GetById(newBooking.Id!);
+            if (created == null)
             {
                 return NotFound();
             }
 
-            return CreatedAtAction(nameof(Post), new { id = newBooking.Id.ToString() }, newBooking);
+            if (!string.IsNullOrWhiteSpace(idemKey))
+            {
+                var body = JsonSerializer.Serialize(created);
+                await _idempotencyService.SaveAsync(idemKey, userId, StatusCodes.Status201Created, body);
+            }
+
+            return CreatedAtAction(nameof(Post), new { id = created.Id }, created);
         }
 
         [HttpPut()]
@@ -93,29 +118,39 @@ namespace api.Controllers
                 return NotFound();
             }
 
-            var startUtc = booking.StartDateTime.Kind == DateTimeKind.Utc 
-                ? booking.StartDateTime 
-                : DateTime.SpecifyKind(booking.StartDateTime, DateTimeKind.Utc);
-            var endUtc = booking.EndDateTime.Kind == DateTimeKind.Utc 
-                ? booking.EndDateTime 
-                : DateTime.SpecifyKind(booking.EndDateTime, DateTimeKind.Utc);
+            var updated = new Booking
+            {
+                Id = dbBooking.Id,
+                UserId = booking.UserId,
+                SpaceId = booking.SpaceId,
+                StartDateTime = ToUtc(booking.StartDateTime),
+                EndDateTime = ToUtc(booking.EndDateTime),
+                Status = dbBooking.Status,
+                CreatedAt = dbBooking.CreatedAt,
+                UpdatedAt = DateTime.UtcNow,
+            };
 
-            dbBooking.UserId = booking.UserId;
-            dbBooking.SpaceId = booking.SpaceId;
-            dbBooking.StartDateTime = startUtc;
-            dbBooking.EndDateTime = endUtc;
-            dbBooking.UpdatedAt = DateTime.UtcNow;
+            try
+            {
+                await _bookingsService.Update(updated.Id!, updated);
+            }
+            catch (BookingConflictException ex)
+            {
+                // Editar para um slot ocupado também é rejeitado pelo banco → 409.
+                return Conflict(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
 
-            await _bookingsService.Update(dbBooking.Id!, dbBooking);
-
-            var updatedBooking = await _bookingsService.GetById(dbBooking.Id!);
-
+            var updatedBooking = await _bookingsService.GetById(updated.Id!);
             if (updatedBooking == null)
             {
                 return NotFound();
             }
 
-            return CreatedAtAction(nameof(Put), new { id = updatedBooking.Id.ToString() }, updatedBooking);
+            return Ok(updatedBooking);
         }
 
         [HttpDelete("{id}")]
@@ -126,5 +161,8 @@ namespace api.Controllers
 
             return NoContent();
         }
+
+        private static DateTime ToUtc(DateTime value) =>
+            value.Kind == DateTimeKind.Utc ? value : DateTime.SpecifyKind(value, DateTimeKind.Utc);
     }
 }

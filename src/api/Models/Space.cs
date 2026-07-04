@@ -1,22 +1,22 @@
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace api.Models
 {
+    // Recurso associado a um espaço (com quantidade). Persistido como jsonb
+    // dentro de `spaces` (owned collection .ToJson()). `Resource` é enriquecido
+    // em runtime a partir da tabela `resources` e NÃO é persistido.
     public class SpaceResources
     {
-        [BsonRepresentation(BsonType.ObjectId)]
         public string ResourceId { get; set; } = null!;
 
         public int Quantity { get; set; } = 1;
 
+        [NotMapped]
         public Resource? Resource { get; set; }
     }
 
     public class Space
     {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
         public string? Id { get; set; }
 
         public string Name { get; set; } = null!;
@@ -26,11 +26,11 @@ namespace api.Models
         public List<SpaceResources> Resources { get; set; } = new();
         public List<string> AvailableHours { get; set; } = new();
         public bool Availability { get; set; } = true;
-        
+
         public bool IsAllDayBooking { get; set; } = false;
         public string? AllDayStartTime { get; set; } = null;
         public string? AllDayEndTime { get; set; } = null;
-        
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
     }

@@ -1,669 +1,232 @@
+using api.Data;
 using api.Models;
 using api.Services;
-using Microsoft.Extensions.Options;
-using MongoDB.Bson;
-using MongoDB.Driver;
 using NUnit.Framework;
 
 namespace api.Tests.Services
 {
+    // Testes de integração do motor de reservas contra PostgreSQL real (Testcontainers).
+    // O foco é a RN-01: prevenção de double-booking garantida pelo banco.
     [TestFixture]
     public class BookingsServiceTests
     {
-        // A string de conexão vem da variável de ambiente AGENDIFY_TEST_MONGO — nunca hardcoded.
-        // Rode: AGENDIFY_TEST_MONGO="mongodb+srv://USER:PASS@..." dotnet test
-        private static readonly string? TestConnectionString =
-            Environment.GetEnvironmentVariable("AGENDIFY_TEST_MONGO");
-        private static readonly string TestDatabaseName = "test-agendify";
+        private const string UserId = "11111111-1111-1111-1111-111111111111";
+        private const string SpaceId = "22222222-2222-2222-2222-222222222222";
+        private const string UnavailableSpaceId = "33333333-3333-3333-3333-333333333333";
 
-        private IMongoClient _mongoClient = null!;
-        private IMongoDatabase _testDatabase = null!;
-        private BookingsService _bookingsService = null!;
-        private IMongoCollection<Booking> _bookingsCollection = null!;
-        private IMongoCollection<User> _usersCollection = null!;
-        private IMongoCollection<Space> _spacesCollection = null!;
-
-        [OneTimeSetUp]
-        public void OneTimeSetUp()
-        {
-            if (string.IsNullOrWhiteSpace(TestConnectionString))
-                Assert.Ignore("Defina a variável de ambiente AGENDIFY_TEST_MONGO para rodar os testes de integração.");
-
-            _mongoClient = new MongoClient(TestConnectionString);
-            _testDatabase = _mongoClient.GetDatabase(TestDatabaseName);
-        }
-
-        [OneTimeTearDown]
-        public void OneTimeTearDown()
-        {
-            try
-            {
-                _testDatabase?.DropCollection("bookings");
-                _testDatabase?.DropCollection("users");
-                _testDatabase?.DropCollection("spaces");
-            }
-            catch
-            {
-                // Ignorar erros de limpeza
-            }
-        }
+        private static DateTime Future(int daysAhead, int hour) =>
+            DateTime.SpecifyKind(DateTime.UtcNow.Date.AddDays(daysAhead).AddHours(hour), DateTimeKind.Utc);
 
         [SetUp]
-        public void Setup()
+        public async Task SetUp()
         {
-            _bookingsCollection = _testDatabase.GetCollection<Booking>("bookings");
-            _usersCollection = _testDatabase.GetCollection<User>("users");
-            _spacesCollection = _testDatabase.GetCollection<Space>("spaces");
+            await TestDatabaseFixture.ResetAsync();
 
-            _bookingsCollection.DeleteMany(Builders<Booking>.Filter.Empty);
-            _usersCollection.DeleteMany(Builders<User>.Filter.Empty);
-            _spacesCollection.DeleteMany(Builders<Space>.Filter.Empty);
-
-            SeedTestData();
-
-            var databaseSettings = new DatabaseSettings
+            await using var db = TestDatabaseFixture.CreateContext();
+            db.Users.Add(new User
             {
-                ConnectionString = TestConnectionString ?? string.Empty,
-                DatabaseName = TestDatabaseName,
-                BookingsCollectionName = "bookings",
-                UsersCollectionName = "users",
-                SpacesCollectionName = "spaces"
-            };
-
-            var options = Options.Create(databaseSettings);
-            _bookingsService = new BookingsService(_testDatabase, options);
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            try
+                Id = UserId,
+                Name = "João Silva",
+                Email = "joao@exemplo.com.br",
+                Password = "hash",
+                Profile = Profile.Common,
+            });
+            db.Spaces.Add(new Space
             {
-                _bookingsCollection?.DeleteMany(Builders<Booking>.Filter.Empty);
-                _usersCollection?.DeleteMany(Builders<User>.Filter.Empty);
-                _spacesCollection?.DeleteMany(Builders<Space>.Filter.Empty);
-            }
-            catch
+                Id = SpaceId,
+                Name = "Sala de Conferência A",
+                Capacity = 20,
+                Availability = true,
+            });
+            db.Spaces.Add(new Space
             {
-                // Ignorar erros de limpeza
-            }
-        }
-
-        private void SeedTestData()
-        {
-            var users = new List<User>
-            {
-                new User
-                {
-                    Id = "507f1f77bcf86cd799439011",
-                    Name = "João Silva",
-                    Email = "joao.silva@exemplo.com.br",
-                    Password = "hashedpassword123",
-                    Profile = Profile.Common,
-                    CreatedAt = DateTime.UtcNow
-                },
-                new User
-                {
-                    Id = "507f1f77bcf86cd799439012",
-                    Name = "Maria Santos",
-                    Email = "maria.santos@exemplo.com.br",
-                    Password = "hashedpassword456",
-                    Profile = Profile.Administrator,
-                    CreatedAt = DateTime.UtcNow
-                }
-            };
-            _usersCollection.InsertMany(users);
-
-            var spaces = new List<Space>
-            {
-                new Space
-                {
-                    Id = "507f1f77bcf86cd799439021",
-                    Name = "Sala de Conferência A",
-                    Description = "Sala de conferência grande com capacidade para eventos",
-                    Capacity = 20,
-                    Availability = true,
-                    CreatedAt = DateTime.UtcNow
-                },
-                new Space
-                {
-                    Id = "507f1f77bcf86cd799439022",
-                    Name = "Sala de Reunião B",
-                    Description = "Sala de reunião pequena para equipes",
-                    Capacity = 8,
-                    Availability = true,
-                    CreatedAt = DateTime.UtcNow
-                }
-            };
-            _spacesCollection.InsertMany(spaces);
-
-            var bookings = new List<Booking>
-            {
-                new Booking
-                {
-                    Id = "507f1f77bcf86cd799439031",
-                    UserId = "507f1f77bcf86cd799439011",
-                    SpaceId = "507f1f77bcf86cd799439021",
-                    StartDateTime = DateTime.UtcNow.AddDays(1),
-                    EndDateTime = DateTime.UtcNow.AddDays(1).AddHours(2),
-                    CreatedAt = DateTime.UtcNow
-                },
-                new Booking
-                {
-                    Id = "507f1f77bcf86cd799439032",
-                    UserId = "507f1f77bcf86cd799439011",
-                    SpaceId = "507f1f77bcf86cd799439022",
-                    StartDateTime = DateTime.UtcNow.AddDays(2),
-                    EndDateTime = DateTime.UtcNow.AddDays(2).AddHours(1),
-                    CreatedAt = DateTime.UtcNow
-                },
-                new Booking
-                {
-                    Id = "507f1f77bcf86cd799439033",
-                    UserId = "507f1f77bcf86cd799439012",
-                    SpaceId = "507f1f77bcf86cd799439021",
-                    StartDateTime = DateTime.UtcNow.AddDays(3),
-                    EndDateTime = DateTime.UtcNow.AddDays(3).AddHours(3),
-                    CreatedAt = DateTime.UtcNow
-                }
-            };
-            _bookingsCollection.InsertMany(bookings);
-        }
-
-         #region Unit Tests for IsSpaceAvailable
-
-        [Test]
-        public async Task IsSpaceAvailable_ShouldReturnTrue_WhenSpaceIsAvailableAndNoConflicts()
-        {
-
-            var newBooking = new Booking
-            {
-                UserId = "507f1f77bcf86cd799439011",
-                SpaceId = "507f1f77bcf86cd799439021",
-                StartDateTime = DateTime.UtcNow.AddDays(10),
-                EndDateTime = DateTime.UtcNow.AddDays(10).AddHours(2)
-            };
-
-
-            var result = await _bookingsService.IsSpaceAvailable(newBooking);
-
-
-            Assert.That(result, Is.True, "O espaço deveria estar disponível para este horário");
-        }
-
-        [Test]
-        public async Task IsSpaceAvailable_ShouldReturnFalse_WhenSpaceHasConflictingBooking()
-        {
-
-            var conflictingBooking = new Booking
-            {
-                UserId = "507f1f77bcf86cd799439012",
-                SpaceId = "507f1f77bcf86cd799439021",
-                StartDateTime = DateTime.UtcNow.AddDays(1).AddHours(1),
-                EndDateTime = DateTime.UtcNow.AddDays(1).AddHours(3)
-            };
-
-
-            var result = await _bookingsService.IsSpaceAvailable(conflictingBooking);
-
-
-            Assert.That(result, Is.False, "O espaço não deveria estar disponível devido a conflito de horário");
-        }
-
-        [Test]
-        public async Task IsSpaceAvailable_ShouldReturnFalse_WhenNewBookingEngulfsExistingBooking()
-        {
-
-            var engulfingBooking = new Booking
-            {
-                UserId = "507f1f77bcf86cd799439012",
-                SpaceId = "507f1f77bcf86cd799439021",
-                StartDateTime = DateTime.UtcNow.AddDays(1).AddHours(-1),
-                EndDateTime = DateTime.UtcNow.AddDays(1).AddHours(3)
-            };
-
-
-            var result = await _bookingsService.IsSpaceAvailable(engulfingBooking);
-
-
-            Assert.That(result, Is.False, "O espaço não deveria estar disponível quando a nova reserva engloba uma existente");
-        }
-
-        [Test]
-        public async Task IsSpaceAvailable_ShouldReturnFalse_WhenExistingBookingEngulfsNewBooking()
-        {
-            var engulfedBooking = new Booking
-            {
-                UserId = "507f1f77bcf86cd799439012",
-                SpaceId = "507f1f77bcf86cd799439021",
-                StartDateTime = DateTime.UtcNow.AddDays(1).AddMinutes(30),
-                EndDateTime = DateTime.UtcNow.AddDays(1).AddMinutes(90)
-            };
-
-
-            var result = await _bookingsService.IsSpaceAvailable(engulfedBooking);
-
-
-            Assert.That(result, Is.False, "O espaço não deveria estar disponível quando está dentro de uma reserva existente");
-        }
-
-        [Test]
-        public async Task IsSpaceAvailable_ShouldReturnTrue_WhenBookingEndsExactlyWhenAnotherStarts()
-        {
-            var baseTime = new DateTime(2025, 12, 1, 10, 0, 0, DateTimeKind.Utc);
-
-            _bookingsCollection.DeleteMany(Builders<Booking>.Filter.Empty);
-            var existingBooking = new Booking
-            {
-                Id = "507f1f77bcf86cd799439034",
-                UserId = "507f1f77bcf86cd799439011",
-                SpaceId = "507f1f77bcf86cd799439021",
-                StartDateTime = baseTime,
-                EndDateTime = baseTime.AddHours(2),
-                CreatedAt = DateTime.UtcNow
-            };
-            _bookingsCollection.InsertOne(existingBooking);
-
-            var adjacentBooking = new Booking
-            {
-                UserId = "507f1f77bcf86cd799439012",
-                SpaceId = "507f1f77bcf86cd799439021",
-                StartDateTime = baseTime.AddHours(-2),
-                EndDateTime = baseTime
-            };
-
-
-            var result = await _bookingsService.IsSpaceAvailable(adjacentBooking);
-
-
-            Assert.That(result, Is.True, "O espaço deveria estar disponível quando não há sobreposição real");
-        }
-
-        [Test]
-        public void IsSpaceAvailable_ShouldThrowException_WhenSpaceDoesNotExist()
-        {
-            var bookingWithInvalidSpace = new Booking
-            {
-                UserId = "507f1f77bcf86cd799439011",
-                SpaceId = "507f1f77bcf86cd799999999",
-                StartDateTime = DateTime.UtcNow.AddDays(10),
-                EndDateTime = DateTime.UtcNow.AddDays(10).AddHours(2)
-            };
-
-            var ex = Assert.ThrowsAsync<InvalidOperationException>(
-                async () => await _bookingsService.IsSpaceAvailable(bookingWithInvalidSpace)
-            );
-            Assert.That(ex!.Message, Does.Contain("não foi encontrado"));
-        }
-
-        [Test]
-        public void IsSpaceAvailable_ShouldThrowException_WhenSpaceIsNotAvailable()
-        {
-            var unavailableSpace = new Space
-            {
-                Id = "507f1f77bcf86cd799439023",
+                Id = UnavailableSpaceId,
                 Name = "Sala em Manutenção",
-                Description = "Sala temporariamente indisponível",
                 Capacity = 10,
                 Availability = false,
-                CreatedAt = DateTime.UtcNow
-            };
-            _spacesCollection.InsertOne(unavailableSpace);
+            });
+            await db.SaveChangesAsync();
+        }
 
-            var bookingForUnavailableSpace = new Booking
-            {
-                UserId = "507f1f77bcf86cd799439011",
-                SpaceId = "507f1f77bcf86cd799439023",
-                StartDateTime = DateTime.UtcNow.AddDays(10),
-                EndDateTime = DateTime.UtcNow.AddDays(10).AddHours(2)
-            };
+        private static BookingsService NewService(AppDbContext db) => new(db);
 
-            var ex = Assert.ThrowsAsync<InvalidOperationException>(
-                async () => await _bookingsService.IsSpaceAvailable(bookingForUnavailableSpace)
-            );
+        private static Booking BookingFor(DateTime start, DateTime end, string spaceId = SpaceId) => new()
+        {
+            UserId = UserId,
+            SpaceId = spaceId,
+            StartDateTime = start,
+            EndDateTime = end,
+        };
 
-            Assert.That(ex!.Message, Does.Contain("não está disponível para reservas"));
+        // ───────────────────────── Double-booking (o que importa) ─────────────────────────
+
+        [Test]
+        public async Task Create_ShouldPersist_WhenNoOverlap()
+        {
+            await using var db = TestDatabaseFixture.CreateContext();
+            var svc = NewService(db);
+
+            await svc.Create(BookingFor(Future(1, 10), Future(1, 11)));
+
+            await using var check = TestDatabaseFixture.CreateContext();
+            Assert.That(check.Bookings.Count(), Is.EqualTo(1));
         }
 
         [Test]
-        public void IsSpaceAvailable_ShouldThrowException_WhenStartDateIsAfterEndDate()
+        public async Task Create_ShouldThrowConflict_WhenOverlapping()
         {
-            var invalidBooking = new Booking
-            {
-                UserId = "507f1f77bcf86cd799439011",
-                SpaceId = "507f1f77bcf86cd799439021",
-                StartDateTime = DateTime.UtcNow.AddDays(10).AddHours(5),
-                EndDateTime = DateTime.UtcNow.AddDays(10).AddHours(2)
-            };
+            await using (var db = TestDatabaseFixture.CreateContext())
+                await NewService(db).Create(BookingFor(Future(1, 10), Future(1, 12)));
 
-            var ex = Assert.ThrowsAsync<InvalidOperationException>(
-                async () => await _bookingsService.IsSpaceAvailable(invalidBooking)
-            );
-            Assert.That(ex!.Message, Does.Contain("data de início deve ser anterior"));
+            await using var db2 = TestDatabaseFixture.CreateContext();
+            Assert.ThrowsAsync<BookingConflictException>(async () =>
+                await NewService(db2).Create(BookingFor(Future(1, 11), Future(1, 13))));
         }
 
         [Test]
-        public void IsSpaceAvailable_ShouldThrowException_WhenStartDateEqualsEndDate()
+        public async Task Create_ShouldAllowAdjacentBookings()
         {
-            var sameDateBooking = new Booking
-            {
-                UserId = "507f1f77bcf86cd799439011",
-                SpaceId = "507f1f77bcf86cd799439021",
-                StartDateTime = DateTime.UtcNow.AddDays(10),
-                EndDateTime = DateTime.UtcNow.AddDays(10)
-            };
+            // [10,11) e [11,12) NÃO se sobrepõem — adjacência permitida (RN-01).
+            await using (var db = TestDatabaseFixture.CreateContext())
+                await NewService(db).Create(BookingFor(Future(1, 10), Future(1, 11)));
 
-            var ex = Assert.ThrowsAsync<InvalidOperationException>(
-                async () => await _bookingsService.IsSpaceAvailable(sameDateBooking)
-            );
-            Assert.That(ex!.Message, Does.Contain("data de início deve ser anterior"));
+            await using var db2 = TestDatabaseFixture.CreateContext();
+            Assert.DoesNotThrowAsync(async () =>
+                await NewService(db2).Create(BookingFor(Future(1, 11), Future(1, 12))));
+
+            await using var check = TestDatabaseFixture.CreateContext();
+            Assert.That(check.Bookings.Count(), Is.EqualTo(2));
         }
 
         [Test]
-        public async Task IsSpaceAvailable_ShouldReturnTrue_WhenMultipleSpacesAndNoConflictForTargetSpace()
+        public async Task Create_ShouldAllowSameSlotOnDifferentSpaces()
         {
-            var bookingForDifferentSpace = new Booking
-            {
-                UserId = "507f1f77bcf86cd799439011",
-                SpaceId = "507f1f77bcf86cd799439022",
-                StartDateTime = DateTime.UtcNow.AddDays(1),
-                EndDateTime = DateTime.UtcNow.AddDays(1).AddHours(2)
-            };
+            await using var db = TestDatabaseFixture.CreateContext();
+            db.Spaces.Add(new Space { Id = "44444444-4444-4444-4444-444444444444", Name = "Outra", Availability = true });
+            await db.SaveChangesAsync();
 
-            var result = await _bookingsService.IsSpaceAvailable(bookingForDifferentSpace);
-
-            Assert.That(result, Is.True, "Espaços diferentes não devem conflitar entre si");
+            await using (var d1 = TestDatabaseFixture.CreateContext())
+                await NewService(d1).Create(BookingFor(Future(1, 10), Future(1, 11)));
+            await using var d2 = TestDatabaseFixture.CreateContext();
+            Assert.DoesNotThrowAsync(async () =>
+                await NewService(d2).Create(BookingFor(Future(1, 10), Future(1, 11), "44444444-4444-4444-4444-444444444444")));
         }
 
-        #endregion
+        [Test]
+        public async Task Update_ShouldThrowConflict_WhenMovedOntoOccupiedSlot()
+        {
+            // Primeira reserva ocupa [10,11).
+            await using (var db = TestDatabaseFixture.CreateContext())
+                await NewService(db).Create(BookingFor(Future(1, 10), Future(1, 11)));
 
-        #region GetById Tests
+            // Segunda reserva em [14,15).
+            string secondId;
+            await using (var db = TestDatabaseFixture.CreateContext())
+            {
+                var b2 = BookingFor(Future(1, 14), Future(1, 15));
+                await NewService(db).Create(b2);
+                secondId = b2.Id!;
+            }
+
+            // Mover a segunda para cima da primeira → o banco rejeita no UPDATE
+            // (fecha a antiga lacuna do PUT que não revalidava sobreposição).
+            await using var db2 = TestDatabaseFixture.CreateContext();
+            Assert.ThrowsAsync<BookingConflictException>(async () =>
+                await NewService(db2).Update(secondId, BookingFor(Future(1, 10), Future(1, 11))));
+        }
 
         [Test]
-        public async Task GetById_ShouldReturnBookingWithUserAndSpace_WhenBookingExists()
+        public void Create_ShouldThrow_WhenSpaceUnavailable()
         {
-            var bookingId = "507f1f77bcf86cd799439031";
+            using var db = TestDatabaseFixture.CreateContext();
+            var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                await NewService(db).Create(BookingFor(Future(1, 10), Future(1, 11), UnavailableSpaceId)));
+            Assert.That(ex!.Message, Does.Contain("não está disponível"));
+        }
 
-            var result = await _bookingsService.GetById(bookingId);
+        [Test]
+        public void Create_ShouldThrow_WhenInThePast()
+        {
+            using var db = TestDatabaseFixture.CreateContext();
+            var ex = Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                await NewService(db).Create(BookingFor(Future(-1, 10), Future(-1, 11))));
+            Assert.That(ex!.Message, Does.Contain("passado"));
+        }
+
+        // ───────────────────────── GATE DE CONCORRÊNCIA (Restrição 10) ─────────────────────────
+
+        [Test]
+        public async Task Create_Concurrent_SameSlot_ExactlyOnePersists()
+        {
+            const int n = 100;
+            var start = Future(2, 9);
+            var end = Future(2, 10);
+
+            // N requisições simultâneas para o MESMO espaço e slot, cada uma com seu
+            // próprio DbContext (o DbContext não é thread-safe).
+            var tasks = Enumerable.Range(0, n).Select(async _ =>
+            {
+                await using var db = TestDatabaseFixture.CreateContext();
+                try
+                {
+                    await NewService(db).Create(BookingFor(start, end));
+                    return true; // persistiu
+                }
+                catch (BookingConflictException)
+                {
+                    return false; // rejeitada pelo banco (409)
+                }
+            });
+
+            var results = await Task.WhenAll(tasks);
+
+            var persisted = results.Count(ok => ok);
+            Assert.That(persisted, Is.EqualTo(1), "Exatamente uma reserva concorrente deveria persistir.");
+
+            await using var check = TestDatabaseFixture.CreateContext();
+            Assert.That(check.Bookings.Count(b => b.SpaceId == SpaceId), Is.EqualTo(1),
+                "O banco deve conter exatamente uma reserva para o slot disputado.");
+        }
+
+        // ───────────────────────── Leitura / join ─────────────────────────
+
+        [Test]
+        public async Task GetById_ShouldReturnBookingWithUserAndSpace()
+        {
+            string id;
+            await using (var db = TestDatabaseFixture.CreateContext())
+            {
+                var b = BookingFor(Future(1, 10), Future(1, 11));
+                await NewService(db).Create(b);
+                id = b.Id!;
+            }
+
+            await using var db2 = TestDatabaseFixture.CreateContext();
+            var result = await NewService(db2).GetById(id);
 
             Assert.That(result, Is.Not.Null);
-            Assert.That(result.Id, Is.EqualTo(bookingId));
-            Assert.That(result.User, Is.Not.Null);
-            Assert.That(result.User.Name, Is.EqualTo("João Silva"));
+            Assert.That(result!.User, Is.Not.Null);
+            Assert.That(result.User!.Name, Is.EqualTo("João Silva"));
             Assert.That(result.Space, Is.Not.Null);
-            Assert.That(result.Space.Name, Is.EqualTo("Sala de Conferência A"));
-            Assert.That(result.UserId, Is.EqualTo("507f1f77bcf86cd799439011"));
-            Assert.That(result.SpaceId, Is.EqualTo("507f1f77bcf86cd799439021"));
+            Assert.That(result.Space!.Name, Is.EqualTo("Sala de Conferência A"));
         }
 
         [Test]
-        public async Task GetById_ShouldReturnCorrectUserAndSpaceRelations()
+        public async Task Delete_ShouldRemoveBooking()
         {
-            var bookingId = "507f1f77bcf86cd799439033";
-
-            var result = await _bookingsService.GetById(bookingId);
-
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.User.Name, Is.EqualTo("Maria Santos"));
-            Assert.That(result.User.Profile, Is.EqualTo(Profile.Administrator));
-            Assert.That(result.Space.Name, Is.EqualTo("Sala de Conferência A"));
-        }
-
-        #endregion
-
-        #region GetByUserId Tests
-
-        [Test]
-        public async Task GetByUserId_ShouldReturnAllBookingsForUser_WhenUserHasBookings()
-        {
-            var userId = "507f1f77bcf86cd799439011";
-
-            var result = await _bookingsService.GetByUserId(userId);
-
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Count, Is.EqualTo(2));
-            Assert.That(result.All(b => b.UserId == userId), Is.True);
-            Assert.That(result.All(b => b.User != null), Is.True);
-            Assert.That(result.All(b => b.Space != null), Is.True);
-            Assert.That(result[0].User.Name, Is.EqualTo("João Silva"));
-
-            var bookingIds = result.Select(b => b.Id).ToList();
-            Assert.That(bookingIds, Does.Contain("507f1f77bcf86cd799439031"));
-            Assert.That(bookingIds, Does.Contain("507f1f77bcf86cd799439032"));
-        }
-
-        [Test]
-        public async Task GetByUserId_ShouldReturnEmptyList_WhenUserHasNoBookings()
-        {
-            var userId = "507f1f77bcf86cd799439099";
-
-            var result = await _bookingsService.GetByUserId(userId);
-
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Count, Is.EqualTo(0));
-        }
-
-        #endregion
-
-        #region GetAsync Tests
-
-        [Test]
-        public async Task GetAsync_ShouldReturnAllBookings_WithUserAndSpaceData()
-        {
-            var result = await _bookingsService.GetAsync();
-
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Count, Is.EqualTo(3));
-            Assert.That(result.All(b => b.User != null), Is.True);
-            Assert.That(result.All(b => b.Space != null), Is.True);
-            Assert.That(result.Select(b => b.Id).Distinct().Count(), Is.EqualTo(3));
-
-            var firstBooking = result.FirstOrDefault(b => b.Id == "507f1f77bcf86cd799439031");
-            Assert.That(firstBooking, Is.Not.Null);
-            Assert.That(firstBooking!.User.Name, Is.EqualTo("João Silva"));
-            Assert.That(firstBooking.Space.Name, Is.EqualTo("Sala de Conferência A"));
-        }
-
-        #endregion
-
-        #region Create Tests
-
-        [Test]
-        public async Task Create_ShouldAddNewBooking_WithGeneratedId()
-        {
-            var newBooking = new Booking
+            string id;
+            await using (var db = TestDatabaseFixture.CreateContext())
             {
-                UserId = "507f1f77bcf86cd799439011",
-                SpaceId = "507f1f77bcf86cd799439021",
-                StartDateTime = DateTime.UtcNow.AddDays(5),
-                EndDateTime = DateTime.UtcNow.AddDays(5).AddHours(2),
-                CreatedAt = DateTime.UtcNow
-            };
+                var b = BookingFor(Future(1, 10), Future(1, 11));
+                await NewService(db).Create(b);
+                id = b.Id!;
+            }
 
-            var initialCount = (await _bookingsCollection.Find(_ => true).ToListAsync()).Count;
+            await using (var db = TestDatabaseFixture.CreateContext())
+                await NewService(db).Delete(id);
 
-            await _bookingsService.Create(newBooking);
-
-            var currentCount = (await _bookingsCollection.Find(_ => true).ToListAsync()).Count;
-            Assert.That(currentCount, Is.EqualTo(initialCount + 1));
-            Assert.That(newBooking.Id, Is.Not.Null);
-            Assert.That(newBooking.Id, Is.Not.Empty);
-
-            var addedBooking = await _bookingsCollection.Find(b => b.Id == newBooking.Id).FirstOrDefaultAsync();
-            Assert.That(addedBooking, Is.Not.Null);
-            Assert.That(addedBooking!.UserId, Is.EqualTo("507f1f77bcf86cd799439011"));
-            Assert.That(addedBooking.SpaceId, Is.EqualTo("507f1f77bcf86cd799439021"));
+            await using var check = TestDatabaseFixture.CreateContext();
+            Assert.That(check.Bookings.Count(), Is.EqualTo(0));
         }
-
-        [Test]
-        public async Task Create_ShouldPreserveExistingId_WhenIdIsProvided()
-        {
-            var bookingId = "507f1f77bcf86cd799439099";
-            var newBooking = new Booking
-            {
-                Id = bookingId,
-                UserId = "507f1f77bcf86cd799439011",
-                SpaceId = "507f1f77bcf86cd799439021",
-                StartDateTime = DateTime.UtcNow.AddDays(5),
-                EndDateTime = DateTime.UtcNow.AddDays(5).AddHours(2),
-                CreatedAt = DateTime.UtcNow
-            };
-
-            await _bookingsService.Create(newBooking);
-
-            Assert.That(newBooking.Id, Is.EqualTo(bookingId));
-
-            var addedBooking = await _bookingsCollection.Find(b => b.Id == bookingId).FirstOrDefaultAsync();
-            Assert.That(addedBooking, Is.Not.Null);
-            Assert.That(addedBooking!.Id, Is.EqualTo(bookingId));
-        }
-
-        [Test]
-        public async Task Create_ShouldGenerateUniqueIds_ForMultipleBookings()
-        {
-            var booking1 = new Booking
-            {
-                UserId = "507f1f77bcf86cd799439011",
-                SpaceId = "507f1f77bcf86cd799439021",
-                StartDateTime = DateTime.UtcNow.AddDays(6),
-                EndDateTime = DateTime.UtcNow.AddDays(6).AddHours(2)
-            };
-
-            var booking2 = new Booking
-            {
-                UserId = "507f1f77bcf86cd799439012",
-                SpaceId = "507f1f77bcf86cd799439022",
-                StartDateTime = DateTime.UtcNow.AddDays(7),
-                EndDateTime = DateTime.UtcNow.AddDays(7).AddHours(2)
-            };
-
-            await _bookingsService.Create(booking1);
-            await _bookingsService.Create(booking2);
-
-            Assert.That(booking1.Id, Is.Not.Null);
-            Assert.That(booking2.Id, Is.Not.Null);
-            Assert.That(booking1.Id, Is.Not.EqualTo(booking2.Id));
-
-            var count1 = await _bookingsCollection.CountDocumentsAsync(b => b.Id == booking1.Id);
-            var count2 = await _bookingsCollection.CountDocumentsAsync(b => b.Id == booking2.Id);
-            Assert.That(count1, Is.EqualTo(1));
-            Assert.That(count2, Is.EqualTo(1));
-        }
-
-        #endregion
-
-        #region Update Tests
-
-        [Test]
-        public async Task Update_ShouldModifyExistingBooking_WhenBookingExists()
-        {
-            var bookingId = "507f1f77bcf86cd799439031";
-            var updatedStartDate = DateTime.UtcNow.AddDays(10);
-            var updatedBooking = new Booking
-            {
-                Id = bookingId,
-                UserId = "507f1f77bcf86cd799439011",
-                SpaceId = "507f1f77bcf86cd799439021",
-                StartDateTime = updatedStartDate,
-                EndDateTime = updatedStartDate.AddHours(3),
-                CreatedAt = DateTime.UtcNow.AddDays(-1),
-                UpdatedAt = DateTime.UtcNow
-            };
-
-            await _bookingsService.Update(bookingId, updatedBooking);
-
-            var booking = await _bookingsCollection.Find(b => b.Id == bookingId).FirstOrDefaultAsync();
-            Assert.That(booking, Is.Not.Null);
-            Assert.That(booking!.StartDateTime.Date, Is.EqualTo(updatedStartDate.Date));
-            Assert.That(booking.UpdatedAt, Is.Not.Null);
-            Assert.That(booking.Id, Is.EqualTo(bookingId));
-        }
-
-        [Test]
-        public async Task Update_ShouldReplaceBookingData_WithCorrectParameters()
-        {
-            var bookingId = "507f1f77bcf86cd799439032";
-            var updatedBooking = new Booking
-            {
-                Id = bookingId,
-                UserId = "507f1f77bcf86cd799439011",
-                SpaceId = "507f1f77bcf86cd799439022",
-                StartDateTime = DateTime.UtcNow.AddDays(15),
-                EndDateTime = DateTime.UtcNow.AddDays(15).AddHours(4),
-                CreatedAt = DateTime.UtcNow.AddDays(-2),
-                UpdatedAt = DateTime.UtcNow
-            };
-
-            var initialCount = await _bookingsCollection.CountDocumentsAsync(_ => true);
-
-            await _bookingsService.Update(bookingId, updatedBooking);
-
-            var currentCount = await _bookingsCollection.CountDocumentsAsync(_ => true);
-            Assert.That(currentCount, Is.EqualTo(initialCount));
-
-            var booking = await _bookingsCollection.Find(b => b.Id == bookingId).FirstOrDefaultAsync();
-            Assert.That(booking, Is.Not.Null);
-            Assert.That(booking!.StartDateTime.Date, Is.EqualTo(updatedBooking.StartDateTime.Date));
-        }
-
-        #endregion
-
-        #region Delete Tests
-
-        [Test]
-        public async Task Delete_ShouldRemoveBooking_WhenBookingExists()
-        {
-            var bookingId = "507f1f77bcf86cd799439031";
-            var initialCount = await _bookingsCollection.CountDocumentsAsync(_ => true);
-
-            await _bookingsService.Delete(bookingId);
-
-            var currentCount = await _bookingsCollection.CountDocumentsAsync(_ => true);
-            Assert.That(currentCount, Is.EqualTo(initialCount - 1));
-
-            var deletedBooking = await _bookingsCollection.Find(b => b.Id == bookingId).FirstOrDefaultAsync();
-            Assert.That(deletedBooking, Is.Null);
-        }
-
-        [Test]
-        public async Task Delete_ShouldOnlyRemoveSpecifiedBooking()
-        {
-            var bookingId = "507f1f77bcf86cd799439033";
-            var otherBookingId = "507f1f77bcf86cd799439031";
-
-            await _bookingsService.Delete(bookingId);
-
-            var deletedBooking = await _bookingsCollection.Find(b => b.Id == bookingId).FirstOrDefaultAsync();
-            var otherBooking = await _bookingsCollection.Find(b => b.Id == otherBookingId).FirstOrDefaultAsync();
-
-            Assert.That(deletedBooking, Is.Null);
-            Assert.That(otherBooking, Is.Not.Null);
-        }
-
-        #endregion
-
-        #region Constructor Tests
-
-        // NOTA: a validação de ConnectionString vazia / configuração ausente foi movida
-        // para o Program.cs (fail-fast no boot). O service agora recebe um IMongoDatabase
-        // já configurado via DI, então os antigos testes de construtor que checavam
-        // ConnectionString/DatabaseSettings nulos não se aplicam mais a esta classe.
-        [Test]
-        public void Constructor_ShouldInitializeSuccessfully_WithValidSettings()
-        {
-            var validSettings = new DatabaseSettings
-            {
-                DatabaseName = TestDatabaseName,
-                BookingsCollectionName = "bookings",
-                UsersCollectionName = "users",
-                SpacesCollectionName = "spaces"
-            };
-
-            var mockOptions = Options.Create(validSettings);
-
-            Assert.DoesNotThrow(() => new BookingsService(_testDatabase, mockOptions));
-        }
-
-        #endregion
     }
 }

@@ -1,7 +1,6 @@
 using api.Services;
 using api.Models;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Bson;
 using Microsoft.AspNetCore.Authorization;
 using System.Text.Json;
 
@@ -31,7 +30,7 @@ namespace api.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Get(string id)
         {
-            var space = await _spacesService.GetById(ObjectId.Parse(id).ToString());
+            var space = await _spacesService.GetById(id);
 
             if (space == null)
             {
@@ -179,7 +178,7 @@ namespace api.Controllers
 
                 var newSpace = new Space
                 {
-                    Id = ObjectId.GenerateNewId().ToString(),
+                    Id = Guid.NewGuid().ToString(),
                     Name = space.Name,
                     Description = space.Description,
                     Capacity = space.Capacity,

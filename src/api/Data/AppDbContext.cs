@@ -1,0 +1,159 @@
+using api.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace api.Data
+{
+    // Fonte de verdade em PostgreSQL. O invariante de double-booking (RN-01)
+    // é garantido no banco por uma exclusion constraint sobre um range tstzrange
+    // gerado — ver a migração InitialCreate, que injeta o SQL bruto que o EF
+    // não modela nativamente (coluna GENERATED + EXCLUDE USING gist).
+    public class AppDbContext : DbContext
+    {
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+
+        public DbSet<User> Users => Set<User>();
+        public DbSet<Space> Spaces => Set<Space>();
+        public DbSet<Resource> Resources => Set<Resource>();
+        public DbSet<Booking> Bookings => Set<Booking>();
+        public DbSet<IdempotencyKey> IdempotencyKeys => Set<IdempotencyKey>();
+        public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+        public DbSet<Consent> Consents => Set<Consent>();
+        public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+        public DbSet<Review> Reviews => Set<Review>();
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<User>(e =>
+            {
+                e.ToTable("users");
+                e.HasKey(x => x.Id);
+                e.Property(x => x.Id).HasColumnName("id");
+                e.Property(x => x.Name).HasColumnName("name");
+                e.Property(x => x.Email).HasColumnName("email");
+                e.Property(x => x.Password).HasColumnName("password");
+                e.Property(x => x.Profile).HasColumnName("profile").HasConversion<string>();
+                e.Property(x => x.CreatedAt).HasColumnName("created_at");
+                e.Property(x => x.UpdatedAt).HasColumnName("updated_at");
+                e.Property(x => x.AnonymizedAt).HasColumnName("anonymized_at");
+                e.HasIndex(x => x.Email).IsUnique();
+            });
+
+            modelBuilder.Entity<Resource>(e =>
+            {
+                e.ToTable("resources");
+                e.HasKey(x => x.Id);
+                e.Property(x => x.Id).HasColumnName("id");
+                e.Property(x => x.Name).HasColumnName("name");
+                e.Property(x => x.Description).HasColumnName("description");
+                e.Property(x => x.CreatedAt).HasColumnName("created_at");
+                e.Property(x => x.UpdatedAt).HasColumnName("updated_at");
+            });
+
+            modelBuilder.Entity<Space>(e =>
+            {
+                e.ToTable("spaces");
+                e.HasKey(x => x.Id);
+                e.Property(x => x.Id).HasColumnName("id");
+                e.Property(x => x.Name).HasColumnName("name");
+                e.Property(x => x.Description).HasColumnName("description");
+                e.Property(x => x.Capacity).HasColumnName("capacity");
+                e.Property(x => x.ImageUrl).HasColumnName("image_url");
+                // Lista de strings -> text[] nativo do Postgres.
+                e.Property(x => x.AvailableHours).HasColumnName("available_hours");
+                e.Property(x => x.Availability).HasColumnName("availability");
+                e.Property(x => x.IsAllDayBooking).HasColumnName("is_all_day_booking");
+                e.Property(x => x.AllDayStartTime).HasColumnName("all_day_start_time");
+                e.Property(x => x.AllDayEndTime).HasColumnName("all_day_end_time");
+                e.Property(x => x.CreatedAt).HasColumnName("created_at");
+                e.Property(x => x.UpdatedAt).HasColumnName("updated_at");
+                // Coleção de recursos embutida como jsonb (preserva o shape do documento).
+                e.OwnsMany(x => x.Resources, nb =>
+                {
+                    nb.ToJson("resources");
+                    nb.Ignore(sr => sr.Resource);
+                });
+            });
+
+            modelBuilder.Entity<Booking>(e =>
+            {
+                e.ToTable("bookings");
+                e.HasKey(x => x.Id);
+                e.Property(x => x.Id).HasColumnName("id");
+                e.Property(x => x.UserId).HasColumnName("user_id");
+                e.Property(x => x.SpaceId).HasColumnName("space_id");
+                e.Property(x => x.StartDateTime).HasColumnName("start_date_time");
+                e.Property(x => x.EndDateTime).HasColumnName("end_date_time");
+                e.Property(x => x.Status).HasColumnName("status");
+                e.Property(x => x.CreatedAt).HasColumnName("created_at");
+                e.Property(x => x.UpdatedAt).HasColumnName("updated_at");
+                e.HasIndex(x => x.SpaceId);
+                e.HasIndex(x => x.UserId);
+                // A coluna gerada `during` (tstzrange) e a exclusion constraint
+                // `no_overlap` são criadas via SQL bruto na migração InitialCreate.
+            });
+
+            modelBuilder.Entity<IdempotencyKey>(e =>
+            {
+                e.ToTable("idempotency_keys");
+                e.HasKey(x => new { x.Key, x.UserId });
+                e.Property(x => x.Key).HasColumnName("key");
+                e.Property(x => x.UserId).HasColumnName("user_id");
+                e.Property(x => x.ResponseStatus).HasColumnName("response_status");
+                e.Property(x => x.ResponseBody).HasColumnName("response_body");
+                e.Property(x => x.CreatedAt).HasColumnName("created_at");
+            });
+
+            modelBuilder.Entity<RefreshToken>(e =>
+            {
+                e.ToTable("refresh_tokens");
+                e.HasKey(x => x.Id);
+                e.Property(x => x.Id).HasColumnName("id");
+                e.Property(x => x.UserId).HasColumnName("user_id");
+                e.Property(x => x.TokenHash).HasColumnName("token_hash");
+                e.Property(x => x.ExpiresAt).HasColumnName("expires_at");
+                e.Property(x => x.CreatedAt).HasColumnName("created_at");
+                e.Property(x => x.RevokedAt).HasColumnName("revoked_at");
+                e.Ignore(x => x.IsActive);
+                e.HasIndex(x => x.TokenHash).IsUnique();
+                e.HasIndex(x => x.UserId);
+            });
+
+            modelBuilder.Entity<Consent>(e =>
+            {
+                e.ToTable("consents");
+                e.HasKey(x => x.Id);
+                e.Property(x => x.Id).HasColumnName("id");
+                e.Property(x => x.UserId).HasColumnName("user_id");
+                e.Property(x => x.Version).HasColumnName("version");
+                e.Property(x => x.AcceptedAt).HasColumnName("accepted_at");
+                e.HasIndex(x => x.UserId);
+            });
+
+            modelBuilder.Entity<AuditLog>(e =>
+            {
+                e.ToTable("audit_logs");
+                e.HasKey(x => x.Id);
+                e.Property(x => x.Id).HasColumnName("id");
+                e.Property(x => x.UserId).HasColumnName("user_id");
+                e.Property(x => x.Action).HasColumnName("action");
+                e.Property(x => x.Details).HasColumnName("details");
+                e.Property(x => x.CreatedAt).HasColumnName("created_at");
+                e.HasIndex(x => x.UserId);
+            });
+
+            modelBuilder.Entity<Review>(e =>
+            {
+                e.ToTable("reviews");
+                e.HasKey(x => x.Id);
+                e.Property(x => x.Id).HasColumnName("id");
+                e.Property(x => x.UserId).HasColumnName("user_id");
+                e.Property(x => x.SpaceId).HasColumnName("space_id");
+                e.Property(x => x.Rating).HasColumnName("rating");
+                e.Property(x => x.Comment).HasColumnName("comment");
+                e.Property(x => x.CreatedAt).HasColumnName("created_at");
+                e.HasIndex(x => x.SpaceId);
+                e.HasIndex(x => x.UserId);
+            });
+        }
+    }
+}

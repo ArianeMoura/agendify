@@ -1,6 +1,6 @@
 <div align="center">
 
-<img width="96" height="96" alt="Agendify" src="https://github.com/user-attachments/assets/066a252c-ff3e-45e5-9217-d5939be69894" />
+<img width="96" height="96" alt="Tipografia da logomarca (1)" src="https://github.com/user-attachments/assets/50b6fc87-d704-4545-a742-ae5705592095" hspace="36"/>
 
 # Agendify
 

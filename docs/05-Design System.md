@@ -6,9 +6,9 @@ A identidade visual do **Agendify** foi construída para transmitir organizaçã
 
 <div align="center">
 
-<img width="266" height="266" alt="Logo do Agendify (mobile)" src="https://github.com/user-attachments/assets/692ecdde-a979-418d-8785-08bca7eb91c0" hspace="36" />
+<img width="106" height="106" alt="Logo do Agendify (mobile)" src="https://github.com/user-attachments/assets/692ecdde-a979-418d-8785-08bca7eb91c0" hspace="36" />
 
-<img width="266" height="266" alt="Logo do Agendify (web)" src="https://github.com/user-attachments/assets/066a252c-ff3e-45e5-9217-d5939be69894" hspace="36" />
+<img width="96" height="96" alt="Logo do Agendify (web)" src="https://github.com/user-attachments/assets/066a252c-ff3e-45e5-9217-d5939be69894" hspace="36" />
 
 </div>
 
@@ -23,7 +23,7 @@ A identidade visual do **Agendify** foi construída para transmitir organizaçã
 ## Cores
 
 <div align="center">
-<img width="280" alt="Paleta de cores do Agendify" src="https://github.com/user-attachments/assets/51a9a38b-7632-473a-ab2e-357d03d7a1f6" />
+<img width="316" alt="Paleta de cores do Agendify" src="https://github.com/user-attachments/assets/51a9a38b-7632-473a-ab2e-357d03d7a1f6" />
 </div>
 
 <h4 align="center">Paleta de cores</h4>
@@ -44,9 +44,9 @@ O roxo estabelece a identidade principal da marca, criando um ambiente visual co
 
 <div align="center">
 
-<img width="206" height="206" alt="Tipografia da logomarca (1)" src="https://github.com/user-attachments/assets/50b6fc87-d704-4545-a742-ae5705592095" hspace="36"/>
+<img width="126" height="126" alt="Tipografia da logomarca (1)" src="https://github.com/user-attachments/assets/50b6fc87-d704-4545-a742-ae5705592095" hspace="36"/>
 
-<img width="206" height="206" alt="Tipografia da logomarca (2)" src="https://github.com/user-attachments/assets/8428f329-c409-4838-85c6-d4d2bb6223d4" hspace="36"/>
+<img width="126" height="126" alt="Tipografia da logomarca (2)" src="https://github.com/user-attachments/assets/8428f329-c409-4838-85c6-d4d2bb6223d4" hspace="36"/>
 
 </div>
 

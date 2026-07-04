@@ -27,4 +27,26 @@ public class AuthController : ControllerBase
 
         return Ok(response);
     }
+
+    // Troca o refresh token por um novo par (access + refresh rotacionado).
+    [HttpPost("refresh")]
+    public async Task<IActionResult> Refresh([FromBody] RefreshRequest request)
+    {
+        var response = await _authService.RefreshAsync(request.RefreshToken);
+
+        if (response == null)
+        {
+            return Unauthorized(new { message = "Refresh token inválido ou expirado" });
+        }
+
+        return Ok(response);
+    }
+
+    // Logout: revoga o refresh token apresentado.
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout([FromBody] RefreshRequest request)
+    {
+        await _authService.RevokeAsync(request.RefreshToken);
+        return NoContent();
+    }
 }

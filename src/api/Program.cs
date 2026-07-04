@@ -1,10 +1,11 @@
 using System.Text;
+using api.Data;
 using api.Models;
 using api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,11 +13,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<DatabaseSettings>(options =>
 {
     options.ConnectionString = builder.Configuration["DatabaseSettings:ConnectionString"] ?? "";
-    options.DatabaseName = builder.Configuration["DatabaseSettings:DatabaseName"] ?? "";
-    options.UsersCollectionName = builder.Configuration["DatabaseSettings:UsersCollectionName"] ?? "";
-    options.SpacesCollectionName = builder.Configuration["DatabaseSettings:SpacesCollectionName"] ?? "";
-    options.ResourcesCollectionName = builder.Configuration["DatabaseSettings:ResourcesCollectionName"] ?? "";
-    options.BookingsCollectionName = builder.Configuration["DatabaseSettings:BookingsCollectionName"] ?? "";
 });
 
 // Fail-fast: aborta o boot se os segredos não estiverem configurados
@@ -26,13 +22,9 @@ if (string.IsNullOrWhiteSpace(connectionString))
     throw new InvalidOperationException(
         "DatabaseSettings:ConnectionString não configurado. Rode 'dotnet user-secrets set \"DatabaseSettings:ConnectionString\" ...' (dev) ou defina a variável de ambiente DatabaseSettings__ConnectionString (prod).");
 
-var databaseName = builder.Configuration["DatabaseSettings:DatabaseName"];
-
-// IMongoClient/IMongoDatabase como singletons — o driver é thread-safe e gerencia
-// o connection pool internamente; instanciar um MongoClient por service desperdiça pools.
-builder.Services.AddSingleton<IMongoClient>(_ => new MongoClient(connectionString));
-builder.Services.AddSingleton<IMongoDatabase>(sp =>
-    sp.GetRequiredService<IMongoClient>().GetDatabase(databaseName));
+// PostgreSQL como fonte de verdade. O Npgsql gerencia o connection pool.
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(connectionString));
 
 builder.Services.AddLogging();
 
@@ -65,14 +57,23 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    // Policy nomeada para endpoints exclusivos de gestor.
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Administrator"));
+});
 
-builder.Services.AddSingleton<UsersService>();
+// Services que dependem do AppDbContext (scoped) precisam ser Scoped também.
+builder.Services.AddScoped<UsersService>();
 builder.Services.AddScoped<AuthService>();
-builder.Services.AddSingleton<SpacesService>();
-builder.Services.AddSingleton<ResourcesService>();
-builder.Services.AddSingleton<BookingsService>();
-builder.Services.AddSingleton<AnalyticsService>();
+builder.Services.AddScoped<SpacesService>();
+builder.Services.AddScoped<ResourcesService>();
+builder.Services.AddScoped<BookingsService>();
+builder.Services.AddScoped<AnalyticsService>();
+builder.Services.AddScoped<IdempotencyService>();
+builder.Services.AddScoped<PrivacyService>();
+builder.Services.AddScoped<ReviewsService>();
+// FileUploadService só toca o filesystem — pode continuar Singleton.
 builder.Services.AddSingleton<FileUploadService>();
 
 builder.Services.AddControllers()
@@ -123,13 +124,14 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowWebApp", policy =>
     {
+        // Origens de dev padrão (Razor legado + Next.js admin). Sem host de
+        // produção hardcoded — produção vem exclusivamente de CORS_ALLOWED_ORIGINS.
         var allowedOrigins = new List<string>
         {
             "http://localhost:5292",
-            "https://agendify-web-efcneeeya4hkfse2.canadacentral-01.azurewebsites.net"
+            "http://localhost:3000"
         };
 
-        // Adicionar origens de produção a partir de variáveis de ambiente
         var productionOrigins = Environment.GetEnvironmentVariable("CORS_ALLOWED_ORIGINS");
         if (!string.IsNullOrEmpty(productionOrigins))
         {
@@ -145,6 +147,15 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+// Em Development, aplica as migrações automaticamente (cria schema + a exclusion
+// constraint). Em produção, rode `dotnet ef database update` no deploy/CI.
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
+}
 
 app.MapGet("/status", () => DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
 
