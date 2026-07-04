@@ -148,9 +148,12 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Em Development, aplica as migrações automaticamente (cria schema + a exclusion
-// constraint). Em produção, rode `dotnet ef database update` no deploy/CI.
-if (app.Environment.IsDevelopment())
+// Aplica as migrações automaticamente (cria schema + a exclusion constraint) em
+// Development, ou em produção quando ApplyMigrationsOnStartup=true (ex.: no Fly/
+// Render, deploy de instância única). Do contrário, rode `dotnet ef database update`.
+var applyMigrations = app.Environment.IsDevelopment()
+    || builder.Configuration.GetValue<bool>("ApplyMigrationsOnStartup");
+if (applyMigrations)
 {
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();

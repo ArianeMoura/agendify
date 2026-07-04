@@ -1,0 +1,28 @@
+# Deploy da API no Fly.io. Rode `fly deploy` a partir de src/api.
+# Segredos NÃO ficam aqui — use `fly secrets set` (ver docs/09-Deploy.md).
+app = "agendify-api"
+# São Paulo: mantém os dados dos titulares no Brasil (residência LGPD) e reduz latência.
+primary_region = "gru"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  ASPNETCORE_ENVIRONMENT = "Production"
+  # Aplica as migrações (schema + exclusion constraint) no boot. Instância única.
+  ApplyMigrationsOnStartup = "true"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  # Escala a zero quando ocioso (custo baixo p/ produto solo). Instância única
+  # evita corrida de migração no boot.
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+[[http_service.checks]]
+  interval = "15s"
+  timeout = "2s"
+  method = "GET"
+  path = "/status"
