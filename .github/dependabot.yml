@@ -1,0 +1,33 @@
+version: 2
+updates:
+  # Backend .NET
+  - package-ecosystem: nuget
+    directory: /src/api
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+  - package-ecosystem: nuget
+    directory: /src/api.Tests
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+
+  # Admin web (Next.js)
+  - package-ecosystem: npm
+    directory: /src/admin
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+
+  # Mobile (Expo)
+  - package-ecosystem: npm
+    directory: /src/mobile
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+
+  # Workflows do próprio CI
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

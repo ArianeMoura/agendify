@@ -32,7 +32,11 @@ jobs:
         run: dotnet restore src/api/api.csproj && dotnet restore src/api.Tests/api.Tests.csproj
       - name: Build
         run: dotnet build src/api/api.csproj --configuration Release --no-restore
-      - name: Test
-        # Sem AGENDIFY_TEST_MONGO os testes de integração são ignorados (Assert.Ignore),
-        # então a suíte roda sem depender de um cluster Mongo real.
+      # A suíte usa Testcontainers para subir um PostgreSQL efêmero (o runner
+      # ubuntu-latest já tem Docker). Não depende de banco externo.
+      - name: Gate de concorrência (RN-01 — double-booking)
+        # Bloqueio de release: N=100 criações simultâneas do mesmo slot → exatamente
+        # uma persiste. Se este teste falhar, o build falha e o merge é barrado.
+        run: dotnet test src/api.Tests/api.Tests.csproj --configuration Release --filter "Name~Concurrent"
+      - name: Suíte completa
         run: dotnet test src/api.Tests/api.Tests.csproj --configuration Release

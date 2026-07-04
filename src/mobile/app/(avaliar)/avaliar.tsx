@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView, TextInput, Alert, Switch, StatusBar } from 'react-native'; // <-- CORREÇÃO AQUI
 import { useLocalSearchParams, useRouter } from 'expo-router'; // Hooks para parâmetros e navegação
 import { Picker } from '@react-native-picker/picker'; // Componente para o <select>
+import { reviewsApi } from '../../lib/api/reviews';
 
 // Variáveis de Cor
 const Cores = {
@@ -28,7 +29,8 @@ export default function AvaliarScreen() {
   const [isAnonymous, setIsAnonymous] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  // Função de envio para o Google Forms (LÓGICA 4 do seu app.js)
+  // Envia a avaliação para a própria API (RF-013), não mais a um Google Form de
+  // terceiros. O usuário vem do token; os campos extras compõem o comentário.
   const handleSubmit = async () => {
     if (rating === "0" || !purpose) {
       Alert.alert("Campos Obrigatórios", "Por favor, selecione uma nota e um propósito.");
@@ -36,28 +38,23 @@ export default function AvaliarScreen() {
     }
 
     setIsSubmitting(true);
-    const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSfVu2vt6wuYLXbR1-IMotKbtc3s6EBBQ5gZfwWpFYqxwzVOeQ/formResponse';
 
-    // Mapeia os dados do formulário para os 'entry' IDs
-    const formData = new FormData();
-    formData.append('entry.771112235', params.id as string); // space-id-input
-    formData.append('entry.1948864566', rating); // rating-value
-    formData.append('entry.1958159279', purpose); // purpose
-    formData.append('entry.1106367887', hadProblem ? "Sim" : "Não"); // problema_sim/nao
-    formData.append('entry.1189940137', problemDetails); // problem_details
-    formData.append('entry.1480821103', feedback); // feedback
-    formData.append('entry.673090461', isAnonymous ? "Sim" : "Não"); // anonymous
+    const commentParts = [
+      `Propósito: ${purpose}`,
+      hadProblem ? `Problema: ${problemDetails || 'sim (sem detalhes)'}` : 'Sem problemas técnicos',
+      feedback ? `Feedback: ${feedback}` : null,
+    ].filter(Boolean);
 
     try {
-      await fetch(GOOGLE_FORM_URL, {
-        method: 'POST',
-        body: formData,
-        mode: 'no-cors'
+      await reviewsApi.create({
+        spaceId: params.id as string,
+        rating: parseInt(rating, 10),
+        comment: commentParts.join(' | '),
       });
       // Navega para a tela de obrigado
       router.push('/obrigado');
     } catch (error) {
-      console.error('Erro ao enviar formulário:', error);
+      console.error('Erro ao enviar avaliação:', error);
       Alert.alert("Erro", "Falha ao enviar avaliação. Tente novamente.");
       setIsSubmitting(false);
     }

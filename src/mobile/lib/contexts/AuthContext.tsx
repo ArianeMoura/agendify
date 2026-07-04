@@ -1,6 +1,9 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { User, LoginResponse } from '../types';
+import { tokenStore } from '../storage/tokenStore';
+import { setOnSessionExpired } from '../api/config';
+import { authApi } from '../api/auth';
 
 interface AuthContextData {
   user: User | null;
@@ -12,6 +15,10 @@ interface AuthContextData {
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
+
+// Chave apenas para o objeto de usuário (não-sensível). Os tokens vão para o
+// armazenamento seguro (Keychain/Keystore) via tokenStore.
+const USER_KEY = 'user';
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -29,18 +36,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    loadStoredData();
+  const logout = useCallback(async () => {
+    try {
+      const refreshToken = await tokenStore.getRefreshToken();
+      if (refreshToken) {
+        // Revoga o refresh token no servidor (best-effort).
+        await authApi.logout(refreshToken).catch(() => undefined);
+      }
+    } finally {
+      await tokenStore.clear();
+      await AsyncStorage.removeItem(USER_KEY);
+      setUser(null);
+    }
   }, []);
 
   const loadStoredData = useCallback(async () => {
     try {
-      const [storedToken, storedUser] = await Promise.all([
-        AsyncStorage.getItem('token'),
-        AsyncStorage.getItem('user'),
+      const [accessToken, storedUser] = await Promise.all([
+        tokenStore.getAccessToken(),
+        AsyncStorage.getItem(USER_KEY),
       ]);
 
-      if (storedToken && storedUser) {
+      if (accessToken && storedUser) {
         setUser(JSON.parse(storedUser));
       }
     } catch (error) {
@@ -50,10 +67,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, []);
 
+  useEffect(() => {
+    loadStoredData();
+    // Se um refresh falhar (sessão expirada), limpa o usuário em memória.
+    setOnSessionExpired(() => setUser(null));
+    return () => setOnSessionExpired(null);
+  }, [loadStoredData]);
+
   const setAuthData = useCallback(async (data: LoginResponse) => {
     try {
-      await AsyncStorage.setItem('token', data.token);
-      await AsyncStorage.setItem('user', JSON.stringify(data.user));
+      await tokenStore.setTokens(data.token, data.refreshToken);
+      await AsyncStorage.setItem(USER_KEY, JSON.stringify(data.user));
       setUser(data.user);
     } catch (error) {
       console.error('Error setting auth data:', error);
@@ -61,20 +85,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, []);
 
-  const logout = useCallback(async () => {
-    try {
-      await AsyncStorage.removeItem('token');
-      await AsyncStorage.removeItem('user');
-      setUser(null);
-    } catch (error) {
-      console.error('Logout error:', error);
-      throw error;
-    }
-  }, []);
-
   const updateUser = useCallback(async (updatedUser: User) => {
     try {
-      await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
+      await AsyncStorage.setItem(USER_KEY, JSON.stringify(updatedUser));
       setUser(updatedUser);
     } catch (error) {
       console.error('Update user error:', error);
@@ -97,4 +110,3 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     </AuthContext.Provider>
   );
 };
-

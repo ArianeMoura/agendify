@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+/* Design tokens do Agendify (roxo da marca, alinhado ao mobile). Admin em tema
+   claro consistente — sem alternância automática para evitar surpresas. */
+@theme {
+  --color-brand-50: #f6f0fc;
+  --color-brand-100: #ead9f8;
+  --color-brand-400: #a95fe3;
+  --color-brand-500: #9345d9;
+  --color-brand-600: #7c34bd;
+  --color-brand-700: #6a0dad;
+
+  --color-surface: #ffffff;
+  --color-muted: #f5f6f8;
+  --color-line: #e6e8ec;
+  --color-ink: #1f2430;
+  --color-ink-soft: #5b6472;
+}
+
+html,
+body {
+  background: var(--color-muted);
+  color: var(--color-ink);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}

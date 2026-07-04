@@ -19,7 +19,24 @@ export interface LoginRequest {
 
 export interface LoginResponse {
   token: string;
+  refreshToken: string;
+  expiresAt?: string;
   user: User;
+}
+
+export interface Review {
+  id: string;
+  userId: string;
+  spaceId: string;
+  rating: number;
+  comment?: string;
+  createdAt: string;
+}
+
+export interface CreateReviewRequest {
+  spaceId: string;
+  rating: number;
+  comment?: string;
 }
 
 export interface CreateUserRequest {

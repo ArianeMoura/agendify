@@ -1,0 +1,30 @@
+name: mobile-app
+
+on:
+  push:
+    branches: [main]
+    paths: ['src/mobile/**', '.github/workflows/mobile.yml']
+  pull_request:
+    branches: [main]
+    paths: ['src/mobile/**', '.github/workflows/mobile.yml']
+
+jobs:
+  lint:
+    name: Lint (Expo)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: src/mobile/package-lock.json
+      - name: Install
+        run: npm ci
+      # expo lint é o gate do mobile. O typecheck completo (tsc) ainda tem erros
+      # pré-existentes em telas legadas (sem `import React`); tratar em separado.
+      - name: Lint
+        run: npx expo lint

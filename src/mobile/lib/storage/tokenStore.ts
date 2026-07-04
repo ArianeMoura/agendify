@@ -1,0 +1,40 @@
+import * as SecureStore from 'expo-secure-store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
+
+// Armazenamento seguro de tokens. Em nativo usa Keychain/Keystore via
+// expo-secure-store; na web (react-native-web, sem SecureStore) cai para
+// AsyncStorage. Substitui o antigo token em texto plano no AsyncStorage.
+const ACCESS_KEY = 'agendify.accessToken';
+const REFRESH_KEY = 'agendify.refreshToken';
+
+const isWeb = Platform.OS === 'web';
+
+async function setItem(key: string, value: string): Promise<void> {
+  if (isWeb) return AsyncStorage.setItem(key, value);
+  return SecureStore.setItemAsync(key, value);
+}
+
+async function getItem(key: string): Promise<string | null> {
+  if (isWeb) return AsyncStorage.getItem(key);
+  return SecureStore.getItemAsync(key);
+}
+
+async function deleteItem(key: string): Promise<void> {
+  if (isWeb) return AsyncStorage.removeItem(key);
+  return SecureStore.deleteItemAsync(key);
+}
+
+export const tokenStore = {
+  async setTokens(accessToken: string, refreshToken: string): Promise<void> {
+    await Promise.all([
+      setItem(ACCESS_KEY, accessToken),
+      setItem(REFRESH_KEY, refreshToken),
+    ]);
+  },
+  getAccessToken: () => getItem(ACCESS_KEY),
+  getRefreshToken: () => getItem(REFRESH_KEY),
+  async clear(): Promise<void> {
+    await Promise.all([deleteItem(ACCESS_KEY), deleteItem(REFRESH_KEY)]);
+  },
+};

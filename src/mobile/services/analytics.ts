@@ -1,5 +1,6 @@
-// src/mobile/services/analytics.ts
-import { api } from "./api";
+// Usa o cliente axios único (lib/api/config) — com Authorization e Base URL por
+// env. Antes ia pelo fetch de services/api.ts, sem token (removido).
+import { api } from '../lib/api/config';
 
 // Tipo conforme o retorno da API de peak hours
 export type PeakHourDto = {
@@ -11,13 +12,12 @@ export type PeakHourDto = {
 export async function getPeakHours(params: {
   year: number;
   month: number;
-  spaceId?: string; // Ajustado para string (ObjectId do MongoDB)
+  spaceId?: string;
 }): Promise<PeakHourDto[]> {
   const { year, month, spaceId } = params;
 
-  return api.get<PeakHourDto[]>("/analytics/peak-hours", {
-    year,
-    month,
-    spaceId,
+  const response = await api.get<PeakHourDto[]>('/analytics/peak-hours', {
+    params: { year, month, spaceId },
   });
+  return response.data;
 }
