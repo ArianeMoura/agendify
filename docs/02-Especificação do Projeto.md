@@ -1,6 +1,6 @@
-# Especificações do Projeto
+# Especificação do Projeto
 
-Esta seção detalha as especificações do projeto **Agendify**, apresentando uma visão estruturada da solução proposta a partir da perspectiva do usuário.
+Esta seção detalha as especificações do **Agendify**, apresentando uma visão estruturada da solução a partir da perspectiva do usuário.
 
 ## Personas
 
@@ -28,7 +28,7 @@ As personas a seguir representam os principais arquétipos de usuário do Agendi
 | **Ocupação:** | Síndico Profissional (administrador) |
 | **Perfil:** | Gerencia múltiplos condomínios e busca profissionalizar a operação das áreas comuns. |
 | **Objetivos:** | Centralizar regras, limites de capacidade e comunicação, além de obter dados concretos de utilização para planejar melhorias e reduzir conflitos. |
-| **Frustrações:** | Gasta muito tempo resolvendo disputas por agendamentos. A comunicação é pulverizada (grupos de WhatsApp, e-mails, murais) e ele não tem controle sobre quem recebeu os comunicados. |
+| **Frustrações:** | Gasta muito tempo resolvendo disputas por agendamentos. A comunicação é pulverizada (grupos de mensagens, e-mails, murais) e ele não tem controle sobre quem recebeu os comunicados. |
 
 | Helena Martins | <div align="center"><img width="200" alt="Foto de Helena Martins" src="https://github.com/user-attachments/assets/12db0c3b-6d42-4d88-a327-e4eea1d60bb2" /></div> |
 | :--- | :--- |
@@ -44,9 +44,9 @@ As personas a seguir representam os principais arquétipos de usuário do Agendi
 | **Ocupação:** | Gerente de Operações de Coworking (operador comercial) |
 | **Perfil:** | Administra um espaço de coworking com salas de reunião e estações compartilhadas alugadas a empresas e profissionais autônomos. |
 | **Objetivos:** | Controlar a ocupação em tempo real, aplicar regras por tipo de plano e extrair relatórios de uso e receita para apoiar decisões de operação. |
-| **Frustrações:** | Ferramentas isoladas que não previnem reservas duplicadas (double booking) nem consolidam métricas de ocupação e faturamento. |
+| **Frustrações:** | Ferramentas isoladas que não previnem reservas duplicadas (*double booking*) nem consolidam métricas de ocupação e faturamento. |
 
-## Histórias de Usuários
+## Histórias de usuário
 
 | EU COMO... `PERSONA` | QUERO/PRECISO ... `FUNCIONALIDADE` | PARA ... `MOTIVO/VALOR` |
 | :--- | :--- | :--- |
@@ -56,11 +56,11 @@ As personas a seguir representam os principais arquétipos de usuário do Agendi
 | **Helena Martins** | Ter acesso a horários disponíveis para minhas aulas e poder reservar horários recorrentes | Planejar minhas turmas de forma organizada, evitando sobreposição de aulas e otimizar minha agenda profissional. |
 | **Rafael Nunes** | Gerenciar a ocupação das salas e estações em tempo real, aplicando regras por plano e emitindo relatórios | Maximizar a ocupação do espaço, evitar reservas duplicadas e acompanhar métricas de uso e receita. |
 
-## Modelagem do Processo de Negócio - Agendify
+## Modelagem do processo de negócio
 
-### Análise da Situação Atual
+### Análise da situação atual
 
-O gerenciamento de reservas de espaços (condomínios, coworkings, salões de festa, salas de reunião, áreas comuns) costuma ser fragmentado e manual em muitas organizações. Usuários recorrem a planilhas, grupos de WhatsApp, ou sistemas isolados que não conversam entre si. Isso provoca vários problemas operacionais:
+O gerenciamento de reservas de espaços (condomínios, coworkings, salões de festa, salas de reunião, áreas comuns) costuma ser fragmentado e manual em muitas organizações. Usuários recorrem a planilhas, grupos de mensagens ou sistemas isolados que não conversam entre si. Isso provoca vários problemas operacionais:
 
 * Falta de centralização das informações sobre disponibilidade e histórico de reservas.
 * Conflitos por reserva e dificuldade de reconciliação de horários.
@@ -68,21 +68,21 @@ O gerenciamento de reservas de espaços (condomínios, coworkings, salões de fe
 * Ausência de notificações/alertas confiáveis (confirmação, lembretes, check-in, cancelamento).
 * Dificuldade para gerar relatórios e auditar uso e receitas associadas.
 
-**Impacto:** insatisfação dos moradores/usuários, perda de receita (por cancelamentos não tratados), e aumento de trabalho administrativo.
+**Impacto:** insatisfação dos usuários, perda de receita (por cancelamentos não tratados) e aumento de trabalho administrativo.
 
-### Descrição Geral da Proposta
+### Descrição geral da proposta
 
-O sistema de gestão de reservas **Agendify** é uma solução mobile e web para gerenciar reservas, uso e faturamento de espaços compartilhados. 
+O Agendify é uma solução mobile e web para gerenciar reservas, uso e faturamento de espaços compartilhados.
 
 **Objetivos principais:**
 
 * Centralizar o catálogo de espaços e calendários.
-* Automação de validações de regras (políticas do condomínio, limites por usuário, horários de bloqueio).
-* Processamento de pagamentos integrados (quando aplicável) e política de reembolso.
-* Notificações e lembretes (confirmação, 24h antes, check-in, avisos de uso indevido).
-* Relatórios de uso, receita e conflitos.
+* Automatizar validações de regras (políticas do local, limites por usuário, horários de bloqueio).
+* Processar pagamentos integrados (quando aplicável) e política de reembolso.
+* Emitir notificações e lembretes (confirmação, 24h antes, check-in, avisos de uso indevido).
+* Gerar relatórios de uso, receita e conflitos.
 
-### Processo 1 – Registro de Reserva
+### Processo 1 — Registro de reserva
 
 **Objetivo:** permitir que um usuário solicite a reserva de um espaço de forma rápida, com validações quase em tempo real e retorno claro (confirmado, pendente ou rejeitado).
 
@@ -94,15 +94,13 @@ O sistema de gestão de reservas **Agendify** é uma solução mobile e web para
 * Processamento de pagamentos quando aplicável.
 * Confirmação automática com comprovante (e-mail) e link para adicionar ao calendário.
 
-#### Fluxograma 1 — Registro de Reserva
-
 <div align="center">
 <img width="900" alt="Fluxograma do processo de registro de reserva" src="https://github.com/user-attachments/assets/f47a1bc3-7561-4320-a7b1-e970fb1652df" />
 </div>
 
-<h4 align="center">FIGURA 01</h4>
+<h4 align="center">Fluxograma — Registro de Reserva</h4>
 
-### Processo 2 – Gerenciamento de Reservas (aprovação, uso e cancelamento)
+### Processo 2 — Gerenciamento de reservas (aprovação, uso e cancelamento)
 
 **Objetivo:** controlar o ciclo de vida da reserva após a solicitação, validação, bloqueio, uso (check-in) e encerramento.
 
@@ -113,40 +111,36 @@ O sistema de gestão de reservas **Agendify** é uma solução mobile e web para
 * Monitoramento do uso (ex.: check-in por QR code) para evitar abusos.
 * Painel administrativo para gerenciar exceções e relatórios.
 
-#### Fluxograma 2 — Gerenciamento de Reservas
-
 <div align="center">
 <img width="900" alt="Fluxograma do processo de gerenciamento de reservas" src="https://github.com/user-attachments/assets/03252803-ab6c-4b07-ac84-55e97d82ee88" />
 </div>
 
-<h4 align="center">FIGURA 02</h4>
+<h4 align="center">Fluxograma — Gerenciamento de Reservas</h4>
 
-## Indicadores de Desempenho
+## Indicadores de desempenho
 
-| Indicador | Descrição | Objetivo | Cálculo | Fonte de Dados | Perspectiva |
+| Indicador | Descrição | Objetivo | Cálculo | Fonte de dados | Perspectiva |
 |---|---|---|---|---|---|
 | **Utilização por espaço (dia/semana/mês)** | Horas ou número de reservas efetivamente utilizadas por cada espaço em um período. | Medir o aproveitamento dos espaços para gestão e alocação. | `(Horas reservadas no período) / (Horas disponíveis no período) * 100` ou `#reservas por espaço` por período. | Logs de reservas (start/end), calendário de disponibilidade. | Operações |
 | **Taxa de ocupação (por espaço / global)** | Percentual do tempo disponível que ficou reservado. | Avaliar aproveitamento total e identificar espaços subutilizados. | `(Total horas ocupadas / Total horas disponíveis) * 100` | Banco de dados de reservas + calendário de disponibilidade. | Operações / Estratégia |
 | **Horários de pico** | Faixas horárias com maior concentração de reservas (por dia da semana). | Planejar recursos, restrições e estratégias (limpeza, staff, precificação). | `Contar reservas por slot horário → ordenar → Top N` | Reservas com timestamps. | Operações |
-| **Taxa de no‑shows** | Percentual de reservas confirmadas onde o usuário não compareceu. | Reduzir desperdício e ajustar políticas de garantia/multa. | `(No-shows / Reservas confirmadas) * 100` | Registros de presença / check-in / confirmação. | Operações / Clientes |
+| **Taxa de no-shows** | Percentual de reservas confirmadas onde o usuário não compareceu. | Reduzir desperdício e ajustar políticas de garantia/multa. | `(No-shows / Reservas confirmadas) * 100` | Registros de presença / check-in / confirmação. | Operações / Clientes |
 | **Tempo médio de aprovação** | Tempo médio entre solicitação e decisão (aprovada/rejeitada) para reservas que exigem aprovação manual. | Otimizar SLA de aprovação e experiência do usuário. | `avg(tempo_aprovacao = tempo_aprovado - tempo_solicitado)` | Logs de workflow / eventos de aprovação. | Processos Internos |
 | **Receita gerada por reservas (por espaço / total)** | Valor financeiro oriundo das reservas (taxas, aluguel, multas). | Monitorar receita, rentabilidade e apoiar decisões de precificação. | `sum(valor_pago)` por período; `Receita média por reserva = total / #reservas` | Sistema de pagamentos / faturas. | Financeiro |
 | **Taxa de cancelamento** | Percentual de reservas que foram canceladas antes do uso. | Identificar fricções, ajustar políticas e reduzir impactos operacionais. | `(Reservas canceladas / Reservas totais) * 100` | Histórico de reservas. | Operações / Clientes |
 
 ## Requisitos
 
-As tabelas a seguir apresentam uma descrição detalhada dos **requisitos funcionais** e **não funcionais** que definem o escopo do projeto:
+### Requisitos funcionais
 
-### Requisitos Funcionais
-
-|ID    | Descrição do Requisito  | Prioridade |
+|ID    | Descrição do requisito  | Prioridade |
 |------|-----------------------------------------|----|
 |RF-001| O sistema deve permitir a criação de perfis com diferentes permissões (administrador, gestor, usuário, prestador de serviços). | ALTA |
 |RF-002| O sistema deve permitir que os usuários realizem login com e-mail e senha. | ALTA |
 |RF-003| O sistema deve possibilitar a recuperação de senha. | ALTA |
 |RF-004| O sistema deve permitir que administradores cadastrem novos espaços com nome, capacidade, recursos, horários e regras de uso. | ALTA |
 |RF-005| O sistema deve permitir que usuários criem, visualizem, editem e cancelem reservas de espaços. | ALTA |
-|RF-006| O sistema deve impedir conflitos de agendamento, evitando reservas duplicadas (double booking). | ALTA |
+|RF-006| O sistema deve impedir conflitos de agendamento, evitando reservas duplicadas (*double booking*), inclusive sob concorrência. | ALTA |
 |RF-007| O sistema deve exibir um calendário ou agenda com todas as reservas por espaço. | ALTA |
 |RF-008| O sistema deve permitir a visualização da disponibilidade dos espaços em tempo real. | ALTA |
 |RF-009| O sistema deve permitir que os usuários recebam notificações de confirmações, lembretes ou alterações de reservas. | ALTA |
@@ -157,49 +151,60 @@ As tabelas a seguir apresentam uma descrição detalhada dos **requisitos funcio
 |RF-014| O sistema deve permitir que os usuários editem seu perfil.| ALTA |
 |RF-015| O sistema deve exibir uma dashboard inicial personalizada, com conteúdos e funcionalidades diferentes para usuários e administradores. | ALTA |
 
-### Requisitos Não-Funcionais
+### Requisitos não funcionais
 
-| ID      | Descrição do Requisito                                                              | Prioridade |
+| ID      | Descrição do requisito                                                              | Prioridade |
 |---------|-------------------------------------------------------------------------------------|------------|
-| RNF-001 | O sistema deve usar tokens de sessão com expiração configurável                     | ALTA       |
-| RNF-002 | A interface deve ser responsiva para desktop, tablet e mobile                       | ALTA       |
-| RNF-003 | O sistema deve suportar os 3 navegadores mais utilizados                            | ALTA       |
-| RNF-004 | O sistema deve ter alta disponibilidade                                             | ALTA       |
-| RNF-005 | O sistema deve ter tempo de resposta médio da API ≤ 1000ms para 95% das requisições | MÉDIA      |
-| RNF-006 | O frontend deve carregar completamente em até 3 segundos                            | MÉDIA      |
-| RNF-007 | O aplicativo mobile deve abrir em até 2 segundos                                    | MÉDIA      |
-| RNF-008 | O código deve ter cobertura mínima de testes de 60%                                 | MÉDIA      |
-| RNF-009 | A API deve suportar pelo menos 100 requisições simultâneas                          | BAIXA      |
-| RNF-010 | O banco de dados deve processar no mínimo 50 transações por segundo                 | BAIXA      |
+| RNF-001 | O sistema deve usar tokens de sessão com expiração configurável.                    | ALTA       |
+| RNF-002 | A interface deve ser responsiva para desktop, tablet e mobile.                      | ALTA       |
+| RNF-003 | O sistema deve suportar os três navegadores mais utilizados.                        | ALTA       |
+| RNF-004 | O sistema deve ter alta disponibilidade.                                            | ALTA       |
+| RNF-005 | O sistema deve ter tempo de resposta médio da API ≤ 1000 ms para 95% das requisições. | MÉDIA    |
+| RNF-006 | O frontend deve carregar completamente em até 3 segundos.                           | MÉDIA      |
+| RNF-007 | O aplicativo mobile deve abrir em até 2 segundos.                                   | MÉDIA      |
+| RNF-008 | O código deve ter cobertura mínima de testes de 60%.                                | MÉDIA      |
+| RNF-009 | A API deve suportar pelo menos 100 requisições simultâneas.                         | BAIXA      |
+| RNF-010 | O banco de dados deve processar no mínimo 50 transações por segundo.                | BAIXA      |
+| RNF-011 | Senhas devem ser armazenadas com hashing forte (BCrypt/Argon2), nunca em texto plano. | ALTA     |
+| RNF-012 | Toda a comunicação deve trafegar sobre TLS (HTTPS); dados sensíveis criptografados em repouso. | ALTA |
+| RNF-013 | O tratamento de dados pessoais deve estar em conformidade com a LGPD.               | ALTA       |
+
+> Os requisitos de segurança (RNF-011 a RNF-013) são detalhados em [SECURITY.md](../SECURITY.md).
+
+### Regras de negócio
+
+Regras críticas que orientam a implementação e os testes. A prevenção de conflitos (RN-01) é
+o coração do produto e o requisito de maior risco técnico — sua solução de concorrência está
+detalhada em [Arquitetura da Solução → Concorrência e Consistência](03-Arquitetura%20da%20Solução.md#concorrência-e-consistência-prevenção-de-double-booking).
+
+| ID | Regra |
+|----|-------|
+| **RN-01** | Duas reservas do **mesmo espaço** não podem ter faixas de horário que se sobreponham. Considerando os intervalos `[início, fim)`, há conflito quando `novaInício < existenteFim` **e** `novaFim > existenteInício`. Reservas **adjacentes** (o fim de uma coincide exatamente com o início da outra) são permitidas. A regra deve valer **mesmo sob requisições concorrentes**. |
+| **RN-02** | Uma reserva só pode ser criada para um espaço com `Availability = true`. Espaços desativados administrativamente bloqueiam novas reservas. |
+| **RN-03** | A data/hora de início deve ser **estritamente anterior** à de término; reservas de duração zero ou negativa são inválidas. |
+| **RN-04** | Não é permitido criar reservas com início no passado. |
+| **RN-05** | Apenas o autor da reserva ou um administrador pode editá-la ou cancelá-la. |
 
 ## Restrições
 
-O projeto está **restrito** pelos itens apresentados na tabela a seguir:
-
-<div align="center">
-
 |ID| Restrição                                             |
 |--|-------------------------------------------------------|
-|01| A aplicação deve ter um controle de acesso de usuários|
-|02| A aplicação deve integrar Web e Mobile                |
-|03| A aplicação deve funcionar online                     |
-|04| A aplicação deve funcionar nos sistemas Android e iOS |
+|01| A aplicação deve ter controle de acesso de usuários.  |
+|02| A aplicação deve integrar Web e Mobile.               |
+|03| A aplicação deve funcionar online.                    |
+|04| A aplicação deve funcionar nos sistemas Android e iOS.|
 
-</div>
-
-## Diagrama de Casos de Uso
+## Diagrama de casos de uso
 
 <div align="center">
 <img width="1000" alt="Diagrama de casos de uso" src="https://github.com/user-attachments/assets/a4f3da60-fac0-4117-a320-9f431f20b918" />
 </div>
 
-<h4 align="center">FIGURA 03</h4>
+## Matriz de rastreabilidade
 
-# Matriz de Rastreabilidade
+A matriz de rastreabilidade estabelece a relação entre os requisitos definidos e os objetivos de negócio, garantindo que cada requisito atenda a uma necessidade real e mensurável. Ela permite acompanhar a consistência do desenvolvimento, facilitando a verificação, a validação e o controle de mudanças ao longo do ciclo de vida do sistema.
 
-A matriz de rastreabilidade tem como objetivo estabelecer a relação entre os requisitos definidos e os objetivos de negócio do projeto, garantindo que cada requisito atenda a uma necessidade real e mensurável. Essa ferramenta permite acompanhar a consistência do desenvolvimento, facilitando a verificação, validação e o controle de mudanças ao longo do ciclo de vida do sistema. Além disso, contribui para assegurar que não haja requisitos esquecidos ou desalinhados com os propósitos do **Agendify**.
-
-| ID | Descrição Resumida | Gestão de Usuários | Autenticação | Recuperação de Senha | Gestão de Espaços | Gestão de Reservas | Prevenção de Conflitos | Calendário/Agenda | Disponibilidade em Tempo Real | Notificações | Relatórios/Dashboards | Pesquisa de Espaços | Avaliação/Feedback |
+| ID | Descrição resumida | Gestão de Usuários | Autenticação | Recuperação de Senha | Gestão de Espaços | Gestão de Reservas | Prevenção de Conflitos | Calendário/Agenda | Disponibilidade em Tempo Real | Notificações | Relatórios/Dashboards | Pesquisa de Espaços | Avaliação/Feedback |
 |--------|--------------------|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
 | RF-001 | Perfis com permissões | X | | | | | | | | | | | |
 | RF-002 | Login com e-mail e senha | | X | | | | | | | | | | |
@@ -217,62 +222,8 @@ A matriz de rastreabilidade tem como objetivo estabelecer a relação entre os r
 | RF-014 | Edição de perfil do usuário | X | | | | | | | | | | | |
 | RF-015 | Dashboard inicial personalizada | | | | | | | | | | X | | |
 
-# Gerenciamento de Projeto
+---
 
-Para o desenvolvimento do **Agendify**, adotamos como referência as práticas do **PMBoK v7 (Project Management Body of Knowledge),** assegurando uma abordagem estruturada, ágil e eficiente. O gerenciamento do projeto foi organizado em áreas-chave — **tempo, equipe e orçamento** — com o objetivo de garantir entregas dentro do prazo estabelecido, alinhadas aos requisitos funcionais e à qualidade esperada.
-
-Essa abordagem proporciona uma visão integrada do ciclo de vida do projeto, favorecendo o planejamento detalhado, a definição clara de responsabilidades e o acompanhamento contínuo de cada etapa. Com isso, o **Agendify** foi conduzido de forma colaborativa, reduzindo riscos, otimizando recursos e assegurando que o produto final atendesse às necessidades do usuário e aos objetivos estratégicos da equipe.
-
-## Gerenciamento de Tempo
-
-O gerenciamento do tempo do **Agendify** foi otimizado pelo uso do **Diagrama de Gantt**, que oferece uma visão clara e estruturada do andamento do projeto. Essa ferramenta possibilita:
-
-- **Planejar e distribuir atividades** de forma equilibrada, evitando sobrecarga da equipe.
-- **Definir prazos e marcos importantes**, garantindo a execução dentro do cronograma.
-- **Monitorar continuamente o progresso**, permitindo ajustes rápidos diante de imprevistos.
-
-Com essa abordagem, o desenvolvimento do **Agendify** pode ser conduzido de maneira **organizada, ágil e alinhada aos objetivos do projeto**, assegurando maior eficiência na entrega dos resultados.
-
-<div align="center">
-<img width="900" alt="Diagrama de Gantt do projeto" src="https://github.com/user-attachments/assets/7ff96a08-e6eb-4b37-be4a-438c17f67de8" />
-</div>
-
-<h4 align="center">FIGURA 04 - Diagrama de Gantt</h4>
-
-## Gerenciamento de Equipe
-
-Este cronograma, desenvolvido em planilha, serve como um **guia visual** para o gerenciamento da equipe e das entregas do projeto. Estruturado para otimizar a coordenação do trabalho entre agosto e dezembro, ele agrupa as atividades do time e define as principais entregas. 
-
-O principal objetivo é sincronizar todas as fases do projeto, garantindo iterações rápidas e um fluxo de feedback contínuo. O resultado é um processo de trabalho transparente, que guia a equipe de forma eficiente para o **deploy da aplicação e a entrega final**.
-
-<br>
-
-<img width="900" alt="Cronograma do projeto" src="https://github.com/user-attachments/assets/dfa4ecfe-b992-45be-90b5-2cae8a9d1160" />
-
-<h4 align="center">FIGURA 05 - Cronograma do Projeto</h4>
-
-## Gestão de Orçamento
-
-O orçamento do projeto **Agendify** foi estruturado para contemplar os principais recursos necessários ao desenvolvimento e implantação da plataforma (Web, Mobile e API). 
-
-O planejamento financeiro considera um ciclo de **6 meses de desenvolvimento** e uma equipe formada por **6 desenvolvedores full-stack**, divididos entre atividades de back-end, front-end, mobile, DevOps e design.
-
-**Resumo por categoria:**
-
-- **Recursos Humanos:** remuneração da equipe de 6 desenvolvedores durante todo o período de desenvolvimento, cobrindo implementação das funcionalidades principais, correções, integração contínua e suporte ao deploy em staging e produção.
-- **Hardware:** aquisição mínima de dispositivos para testes (como smartphones), periféricos e licenças pontuais de ferramentas de teste. A estratégia prevê o aproveitamento dos equipamentos pessoais da equipe para reduzir custos.
-- **Rede e Infraestrutura:** despesas de conectividade e suporte a ferramentas de colaboração e versionamento do código.
-- **Software, Licenças e Ferramentas:** licenças essenciais não cobertas por versões gratuitas, ferramentas de design e produtividade em planos limitados e soluções de gestão do projeto.
-- **Serviços em Nuvem:** instâncias de hospedagem da API, banco de dados gerenciado, armazenamento e backups. A configuração é otimizada para manter custos baixos sem comprometer a performance.
-- **Marketing e Vendas:** ações iniciais para lançamento, incluindo landing page, materiais digitais básicos e anúncios experimentais para validação de mercado.
-- **Recursos Adicionais:** reserva destinada a imprevistos operacionais ou contratação pontual de serviços específicos.
-
-Esse planejamento financeiro visa garantir que o projeto seja executado com qualidade e em total alinhamento com as funcionalidades essenciais estabelecidas.
-
-<br>
-
-<p align="center">
-<img width="460" alt="Quadro de gestão de custos" src="https://github.com/user-attachments/assets/e112d384-7a6b-4395-801b-89ce26c67f45" />
-</p>
-
-<h4 align="center"> FIGURA 06 - Quadro de Gestão de Custos</h4>
+O acompanhamento de tarefas, prioridades e entregas é feito no **GitHub Projects**, com cada
+requisito desdobrado em **Issues** rastreáveis. O fluxo de trabalho está descrito em
+[CONTRIBUTING.md](../CONTRIBUTING.md).

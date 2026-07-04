@@ -1,6 +1,6 @@
 # Instruções de utilização
 
-## ▶️ Como Rodar o App Mobile no Simulador com Expo
+## Como rodar o app mobile no simulador com Expo
 
 Siga os passos abaixo para executar o Agendify em um emulador ou dispositivo físico via Expo:
 
@@ -16,7 +16,7 @@ Siga os passos abaixo para executar o Agendify em um emulador ou dispositivo fí
 
 ### 2. Passos:
 
-**Clone** o repositório oficial:
+**Clone** o repositório:
 
 `git clone https://github.com/ArianeMoura/agendify.git`
 
@@ -38,7 +38,7 @@ Siga os passos abaixo para executar o Agendify em um emulador ou dispositivo fí
 - No **emulador Android**, pressione `a` no terminal.
 - No **simulador iOS** (macOS + Xcode), pressione `i`.
 
-## ▶️ Como Rodar a API (.NET 9)
+## Como rodar a API (.NET 9)
 
 ### 1. Pré-requisitos:
 
@@ -91,24 +91,12 @@ git config core.hooksPath .githooks
 O CI (`.github/workflows/security.yml`) também roda o gitleaks em cada push/PR. Recomenda-se
 habilitar **Secret scanning + Push protection** nas configurações do repositório no GitHub.
 
-## Hospedagem
+## Hospedagem e acesso
 
-`🔗 Link de Acesso:`
+O ambiente de demonstração em nuvem (Azure App Service) foi **descontinuado**. A API (com a
+documentação Swagger em `/swagger`), a Web e o Mobile são executados **localmente** seguindo as
+instruções acima; o MongoDB de desenvolvimento é provido pelo `docker/docker-compose.yml`.
 
-**Documentação da API:** https://agendify-api-hcakacdneufubggc.canadacentral-01.azurewebsites.net/swagger/index.html
-
-**API URL:** https://agendify-web-efcneeeya4hkfse2.canadacentral-01.azurewebsites.net/Login
-
-`🔐 Credenciais de Acesso:` 
-
-- Administrador Demo:
-
-**E-mail:** admin@agendify.com
-
-**Senha:** 12345678
-
-- Usúario Demo:
-
-**E-mail:** usuario@agendify.com
-
-**Senha:** 12345678
+As **credenciais de demonstração** (perfis de administrador e usuário) são criadas via *seed*
+local sob solicitação e **não são versionadas** no repositório, por segurança. Consulte as
+diretrizes em [SECURITY.md](../SECURITY.md).
