@@ -151,6 +151,20 @@ O Agendify é uma solução mobile e web para gerenciar reservas, uso e faturame
 |RF-014| O sistema deve permitir que os usuários editem seu perfil.| ALTA |
 |RF-015| O sistema deve exibir uma dashboard inicial personalizada, com conteúdos e funcionalidades diferentes para usuários e administradores. | ALTA |
 
+#### Requisitos funcionais avançados
+
+Funcionalidades de plataforma moderna de reservas, priorizadas para a evolução do produto. O
+detalhamento arquitetural (incluindo a base de concorrência que sustenta *hold* e lista de
+espera) está em [Arquitetura da Solução](03-Arquitetura%20da%20Solução.md).
+
+|ID    | Descrição do requisito  | Prioridade |
+|------|-----------------------------------------|----|
+|RF-016| O sistema deve permitir **reservas recorrentes** (diária, semanal ou mensal) por meio de uma regra de recorrência padrão **iCalendar RRULE (RFC 5545)**, criando as ocorrências livres e reportando as que estejam em conflito. | ALTA |
+|RF-017| O sistema deve oferecer **lista de espera** para horários indisponíveis: ao cancelar uma reserva, o slot liberado é ofertado ao próximo da fila com um bloqueio temporário; expirado o prazo, passa ao seguinte. | MÉDIA |
+|RF-018| O sistema deve permitir **check-in por QR code** e aplicar **política de no-show**: a ausência após o período de tolerância marca a reserva como não comparecida e libera o slot automaticamente. | MÉDIA |
+|RF-019| O sistema deve manter uma **reserva temporária (*hold*)** durante o fluxo de confirmação/pagamento, bloqueando o slot por um tempo limitado e liberando-o automaticamente (via *TTL index* do MongoDB) caso não seja confirmado. | ALTA |
+|RF-020| O sistema deve **propagar a disponibilidade em tempo real** (reservas e cancelamentos) aos clientes conectados, sem necessidade de recarregar a tela, complementando o RF-008. | ALTA |
+
 ### Requisitos não funcionais
 
 | ID      | Descrição do requisito                                                              | Prioridade |
@@ -168,6 +182,22 @@ O Agendify é uma solução mobile e web para gerenciar reservas, uso e faturame
 | RNF-011 | Senhas devem ser armazenadas com hashing forte (BCrypt/Argon2), nunca em texto plano. | ALTA     |
 | RNF-012 | Toda a comunicação deve trafegar sobre TLS (HTTPS); dados sensíveis criptografados em repouso. | ALTA |
 | RNF-013 | O tratamento de dados pessoais deve estar em conformidade com a LGPD.               | ALTA       |
+
+#### Requisitos não funcionais de sistema distribuído
+
+Requisitos de qualidade específicos de uma plataforma distribuída de reservas de alta
+disponibilidade. As decisões e o "porquê" de cada um estão em
+[Arquitetura da Solução](03-Arquitetura%20da%20Solução.md).
+
+| ID      | Descrição do requisito                                                              | Prioridade |
+|---------|-------------------------------------------------------------------------------------|------------|
+| RNF-014 | Os endpoints de escrita de reserva devem aceitar uma **`Idempotency-Key`** e ser idempotentes sob *retry* de rede (uma mesma chave nunca gera duas reservas). | ALTA |
+| RNF-015 | A prevenção de *double-booking* deve ser **garantida no nível do banco** (índice único e/ou transação), não apenas em memória, resistindo a ≥ 100 requisições concorrentes. | ALTA |
+| RNF-016 | Mudanças de disponibilidade devem ser **propagadas em tempo real** aos clientes conectados com latência p95 ≤ 1 s. | MÉDIA |
+| RNF-017 | O sistema deve ser **observável**: *tracing* distribuído (OpenTelemetry), *logs* estruturados correlacionados por `correlationId` e endpoints de `health`/`readiness`. | MÉDIA |
+| RNF-018 | O contrato da API deve ser **versionado e retrocompatível** (`/api/v1`), com **OpenAPI publicado** como artefato e testes de contrato. | MÉDIA |
+| RNF-019 | Os **direitos do titular (LGPD)** — exportação (portabilidade) e apagamento/anonimização — devem ser atendidos por *self-service* em prazo ≤ 15 dias, com trilha de auditoria. | ALTA |
+| RNF-020 | O sistema deve ser **resiliente**: *timeouts*, *retry* com *backoff* e *circuit breaker* nos clientes, com **degradação graciosa** (fallback para *polling*) quando o canal de tempo real estiver indisponível. | MÉDIA |
 
 > Os requisitos de segurança (RNF-011 a RNF-013) são detalhados em [SECURITY.md](../SECURITY.md).
 
@@ -193,6 +223,12 @@ detalhada em [Arquitetura da Solução → Concorrência e Consistência](03-Arq
 |02| A aplicação deve integrar Web e Mobile.               |
 |03| A aplicação deve funcionar online.                    |
 |04| A aplicação deve funcionar nos sistemas Android e iOS.|
+|05| O MongoDB deve operar como **replica set** em todos os ambientes (inclusive local, via *single-node replica set* no `docker-compose`), para habilitar transações e garantir paridade dev/prod. |
+|06| A API deve permanecer **stateless** (autenticação por JWT), sem *sticky sessions*, permitindo escala horizontal atrás de *load balancer*. |
+|07| Web e Mobile **não acessam o banco diretamente**: toda a lógica de negócio trafega pela API, que é a única fonte de verdade. |
+|08| A configuração sensível (connection strings, segredos, URLs de ambiente) deve vir de variáveis de ambiente / *User Secrets* — **nunca *hardcoded*** no código ou versionada. |
+|09| O contrato da API deve ser **versionado** (`/api/v1`), com erros padronizados em `ProblemDetails` (RFC 7807) e códigos semânticos (ex.: `409` para conflito de reserva). |
+|10| A cobertura mínima de testes (RNF-008) e um **teste de concorrência de reservas** (N criações simultâneas → exatamente uma persiste) são *gates* obrigatórios de release no CI. |
 
 ## Diagrama de casos de uso
 
@@ -221,6 +257,26 @@ A matriz de rastreabilidade estabelece a relação entre os requisitos definidos
 | RF-013 | Avaliação de espaços e serviços | | | | | | | | | | | | X |
 | RF-014 | Edição de perfil do usuário | X | | | | | | | | | | | |
 | RF-015 | Dashboard inicial personalizada | | | | | | | | | | X | | |
+
+### Matriz de rastreabilidade — requisitos avançados
+
+Rastreabilidade dos requisitos avançados (RF-016…020) e não funcionais de sistema distribuído
+(RNF-014…020) até os *epics* de produto e as decisões arquiteturais que os sustentam.
+
+| ID | Descrição resumida | Epic / Capacidade | Decisão arquitetural de suporte |
+|----|--------------------|-------------------|---------------------------------|
+| RF-016 | Reservas recorrentes (RRULE) | Agenda avançada | Expansão de RRULE + guarda de concorrência por slot |
+| RF-017 | Lista de espera com liberação automática | Otimização de ocupação | Evento `SlotReleased` (outbox) + *hold* com TTL |
+| RF-018 | Check-in por QR e no-show | Governança de uso | Ciclo de vida da reserva + liberação automática |
+| RF-019 | Reserva temporária (*hold*) | Confirmação/pagamento | *TTL index* + índice único de guarda |
+| RF-020 | Disponibilidade em tempo real | Tempo real | Canal WebSocket (SignalR) + fallback *polling* |
+| RNF-014 | Idempotência | Confiabilidade de escrita | `Idempotency-Key` na criação de reserva |
+| RNF-015 | Não-duplicação no nível do banco | Prevenção de conflito | Índice único + transação com *retry* |
+| RNF-016 | Propagação em tempo real (p95 ≤ 1 s) | Tempo real | SignalR por grupo de espaço |
+| RNF-017 | Observabilidade | Operação | OpenTelemetry + logs estruturados + health checks |
+| RNF-018 | Contrato versionado + OpenAPI | Evolução de contrato | `/api/v1` + `ProblemDetails` + testes de contrato |
+| RNF-019 | Direitos do titular (LGPD) | Privacidade | Export/erasure/anonimização + auditoria |
+| RNF-020 | Resiliência | Tolerância a falhas | Retry/backoff + circuit breaker + degradação graciosa |
 
 ---
 

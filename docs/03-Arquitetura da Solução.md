@@ -54,11 +54,36 @@ A API segue uma separação em camadas inspirada na **Clean Architecture**, com 
 
 ## Comunicação entre aplicações
 
-- **Protocolo:** REST sobre HTTPS, payloads em JSON.
+A comunicação combina **REST para o CRUD** (o que já existe e é adequado ao domínio orientado a
+recursos) com um **canal de tempo real para disponibilidade** (a lacuna atual do RF-008/RF-020).
+A escolha de cada padrão é justificada abaixo.
+
+### REST/HTTPS + JSON — contrato principal
+
+- **Protocolo:** REST sobre HTTPS, payloads em JSON. *Por quê:* o domínio de reservas é orientado a recursos (`bookings`, `spaces`, `users`), a semântica *request/response* é natural, o *tooling* é maduro e as respostas são cacheáveis. É o que já está implantado.
 - **Autenticação:** *Bearer token* JWT (HS256) enviado no header `Authorization`.
-- **Versionamento:** recomenda-se versionar o contrato sob prefixo (`/api/v1/...`) para permitir evolução sem quebrar clientes existentes.
-- **Erros:** padronização recomendada via `ProblemDetails` (RFC 7807), retornando `400` (validação), `401/403` (auth), `404` (não encontrado) e `409` (conflito de reserva).
-- **GraphQL:** não faz parte do escopo atual (o contrato é REST). É uma consideração futura caso os clientes passem a exigir *queries* muito heterogêneas — ver [ROADMAP.md](../ROADMAP.md).
+- **Versionamento:** versionar o contrato sob prefixo (`/api/v1/...`) para evoluir sem quebrar clientes existentes; publicar o **OpenAPI como artefato** (RNF-018).
+- **Erros:** `ProblemDetails` (RFC 7807), retornando `400` (validação), `401/403` (auth), `404` (não encontrado) e **`409` (conflito de reserva)**.
+- **Concorrência otimista em edições:** usar **ETag / `If-Match`** em `PUT` de reserva/espaço para detectar edições concorrentes (evita *lost update* em um mesmo documento).
+- **Idempotência:** aceitar `Idempotency-Key` nas escritas (RNF-014) para tornar *retries* seguros.
+
+### WebSocket via SignalR — tempo real (RF-008 / RF-020)
+
+- **Decisão:** usar **SignalR** para propagar mudanças de disponibilidade e notificações aos clientes conectados. O servidor publica eventos `SlotReserved` / `SlotReleased` em **grupos por espaço**; o cliente atualiza o cache do React Query, refletindo a mudança sem recarregar a tela.
+- **Por quê:** disponibilidade é intrinsecamente **multiusuário** e precisa propagar ao vivo; *polling* desperdiça banda e desatualiza. SignalR é o transporte bidirecional **nativo do .NET**, com *fallback* automático (WebSocket → SSE → *long-polling*) e cliente para React Native via `@microsoft/signalr`.
+- **Degradação graciosa (RNF-020):** quando o socket cai, o cliente recai para *polling* leve via React Query — a disponibilidade continua correta, apenas menos "instantânea".
+
+### gRPC — comunicação interna (evolução)
+
+- Recomendado **apenas para comunicação serviço-a-serviço interna** (ex.: um futuro microsserviço de notificações), pela eficiência do *protobuf*/HTTP-2. **Não** para a borda mobile: o suporte a gRPC-web/React Native é mais frágil e os *payloads* de reserva são pequenos, sem ganho que justifique. Fica como evolução caso o monólito seja decomposto — ver [ROADMAP.md](../ROADMAP.md).
+
+### GraphQL — fora de escopo
+
+- As *queries* dos clientes **não são heterogêneas** o suficiente para justificar a complexidade adicional; REST + alguns endpoints de agregação (ex.: disponibilidade por espaço) atendem. Reavaliar apenas se surgirem clientes com necessidades de *query* muito variáveis.
+
+### Eventos assíncronos (padrão Outbox) — evolução
+
+- Para notificações (RF-009) e lista de espera (RF-017), gravar os eventos de domínio numa **coleção *outbox* dentro da mesma transação** da reserva; um *worker* em *background* os publica (broker ou SignalR) com entrega **at-least-once**. *Por quê:* elimina a inconsistência de *dual-write* entre "gravar a reserva" e "notificar/liberar slot". No MVP de mantenedor solo, o envio direto com *retry* é suficiente; o *outbox* entra quando houver pagamento ou integração externa que exija entrega garantida.
 
 ## Modelo de dados (MongoDB)
 
@@ -190,6 +215,32 @@ A prevenção robusta combina uma **guarda atômica no banco** com **atomicidade
 4. **Semântica de erro.** Conflitos devem retornar **HTTP 409 Conflict** (não 400), permitindo
    ao cliente sugerir horários alternativos.
 
+### Por que não outras abordagens
+
+- **Campo de versão / concorrência otimista sozinho** protege *um único documento* contra *lost
+  update*, mas o *double-booking* é um invariante **entre dois documentos distintos** (duas
+  reservas diferentes) — um `version` em uma delas não impede a outra. Por isso a defesa correta é
+  a **guarda de unicidade** (índice único), e não apenas versionamento. O ETag/`If-Match` continua
+  válido, porém para o caso separado de **edição concorrente da mesma reserva**.
+- **Lock distribuído (ex.: Redis Redlock)** adiciona infraestrutura e novos modos de falha
+  (expiração de *lease*, *clock skew*) para resolver algo que o **próprio banco já arbitra** via
+  índice único. Mais simples, barato e correto deixar o MongoDB ser a fonte da verdade.
+
+### Correções acopladas (dívida técnica atual)
+
+A implementação vigente ([`BookingsService.IsSpaceAvailable`](../src/api/Services/BookingsService.cs) +
+`InsertOneAsync`) precisa evoluir junto com a guarda:
+
+1. **Consulta limitada por data:** a verificação hoje carrega *todas* as reservas do espaço em
+   memória (`Find(...).ToListAsync()` + `Any()`); deve **filtrar por faixa de data** na *query*,
+   apoiada no índice `{ spaceId, startDateTime, endDateTime }`.
+2. **`Update` também valida:** a edição de reserva (`ReplaceOneAsync`) hoje **não** checa
+   sobreposição — deve passar pela mesma guarda/checagem que a criação.
+3. **Índices no *startup*:** criar os índices (único de guarda e o composto de disponibilidade)
+   automaticamente via `IHostedService` (`EnsureIndexes`), já que hoje **nenhum índice é criado**
+   por código.
+4. **Idempotência:** aceitar `Idempotency-Key` na criação (RNF-014) para colapsar *retries*.
+
 > Requisitos de infraestrutura: transações multi-documento exigem MongoDB em **replica set**
 > (o Atlas já opera assim; para desenvolvimento local, o `docker-compose` precisa habilitar
 > um *single-node replica set*). Quando isso não estiver disponível, o índice único por slot
@@ -223,6 +274,20 @@ A segurança é tratada em profundidade (*defense in depth*) e detalhada em
 - **Auditoria:** *logs* de ações relevantes (autenticação, criação/alteração/cancelamento de
   reservas) para rastreabilidade e apoio à conformidade **LGPD**.
 
+### LGPD e privacidade de dados no MongoDB
+
+Como o Agendify passa a tratar **dados de usuários reais**, a conformidade com a LGPD é
+**pré-requisito de lançamento** — não um item de *roadmap* distante. Padrões adotados:
+
+- **Classificação e minimização de PII:** identificar e marcar campos pessoais (nome, e-mail, e — quando existirem — telefone/documento) e coletar apenas o necessário para a finalidade (base legal).
+- **Criptografia em nível de campo (CSFLE / Queryable Encryption):** para PII sensível, com chaves em um **KMS** (ex.: Azure Key Vault). *Por quê:* o *encryption-at-rest* do Atlas protege o disco, mas a **CSFLE protege o dado até de administradores do banco e de *dumps*** vazados. *(Para o MVP solo, iniciar com o encryption-at-rest gerenciado do Atlas + hashing; adotar CSFLE quando houver PII que o justifique.)*
+- **Anonimização × pseudonimização:** no apagamento ou no expurgo por retenção, substituir a PII por um **token irreversível** (hash com *salt* descartado), **preservando a reserva agregada** para os indicadores — a reserva anonimizada mantém `spaceId`/horário mas **perde o vínculo com `userId`**. Distinguir **anonimização** (irreversível, fora do escopo da LGPD) de **pseudonimização** (reversível, ainda é dado pessoal).
+- **Direitos do titular programáticos (RNF-019):** endpoint de **exportação** (portabilidade — todos os dados do usuário em JSON) e de **apagamento** ("direito ao esquecimento"), que anonimiza `bookings` e remove o documento em `users`; ambos **auditados**.
+- **Retenção e expurgo:** política por tipo de dado; **`TTL index`** para dados efêmeros (*holds* do RF-019, sessões, notificações expiradas). Os *logs* de auditoria têm retenção maior.
+- **Consentimento e base legal:** coleção de consentimentos **versionados** (com *timestamp* e revogação).
+- **Menor privilégio no banco:** usuário de aplicação distinto do administrativo; sem `dbOwner` amplo.
+- **Transferência a terceiros — gap a corrigir:** o fluxo de avaliação atual envia dados a um **Google Form de terceiros** (transferência sem base legal/contrato de operador). A avaliação (RF-013) deve ser **trazida para dentro da API** antes do lançamento.
+
 ## Escalabilidade e disponibilidade
 
 - **API sem estado (*stateless*):** a autenticação por JWT permite escalar horizontalmente
@@ -233,6 +298,64 @@ A segurança é tratada em profundidade (*defense in depth*) e detalhada em
   frequentes (ex.: catálogo de espaços) na API — ver [ROADMAP.md](../ROADMAP.md).
 - **Observabilidade:** *health checks*, *logs* estruturados e métricas para suportar os alvos
   de desempenho (RNF-005 a RNF-010).
+
+## Casos extremos (edge cases)
+
+Três cenários de risco extremo na gestão de reservas e como a arquitetura proposta os trata.
+
+### 1. Corrida de *double-booking* (TOCTOU real)
+
+**Cenário:** dois usuários submetem reservas sobrepostas para o mesmo espaço dentro da janela
+entre a verificação e a inserção, e/ou o cliente reenvia a requisição após *timeout* de rede.
+
+**Tratamento:** o **índice único por slot** faz a segunda inserção falhar de forma determinística
+(`E11000 duplicate key`) → **HTTP 409**; para faixas arbitrárias, a **transação + *retry*** em
+`WriteConflict` garante a serialização; a **`Idempotency-Key`** colapsa *retries* do mesmo cliente.
+Corrige diretamente a lacuna de [`BookingsService`](../src/api/Services/BookingsService.cs)
+(hoje *read-then-write* sem atomicidade).
+
+### 2. Cancelamento concorrente + liberação de lista de espera
+
+**Cenário:** o usuário A cancela uma reserva no exato instante em que o usuário B tenta reservar
+o slot liberado e a oferta automática de lista de espera (RF-017) dispara — **três escritores**
+disputando o mesmo horário.
+
+**Tratamento:** o cancelamento remove o documento-guarda **dentro de uma transação que emite o
+evento `SlotReleased`** (via *outbox*); a oferta de lista de espera cria um ***hold* (TTL)**
+disputando o **mesmo índice único**. Quem vencer a inserção do guarda leva o slot; os demais
+recebem `409`/passam ao próximo da fila. **Nenhum slot é perdido e não há concessão dupla.**
+
+### 3. Falha parcial / *dual-write* e fuso horário
+
+**Cenário:** a reserva é confirmada, mas a notificação ou o pagamento falha; ou a rede cai
+**após** a inserção; ou a reserva cruza uma transição de horário de verão.
+
+**Tratamento:** o padrão ***outbox*** grava reserva + evento **atomicamente**, e um *dispatcher*
+reentrega (*at-least-once*) → a notificação chega sem gerar reserva-fantasma nem duplicada; a
+**idempotência** torna o *retry* do cliente seguro. Todos os *timestamps* são armazenados em
+**UTC** (o código já força `DateTimeKind.Utc`), com a **chave de slot calculada no fuso do
+espaço** para evitar dupla contagem em transições de DST.
+
+## Estado atual vs. estado-alvo
+
+Reconciliação entre o que a documentação especifica e o que o código hoje implementa. Cada
+divergência abaixo é um item acionável (issue) para a evolução do produto.
+
+| Item | Estado atual (código) | Estado-alvo | Ação |
+|------|-----------------------|-------------|------|
+| **Double-booking** | *Read-then-write* em memória, sem índice/transação; `Update` ignora a checagem | Guarda por índice único + transação + idempotência | Índice único, `EnsureIndexes` no *boot*, *query* com filtro de data, corrigir `Update` |
+| **Tempo real (RF-008/020)** | Sem transporte (nem WebSocket nem *polling*) | SignalR + *fallback polling* | *Hub* por espaço, cliente `@microsoft/signalr` |
+| **Config do mobile** | Base URL *hardcoded* para host Azure **descontinuado**; dois clientes HTTP duplicados; cliente de *analytics* sem `Authorization` | Config por *env*/`app.json`; cliente único com *interceptor* de auth | Unificar cliente, mover URL para configuração |
+| **Avaliações (RF-013)** | Postam PII a um **Google Form** de terceiros | Endpoint próprio de avaliação na API | Trazer o fluxo para a API (LGPD) |
+| **Infra MongoDB** | `docker-compose` *single-node* (não *replica set*) | *Single-node replica set* local | Ajustar o compose + inicializar o RS |
+| **LGPD** | Documentado; apenas hashing BCrypt implementado | Export/erasure/anonimização + criptografia de PII | Implementar RNF-019 e a arquitetura de privacidade |
+| **Resíduo PT no código** | Classe órfã `Reserva` e módulo de *analytics* com identificadores em português | Domínio 100% em inglês | Remover órfão e padronizar (ver nota abaixo) |
+| **CI** | Apenas `security.yml`; mobile sem CI | + CodeQL, Dependabot, CI de mobile | *Workflows* por caminho |
+
+> **Priorização (produto solo):** bloqueiam o lançamento a correção de *double-booking*, a
+> conformidade LGPD (incl. sair do Google Form), a configuração sem *hardcode* e a idempotência.
+> Tempo real (SignalR), *outbox*, gRPC e CSFLE são **evolução**, não MVP — evitando
+> *over-engineering* para um mantenedor único.
 
 ## Tecnologias utilizadas
 
