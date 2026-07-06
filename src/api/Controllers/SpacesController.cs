@@ -160,10 +160,13 @@ namespace api.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> Post([FromForm] string spaceData, [FromForm] IFormFile? image)
+        public async Task<IActionResult> Post([FromForm] SpaceFormRequest request)
         {
             try
             {
+                var spaceData = request.SpaceData;
+                var image = request.Image;
+
                 var space = JsonSerializer.Deserialize<Space>(spaceData, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true
@@ -215,10 +218,13 @@ namespace api.Controllers
 
         [HttpPut()]
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> Put([FromForm] string spaceData, [FromForm] IFormFile? image)
+        public async Task<IActionResult> Put([FromForm] SpaceFormRequest request)
         {
             try
             {
+                var spaceData = request.SpaceData;
+                var image = request.Image;
+
                 var space = JsonSerializer.Deserialize<Space>(spaceData, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true
