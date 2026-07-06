@@ -1,23 +1,6 @@
 <div align="center">
 
-<img width="96" height="96" alt="Tipografia da logomarca (1)" src="https://github.com/user-attachments/assets/50b6fc87-d704-4545-a742-ae5705592095" hspace="36"/>
-
-# Agendify
-
-Gestão inteligente de reservas de espaços compartilhados.
-
-<p>
-<img alt=".NET 9" src="https://img.shields.io/badge/.NET-9.0-512BD4?style=flat-square&logo=dotnet&logoColor=white" />
-<img alt="C#" src="https://img.shields.io/badge/C%23-239120?style=flat-square&logo=csharp&logoColor=white" />
-<img alt="MongoDB" src="https://img.shields.io/badge/MongoDB-47A248?style=flat-square&logo=mongodb&logoColor=white" />
-<img alt="React Native" src="https://img.shields.io/badge/React%20Native-20232A?style=flat-square&logo=react&logoColor=61DAFB" />
-<img alt="Expo" src="https://img.shields.io/badge/Expo-000020?style=flat-square&logo=expo&logoColor=white" />
-</p>
-
-<p>
-<a href="https://github.com/ArianeMoura/agendify/actions/workflows/security.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/ArianeMoura/agendify/security.yml?branch=main&style=flat-square&label=CI" /></a>
-<a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-ver%20LICENSE-blue?style=flat-square" /></a>
-</p>
+<img width="200" height="166" alt="agendify-lockup-vertical-light" src="https://github.com/user-attachments/assets/afaeb3f2-9af8-4806-b9b5-22dccec2131a" />
 
 </div>
 
