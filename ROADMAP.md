@@ -11,10 +11,14 @@ Direções de evolução do **Agendify**. Intencionalmente **sem datas** — a p
   [ADR-0002](docs/adr/0002-db-enforced-invariant.md).
 - **Teste de concorrência** (100 criações simultâneas no mesmo slot) como *gate*
   bloqueante de release na CI. Ver [Testing](docs/TESTING.md).
-- **CI por camada** — GitHub Actions para API (build+test+secret scan), admin e mobile
-  (lint/build), e CodeQL (SAST). Ver [CI/CD](docs/CICD.md).
+- **CI por camada** — GitHub Actions para API (build+test+secret scan), admin
+  (lint/typecheck/test/build), mobile (lint) e CodeQL (SAST). Ver [CI/CD](docs/CICD.md).
 - **Deploy em produção** — API no Render + PostgreSQL no Neon. Ver [Deployment](docs/DEPLOYMENT.md).
 - **Refresh tokens com rotação** e armazenamento seguro no mobile (`expo-secure-store`).
+- **Redesign do painel admin** — nova identidade da marca, design system tokenizado (tema claro +
+  escuro), biblioteca de componentes acessível (Radix, WCAG 2.2 AA), shell responsivo, telas
+  refeitas, tela de gestão de usuários, CSP/headers de segurança e testes (Vitest + vitest-axe).
+  Ver [Design System](docs/DESIGN-SYSTEM.md) e [`src/admin/README.md`](src/admin/README.md).
 
 ## Prioridades imediatas (robustez)
 
@@ -27,8 +31,10 @@ Direções de evolução do **Agendify**. Intencionalmente **sem datas** — a p
 ## Qualidade e testes
 
 - **Tier de testes unitários** distinto da integração.
-- **Testes de frontend** (admin/mobile) e **E2E** (Playwright/Detox).
-- **Padronização:** Prettier, `.editorconfig`, analisadores .NET; **hooks** enforced (Husky/lint-staged).
+- **Testes de frontend do mobile** e **E2E** (Playwright/Detox). _(Admin já tem testes de
+  componente/acessibilidade: Vitest + Testing Library + vitest-axe.)_
+- **Padronização:** `.editorconfig`, analisadores .NET; **hooks** enforced (Husky/lint-staged).
+  _(Admin já usa Prettier — `format`/`format:check`.)_
 
 ## Segurança e conformidade
 
@@ -44,7 +50,8 @@ Direções de evolução do **Agendify**. Intencionalmente **sem datas** — a p
 
 ## Arquitetura e desempenho
 
-- **Redesign do frontend** (admin + mobile) consumindo o [Design System](docs/DESIGN-SYSTEM.md).
+- **Redesign do frontend mobile** consumindo o [Design System](docs/DESIGN-SYSTEM.md). _(O admin
+  já foi redesenhado — ver "Concluído recentemente".)_
 - **Cache** de leituras frequentes (catálogo de espaços).
 - Versionamento explícito do contrato REST (`/api/v1`).
 - Escala do PostgreSQL: *read replicas* e *connection pooling* conforme a carga crescer.

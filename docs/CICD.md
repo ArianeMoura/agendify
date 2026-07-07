@@ -10,7 +10,7 @@ Four workflows under [`.github/workflows/`](../.github/workflows/):
 | Workflow | Trigger | What it does |
 | :--- | :--- | :--- |
 | `security.yml` | push / PR to `main` | Gitleaks secret scan; .NET 9 build; **concurrency gate** (100-way double-booking test, release-blocking); full test suite |
-| `admin.yml` | push / PR touching `src/admin/**` | `npm ci`, lint, build (Next.js) |
+| `admin.yml` | push / PR touching `src/admin/**` | `npm ci`, lint, typecheck, test (Vitest), build (Next.js) |
 | `mobile.yml` | push / PR touching `src/mobile/**` | `expo lint` (full `tsc` typecheck deferred — legacy screens) |
 | `codeql.yml` | push / PR + weekly cron | CodeQL static analysis (C#, JS/TS) |
 
@@ -28,7 +28,7 @@ while the product is small (see [ADR-0004](adr/0004-deploy-first-render-neon.md)
 - **API → Render** — auto-deploys on push to `main` (Docker build from `src/api/Dockerfile`,
   region Virginia).
 - **Database → Neon** — managed PostgreSQL (`us-east-1`), co-located with the API.
-- **Admin → Vercel** — Planned (after the frontend redesign).
+- **Admin → Vercel** — Planned (panel is redesign-complete and deploy-ready).
 - **Mobile → Expo EAS** — Planned (build & distribute).
 
 See [DEPLOYMENT.md](DEPLOYMENT.md) and [ADR-0004](adr/0004-deploy-first-render-neon.md).

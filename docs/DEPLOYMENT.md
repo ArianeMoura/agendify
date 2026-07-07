@@ -9,7 +9,7 @@ Production topology and the steps to deploy Agendify. Rationale:
 | :--- | :--- | :--- |
 | API (.NET 9) | **Render** (Docker) | Auto-deploys on push to `main`; region Virginia |
 | PostgreSQL 16 | **Neon** (serverless) | Region `us-east-1`; co-located with the API |
-| Admin (Next.js) | **Vercel** | Planned (after the frontend redesign) |
+| Admin (Next.js) | **Vercel** | Planned (panel is redesign-complete and deploy-ready) |
 | Mobile (Expo) | **Expo EAS** | Planned (build & distribute, not hosted) |
 
 API and database are kept in the same US-East region so query latency stays low.

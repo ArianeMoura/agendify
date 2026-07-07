@@ -22,6 +22,29 @@ import {
   Tooltip,
 } from "@/components/ui";
 import { SpaceFormDialog } from "./SpaceFormDialog";
+/** Miniatura do espaço com fallback: sem imagem OU se a imagem falhar (404), mostra o ícone. */
+function SpaceThumb({ src }: { src?: string }) {
+  // Guarda a src que falhou (não um booleano): assim o fallback reseta sozinho
+  // quando a src muda — ex.: após enviar uma imagem nova para o espaço.
+  const [failedSrc, setFailedSrc] = useState<string>();
+  if (!src || failedSrc === src) {
+    return (
+      <span className="bg-surface-muted text-ink-muted flex size-10 items-center justify-center rounded-[var(--radius-sm)]">
+        <MapPin className="size-4" aria-hidden />
+      </span>
+    );
+  }
+  return (
+    <Image
+      src={src}
+      alt=""
+      width={40}
+      height={40}
+      onError={() => setFailedSrc(src)}
+      className="size-10 rounded-[var(--radius-sm)] object-cover"
+    />
+  );
+}
 
 export default function SpacesPage() {
   const qc = useQueryClient();
@@ -104,19 +127,7 @@ export default function SpacesPage() {
             {spaces.map((s) => (
               <tr key={s.id} className="hover:bg-surface-muted/50 transition-colors">
                 <Td>
-                  {s.imageUrl ? (
-                    <Image
-                      src={imageUrl(s.imageUrl) ?? ""}
-                      alt=""
-                      width={40}
-                      height={40}
-                      className="size-10 rounded-[var(--radius-sm)] object-cover"
-                    />
-                  ) : (
-                    <span className="bg-surface-muted text-ink-muted flex size-10 items-center justify-center rounded-[var(--radius-sm)]">
-                      <MapPin className="size-4" aria-hidden />
-                    </span>
-                  )}
+                  <SpaceThumb src={imageUrl(s.imageUrl)} />
                 </Td>
                 <Td className="font-medium">{s.name}</Td>
                 <Td>{s.capacity}</Td>

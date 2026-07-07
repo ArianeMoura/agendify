@@ -84,11 +84,13 @@ CI also runs gitleaks on every push/PR ([`.github/workflows/security.yml`](../.g
 ```bash
 cd src/admin
 npm ci
-npm run dev     # http://localhost:3000
+cp .env.example .env.local   # aponte NEXT_PUBLIC_API_URL (Render por padrão, ou localhost)
+npm run dev                  # http://localhost:3000
 ```
 
 Reads the API base URL from `NEXT_PUBLIC_API_URL` (defaults to `http://localhost:5089`).
-Scripts: `dev`, `build`, `start`, `lint`.
+Scripts: `dev`, `build`, `start`, `lint`, `typecheck`, `test`, `test:watch`, `format`,
+`format:check`. Design system, components, and accessibility notes: [`src/admin/README.md`](admin/README.md).
 
 ## Mobile (`src/mobile`) — Expo / React Native
 

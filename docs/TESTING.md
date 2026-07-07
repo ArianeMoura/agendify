@@ -16,8 +16,8 @@ A mocked test cannot observe it; a real Postgres can.
 used instead.
 
 This inverts the classic "test pyramid" on purpose: risk is concentrated at the data layer,
-so that is where the tests are concentrated. A unit tier and frontend/E2E tests are planned
-(see below).
+so that is where the tests are concentrated. The admin panel adds component/accessibility tests
+(Vitest + Testing Library + vitest-axe); a backend unit tier and E2E remain planned (see below).
 
 ## Test inventory — Implemented
 
@@ -52,9 +52,9 @@ automated proof of RN-01.
 | Gitleaks secret scanning (CI + opt-in local hook) | Implemented |
 | CodeQL SAST (C#, JS/TS) | Implemented |
 | Unit-test tier distinct from integration | Planned (Moq is referenced but unused) |
-| Frontend/component tests (Jest/Vitest/RTL) | Planned (none today) |
+| Frontend/component tests (Vitest + RTL + vitest-axe) | Implemented (admin); Planned (mobile) |
 | E2E tests (Playwright/Cypress/Detox) | Planned (none today) |
-| Prettier, `.editorconfig`, .NET analyzers (`dotnet format`, warnings-as-errors) | Planned |
+| Prettier (admin: `format`/`format:check`); `.editorconfig`, .NET analyzers | Implemented (admin Prettier); Planned (rest) |
 | Enforced Git hooks (Husky/lint-staged) | Planned (only an opt-in gitleaks hook exists) |
 
 Coverage report (HTML, local):
