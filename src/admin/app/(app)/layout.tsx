@@ -33,7 +33,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen">
       <aside className="flex w-60 flex-col border-r border-[var(--color-line)] bg-[var(--color-surface)] p-4">
-        <div className="mb-8 px-2 text-xl font-bold text-brand-700">Agendify</div>
+        <div className="text-brand-700 mb-8 px-2 text-xl font-bold">Agendify</div>
         <nav className="flex-1 space-y-1">
           {nav.map((item) => {
             const active = pathname === item.href;
@@ -42,7 +42,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 key={item.href}
                 href={item.href}
                 className={`block rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                  active ? "bg-brand-50 text-brand-700" : "text-ink-soft hover:bg-[var(--color-muted)]"
+                  active
+                    ? "bg-brand-50 text-brand-700"
+                    : "text-ink-soft hover:bg-[var(--color-muted)]"
                 }`}
               >
                 {item.label}
@@ -52,10 +54,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </nav>
         <div className="border-t border-[var(--color-line)] pt-4">
           <p className="px-2 text-sm font-medium">{user.name}</p>
-          <p className="mb-2 px-2 text-xs text-ink-soft">{user.email}</p>
+          <p className="text-ink-soft mb-2 px-2 text-xs">{user.email}</p>
           <button
             onClick={() => logout().then(() => router.replace("/login"))}
-            className="w-full rounded-lg px-3 py-2 text-left text-sm text-ink-soft hover:bg-[var(--color-muted)]"
+            className="text-ink-soft w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-[var(--color-muted)]"
           >
             Sair
           </button>

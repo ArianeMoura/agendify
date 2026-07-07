@@ -22,13 +22,19 @@ export default function BookingsPage() {
   const qc = useQueryClient();
   const { user } = useAuth();
 
-  const bookings = useQuery({ queryKey: ["bookings"], queryFn: () => apiFetch<Booking[]>("/bookings") });
+  const bookings = useQuery({
+    queryKey: ["bookings"],
+    queryFn: () => apiFetch<Booking[]>("/bookings"),
+  });
   const spaces = useQuery({ queryKey: ["spaces"], queryFn: () => apiFetch<Space[]>("/spaces") });
 
   const [spaceId, setSpaceId] = useState("");
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
-  const [feedback, setFeedback] = useState<{ kind: "ok" | "conflict" | "error"; text: string } | null>(null);
+  const [feedback, setFeedback] = useState<{
+    kind: "ok" | "conflict" | "error";
+    text: string;
+  } | null>(null);
 
   const create = useMutation({
     mutationFn: () =>
@@ -61,7 +67,11 @@ export default function BookingsPage() {
   };
 
   const feedbackColor =
-    feedback?.kind === "ok" ? "text-green-700" : feedback?.kind === "conflict" ? "text-amber-700" : "text-red-600";
+    feedback?.kind === "ok"
+      ? "text-green-700"
+      : feedback?.kind === "conflict"
+        ? "text-amber-700"
+        : "text-red-600";
 
   return (
     <div>
@@ -94,7 +104,7 @@ export default function BookingsPage() {
               ))}
               {(bookings.data ?? []).length === 0 && (
                 <tr>
-                  <td colSpan={4} className="px-4 py-8 text-center text-ink-soft">
+                  <td colSpan={4} className="text-ink-soft px-4 py-8 text-center">
                     Nenhuma reserva.
                   </td>
                 </tr>
@@ -119,11 +129,21 @@ export default function BookingsPage() {
             </div>
             <div>
               <Label>Início</Label>
-              <Input type="datetime-local" value={start} onChange={(e) => setStart(e.target.value)} required />
+              <Input
+                type="datetime-local"
+                value={start}
+                onChange={(e) => setStart(e.target.value)}
+                required
+              />
             </div>
             <div>
               <Label>Fim</Label>
-              <Input type="datetime-local" value={end} onChange={(e) => setEnd(e.target.value)} required />
+              <Input
+                type="datetime-local"
+                value={end}
+                onChange={(e) => setEnd(e.target.value)}
+                required
+              />
             </div>
             {feedback && <p className={`text-sm ${feedbackColor}`}>{feedback.text}</p>}
             <Button type="submit" className="w-full" disabled={create.isPending}>

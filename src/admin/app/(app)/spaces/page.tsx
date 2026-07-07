@@ -8,7 +8,10 @@ import { Badge, Button, Card, Input, Label, Spinner, Table } from "@/components/
 
 export default function SpacesPage() {
   const qc = useQueryClient();
-  const { data, isLoading } = useQuery({ queryKey: ["spaces"], queryFn: () => apiFetch<Space[]>("/spaces") });
+  const { data, isLoading } = useQuery({
+    queryKey: ["spaces"],
+    queryFn: () => apiFetch<Space[]>("/spaces"),
+  });
 
   const [name, setName] = useState("");
   const [capacity, setCapacity] = useState(10);
@@ -22,7 +25,10 @@ export default function SpacesPage() {
         capacity,
         availability: true,
         isAllDayBooking: false,
-        availableHours: hours.split(",").map((h) => h.trim()).filter(Boolean),
+        availableHours: hours
+          .split(",")
+          .map((h) => h.trim())
+          .filter(Boolean),
         resources: [],
       };
       const form = new FormData();
@@ -65,7 +71,9 @@ export default function SpacesPage() {
                 <tr key={s.id}>
                   <td className="px-4 py-3 font-medium">{s.name}</td>
                   <td className="px-4 py-3">{s.capacity}</td>
-                  <td className="px-4 py-3 text-ink-soft">{s.availableHours?.length ?? 0} horários</td>
+                  <td className="text-ink-soft px-4 py-3">
+                    {s.availableHours?.length ?? 0} horários
+                  </td>
                   <td className="px-4 py-3">
                     <Badge tone={s.availability ? "green" : "red"}>
                       {s.availability ? "Disponível" : "Indisponível"}
@@ -75,7 +83,7 @@ export default function SpacesPage() {
               ))}
               {(data ?? []).length === 0 && (
                 <tr>
-                  <td colSpan={4} className="px-4 py-8 text-center text-ink-soft">
+                  <td colSpan={4} className="text-ink-soft px-4 py-8 text-center">
                     Nenhum espaço cadastrado.
                   </td>
                 </tr>

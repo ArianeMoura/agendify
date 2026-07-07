@@ -1,25 +1,139 @@
 @import "tailwindcss";
 
-/* Design tokens do Agendify (roxo da marca, alinhado ao mobile). Admin em tema
-   claro consistente — sem alternância automática para evitar surpresas. */
-@theme {
-  --color-brand-50: #f6f0fc;
-  --color-brand-100: #ead9f8;
-  --color-brand-400: #a95fe3;
-  --color-brand-500: #9345d9;
-  --color-brand-600: #7c34bd;
-  --color-brand-700: #6a0dad;
+/* ─────────────────────────────────────────────────────────────────────────
+   Agendify — Design tokens (fonte única de verdade)
+   Marca: roxo #5E35B1 (confiança/gestão) · âmbar #FFB300 (ação/disponibilidade)
+   · coral #FF7043 (conflito/atenção) · petróleo #14333E (texto).
 
-  --color-surface: #ffffff;
-  --color-muted: #f5f6f8;
-  --color-line: #e6e8ec;
-  --color-ink: #1f2430;
-  --color-ink-soft: #5b6472;
+   Tema escuro via classe `.dark` (aplicada pelo next-themes no <html>). Os
+   tokens SEMÂNTICOS (surface/canvas/ink/line…) apontam para variáveis de runtime
+   e trocam de valor por tema; a ESCALA de marca é estática nos dois temas.
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* dark: passa a responder à classe `.dark` em vez de prefers-color-scheme,
+   para que o toggle de tema funcione. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Valores que trocam por tema ------------------------------------------------ */
+:root {
+  --canvas: #efecf6; /* fundo da página */
+  --surface: #fbfafe; /* cartões / superfícies */
+  --surface-muted: #f2eefb; /* preenchimentos sutis, hover */
+  --line: #ece7f6; /* divisores / bordas */
+  --ink: #14333e; /* texto principal (petróleo, nunca preto puro) */
+  --ink-muted: #5a6870; /* texto secundário */
+  --brand-fg: #5e35b1; /* roxo p/ texto/ícone com contraste AA no claro */
+  --ring: #7e55d2; /* anel de foco */
 }
 
+.dark {
+  --canvas: #141020;
+  --surface: #1e1830;
+  --surface-muted: #251c3d;
+  --line: #2e2646;
+  --ink: #f4f1fb;
+  --ink-muted: #b0a8c8;
+  --brand-fg: #b79af2; /* roxo claro p/ contraste AA no escuro */
+  --ring: #b79af2;
+}
+
+/* Registro dos tokens no Tailwind. `inline` faz as utilitárias emitirem
+   var(--…) diretamente, para o override de `.dark` valer em runtime. */
+@theme inline {
+  /* Escala de marca (roxo) — estática nos dois temas */
+  --color-brand-50: #f3eefb;
+  --color-brand-100: #e4d8f5;
+  --color-brand-200: #c9b2ec;
+  --color-brand-300: #ad8be2;
+  --color-brand-400: #8a5fd4;
+  --color-brand-500: #6e44c0;
+  --color-brand-600: #5e35b1; /* PRIMÁRIA */
+  --color-brand-700: #4e2a99;
+  --color-brand-800: #3f2380; /* brand-dark: hover/sidebar */
+  --color-brand-900: #2e1a5e;
+  --color-brand: #5e35b1;
+  --color-brand-soft: #7e55d2;
+
+  /* Ação / disponibilidade (âmbar) — texto sempre em petróleo, nunca branco */
+  --color-action: #ffb300;
+  --color-action-hover: #ffc233;
+  --color-on-action: #14333e;
+
+  /* Conflito / atenção (coral) */
+  --color-alert: #ff7043;
+  --color-alert-soft: #ffd7cb;
+
+  /* Status semânticos */
+  --color-success: #2e7d32;
+  --color-success-soft: #d7efd9;
+  --color-danger: #dc2626; /* destrutivo (excluir) — distinto do coral */
+  --color-warning: #ffb300;
+  --color-info: #5e35b1;
+
+  /* Semânticos que trocam por tema */
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-muted: var(--surface-muted); /* alias legado */
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-soft: var(--ink-muted); /* alias legado */
+  --color-brand-fg: var(--brand-fg);
+  --color-ring: var(--ring);
+
+  /* Tipografia — Sora (marca/títulos) · Manrope (UI/corpo) */
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+
+  /* Raios — 8 controles · 10–12 cartões · 99px pílulas */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.625rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 99px;
+
+  /* Sombras suaves com leve tom roxo */
+  --shadow-sm: 0 1px 2px rgba(20, 51, 62, 0.06);
+  --shadow-md: 0 4px 16px rgba(62, 35, 128, 0.08);
+  --shadow-lg: 0 12px 32px rgba(62, 35, 128, 0.12);
+}
+
+/* Base ---------------------------------------------------------------------- */
 html,
 body {
-  background: var(--color-muted);
+  background: var(--color-canvas);
   color: var(--color-ink);
-  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-sans);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+}
+
+/* Foco visível consistente (WCAG 2.4.7) */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-action) 40%, transparent);
+  color: var(--color-ink);
+}
+
+/* Respeita quem pediu menos movimento (WCAG 2.3.3 / prefers-reduced-motion) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

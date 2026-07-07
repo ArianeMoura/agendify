@@ -8,15 +8,18 @@ import { Card, Spinner } from "@/components/ui";
 function Stat({ label, value }: { label: string; value: number | string }) {
   return (
     <Card className="p-5">
-      <p className="text-sm text-ink-soft">{label}</p>
-      <p className="mt-1 text-3xl font-semibold text-ink">{value}</p>
+      <p className="text-ink-soft text-sm">{label}</p>
+      <p className="text-ink mt-1 text-3xl font-semibold">{value}</p>
     </Card>
   );
 }
 
 export default function DashboardPage() {
   const spaces = useQuery({ queryKey: ["spaces"], queryFn: () => apiFetch<Space[]>("/spaces") });
-  const bookings = useQuery({ queryKey: ["bookings"], queryFn: () => apiFetch<Booking[]>("/bookings") });
+  const bookings = useQuery({
+    queryKey: ["bookings"],
+    queryFn: () => apiFetch<Booking[]>("/bookings"),
+  });
 
   if (spaces.isLoading || bookings.isLoading) return <Spinner />;
 

@@ -31,8 +31,8 @@ export default function LoginPage() {
     <div className="grid min-h-screen place-items-center px-4">
       <Card className="w-full max-w-sm p-8">
         <div className="mb-6 text-center">
-          <div className="text-2xl font-bold text-brand-700">Agendify</div>
-          <p className="mt-1 text-sm text-ink-soft">Painel de gestão</p>
+          <div className="text-brand-700 text-2xl font-bold">Agendify</div>
+          <p className="text-ink-soft mt-1 text-sm">Painel de gestão</p>
         </div>
 
         <form onSubmit={submit} className="space-y-4">

@@ -32,7 +32,12 @@ export default function ReportsPage() {
       <div className="mb-4 flex gap-3">
         <div>
           <Label>Ano</Label>
-          <Input type="number" value={year} onChange={(e) => setYear(Number(e.target.value))} className="w-28" />
+          <Input
+            type="number"
+            value={year}
+            onChange={(e) => setYear(Number(e.target.value))}
+            className="w-28"
+          />
         </div>
         <div>
           <Label>Mês</Label>
@@ -56,7 +61,7 @@ export default function ReportsPage() {
               <tr>
                 <th className="px-4 py-3">Espaço</th>
                 <th className="px-4 py-3">Horário de pico</th>
-                <th className="px-4 py-3 w-1/2">Reservas</th>
+                <th className="w-1/2 px-4 py-3">Reservas</th>
               </tr>
             }
           >
@@ -67,7 +72,7 @@ export default function ReportsPage() {
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
                     <div
-                      className="h-2 rounded-full bg-brand-500"
+                      className="bg-brand-500 h-2 rounded-full"
                       style={{ width: `${(p.reservationsCount / max) * 100}%`, minWidth: "8px" }}
                     />
                     <span className="text-ink-soft">{p.reservationsCount}</span>
@@ -77,7 +82,7 @@ export default function ReportsPage() {
             ))}
             {(peaks.data ?? []).length === 0 && (
               <tr>
-                <td colSpan={3} className="px-4 py-8 text-center text-ink-soft">
+                <td colSpan={3} className="text-ink-soft px-4 py-8 text-center">
                   Sem dados para o período.
                 </td>
               </tr>
