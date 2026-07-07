@@ -5,6 +5,23 @@ import nextTs from "eslint-config-next/typescript";
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
+  // Acessibilidade (WCAG). O eslint-config-next já registra o plugin `jsx-a11y`
+  // com o preset recomendado; aqui elevamos a erro as regras mais relevantes para
+  // WCAG 2.2 AA (labels associadas, roles/aria válidos, teclado em interativos).
+  {
+    rules: {
+      "jsx-a11y/alt-text": "error",
+      "jsx-a11y/anchor-has-content": "error",
+      "jsx-a11y/aria-props": "error",
+      "jsx-a11y/aria-proptypes": "error",
+      "jsx-a11y/aria-role": "error",
+      "jsx-a11y/aria-unsupported-elements": "error",
+      "jsx-a11y/label-has-associated-control": "error",
+      "jsx-a11y/no-redundant-roles": "error",
+      "jsx-a11y/role-has-required-aria-props": "error",
+      "jsx-a11y/role-supports-aria-props": "error",
+    },
+  },
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:

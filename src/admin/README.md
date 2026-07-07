@@ -15,8 +15,8 @@ npm run dev     # http://localhost:3000
 
 ## Environment
 
-| Variable | Purpose |
-| :--- | :--- |
+| Variable              | Purpose                                                                               |
+| :-------------------- | :------------------------------------------------------------------------------------ |
 | `NEXT_PUBLIC_API_URL` | API base URL (default `http://localhost:5089`); set to the production API for deploys |
 
 ## Scripts

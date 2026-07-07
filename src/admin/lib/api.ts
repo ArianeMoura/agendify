@@ -24,7 +24,10 @@ export const tokens = {
 };
 
 export class ApiError extends Error {
-  constructor(public status: number, message: string) {
+  constructor(
+    public status: number,
+    message: string
+  ) {
     super(message);
     this.name = "ApiError";
   }
@@ -93,7 +96,11 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}): P
 
 // Requisição multipart (o endpoint de espaços usa [FromForm]). Não define
 // Content-Type — o browser injeta o boundary do multipart automaticamente.
-export async function apiForm<T>(path: string, form: FormData, method: "POST" | "PUT" = "POST"): Promise<T> {
+export async function apiForm<T>(
+  path: string,
+  form: FormData,
+  method: "POST" | "PUT" = "POST"
+): Promise<T> {
   const run = () =>
     fetch(`${API_BASE}${path}`, {
       method,
