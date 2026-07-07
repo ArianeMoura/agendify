@@ -1,6 +1,5 @@
 import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, StatusBar, Linking } from 'react-native';
-import { Link, useRouter } from 'expo-router'; // Importa Link e useRouter
-
+import { Link } from 'expo-router';
 
 const Cores = {
   primaryPurple: '#9345D9',
@@ -10,11 +9,7 @@ const Cores = {
   pageBg: '#FFFFFF',
 };
 
-
 export default function RecuperarSenhaScreen() {
-  const router = useRouter(); // Para o botão "voltar"
-
-  // Função para abrir o cliente de e-mail
   const handleAbrirEmail = () => {
     Linking.openURL('mailto:admagendify@email.com?subject=Recuperação de Senha - AgendifyApp');
   };
@@ -22,17 +17,12 @@ export default function RecuperarSenhaScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" backgroundColor={Cores.headerPurple} />
-      
-      {/* <header class="top-bar"></header> */}
       <View style={styles.topBar}></View>
 
-      {/* <main class="login-container"> */}
       <View style={styles.loginContainer}>
 
-        {/* <div class="logo"> (Reutilizado do Login) */}
         <View style={styles.logo}>
           <View style={styles.logoIconWrapper}>
-            {/* O ÍCONE FOI REMOVIDO */}
             <View style={{width: 50, height: 50}} />
           </View>
           <Text style={styles.logoText}>
@@ -41,24 +31,18 @@ export default function RecuperarSenhaScreen() {
           </Text>
         </View>
 
-        {/* <div class="recovery-content"> */}
         <View style={styles.recoveryContent}>
           <Text style={styles.recoveryTitle}>Recuperar Senha</Text>
           <Text style={styles.recoveryText}>
             Para iniciar o processo de redefinição, envie um e-mail para o nosso suporte e nossa equipe irá ajudá-lo.
           </Text>
-          
           <Text style={styles.emailAddress}>admagendify@email.com</Text>
-          
-          {/* <a href="mailto:..." class="action-button"> */}
           <TouchableOpacity style={styles.actionButton} onPress={handleAbrirEmail}>
             <Text style={styles.actionButtonText}>ABRIR E-MAIL</Text>
           </TouchableOpacity>
         </View>
 
-       
         <Text style={styles.forgotPassword}>
-          
           <Link href="/">
             <Text style={styles.forgotPasswordLink}>Lembrou sua senha? Voltar para o Login</Text>
           </Link>
@@ -68,7 +52,6 @@ export default function RecuperarSenhaScreen() {
     </SafeAreaView>
   );
 }
-
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -110,7 +93,6 @@ const styles = StyleSheet.create({
   logoPart2: {
     color: Cores.primaryPurple,
   },
-  
   recoveryContent: {
     width: '100%',
     maxWidth: 350,
@@ -136,7 +118,6 @@ const styles = StyleSheet.create({
     color: Cores.primaryPurple,
     marginBottom: 32, 
   },
-  
   actionButton: {
     width: '100%', 
     backgroundColor: Cores.primaryPurple,

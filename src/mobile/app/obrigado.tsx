@@ -1,7 +1,6 @@
 import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, StatusBar } from 'react-native';
 import { Link } from 'expo-router'; 
 
-
 const Cores = {
   primaryPurple: '#9543dcff',
   headerPurple: '#6A0DAD',
@@ -10,20 +9,16 @@ const Cores = {
   pageBg: '#ffffffff',
 };
 
-
 export default function ObrigadoScreen() {
   
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" backgroundColor={Cores.headerPurple} />
       
-      {/* <header class="top-bar"></header> */}
       <View style={styles.topBar}></View>
 
-      {/* <main class="login-container"> */}
       <View style={styles.loginContainer}>
 
-        {/* <div class="recovery-content"> (Reutiliza o estilo) */}
         <View style={styles.recoveryContent}>
           {/* O ícone de check foi removido para evitar erros de pacote */}
           <Text style={styles.checkIcon}>✔</Text> 
@@ -33,9 +28,6 @@ export default function ObrigadoScreen() {
             Obrigado pelo seu feedback. Sua opinião é muito importante para melhorarmos nossos espaços.
           </Text>
           
-          {/* <a href="escolher-espaco.html" class="action-button"> 
-            No Expo Router, href="/(tabs)" volta para a tela de Escolher Espaço
-          */}
           <Link href="/(tabs)" asChild>
             <TouchableOpacity style={styles.actionButton}>
               <Text style={styles.actionButtonText}>AVALIAR OUTRO ESPAÇO</Text>
@@ -48,7 +40,6 @@ export default function ObrigadoScreen() {
   );
 }
 
- 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -109,6 +100,3 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
 });
-
-
-// adicionar icons

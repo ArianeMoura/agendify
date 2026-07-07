@@ -19,9 +19,6 @@ namespace api.Services
         public async Task<List<Resource>> GetAsync() =>
             await _db.Resources.AsNoTracking().ToListAsync();
 
-        public async Task<List<Resource>> GetByIdsAsync(List<string> ids) =>
-            await _db.Resources.AsNoTracking().Where(r => ids.Contains(r.Id!)).ToListAsync();
-
         public async Task Create(Resource resource)
         {
             if (string.IsNullOrWhiteSpace(resource.Id))

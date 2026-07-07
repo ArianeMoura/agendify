@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, ScrollView, TextInput, Alert, Switch, StatusBar } from 'react-native'; // <-- CORREÇÃO AQUI
-import { useLocalSearchParams, useRouter } from 'expo-router'; // Hooks para parâmetros e navegação
-import { Picker } from '@react-native-picker/picker'; // Componente para o <select>
+import { StyleSheet, View, Text, TouchableOpacity, ScrollView, TextInput, Alert, Switch, StatusBar } from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Picker } from '@react-native-picker/picker';
 import { reviewsApi } from '../../lib/api/reviews';
 
-// Variáveis de Cor
 const Cores = {
   primaryPurple: '#9345D9',
   headerPurple: '#6A0DAD',
@@ -14,13 +13,10 @@ const Cores = {
   pageBg: '#FFFFFF',
 };
 
-// Componente do Ecrã de Avaliação
 export default function AvaliarScreen() {
-  // Hooks
-  const router = useRouter(); // Para navegar de volta ou para "obrigado"
-  const params = useLocalSearchParams(); // Pega os parâmetros da URL (id e nome)
+  const router = useRouter();
+  const params = useLocalSearchParams();
 
-  // Estados para controlar o formulário
   const [rating, setRating] = useState<string>("0");
   const [purpose, setPurpose] = useState<string>("");
   const [hadProblem, setHadProblem] = useState<boolean>(false);
@@ -51,7 +47,6 @@ export default function AvaliarScreen() {
         rating: parseInt(rating, 10),
         comment: commentParts.join(' | '),
       });
-      // Navega para a tela de obrigado
       router.push('/obrigado');
     } catch (error) {
       console.error('Erro ao enviar avaliação:', error);
@@ -60,7 +55,6 @@ export default function AvaliarScreen() {
     }
   };
 
-  // Componente para as estrelas (LÓGICA 2 do seu app.js)
   const StarRating = () => (
     <View style={styles.starRating}>
       {[1, 2, 3, 4, 5].map((value) => (
@@ -77,7 +71,6 @@ export default function AvaliarScreen() {
     <ScrollView style={styles.safeArea} contentContainerStyle={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={Cores.pageBg} />
 
-      {/* Botão Voltar (Manual) */}
       <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
         <Text style={styles.backButtonText}>{"< Voltar"}</Text>
       </TouchableOpacity>
@@ -88,12 +81,10 @@ export default function AvaliarScreen() {
           Espaço: <Text style={{ fontWeight: 'bold' }}>{params.nome}</Text>
         </Text>
 
-        {/* --- Formulário --- */}
         <Text style={styles.formLabel}>Nota Geral:</Text>
         <StarRating />
 
         <Text style={styles.formLabel}>Qual foi o propósito da sua reserva?</Text>
-        {/* Isto é um <select> */}
         <View style={styles.pickerContainer}>
           <Picker
             selectedValue={purpose}
@@ -110,7 +101,6 @@ export default function AvaliarScreen() {
         </View>
 
         <Text style={styles.formLabel}>Houve algum problema técnico?</Text>
-        {/* Isto são <radio buttons> (usamos um Switch no mobile) */}
         <View style={styles.switchContainer}>
           <Text>Não</Text>
           <Switch
@@ -122,7 +112,6 @@ export default function AvaliarScreen() {
           <Text>Sim</Text>
         </View>
 
-        {/* Campo Condicional (LÓGICA 3 do seu app.js) */}
         {hadProblem && (
           <View style={styles.problemDetailsContainer}>
             <Text style={styles.formLabel}>Por favor, descreva o problema:</Text>
@@ -147,7 +136,6 @@ export default function AvaliarScreen() {
           onChangeText={setFeedback}
         />
 
-        {/* Isto é um <checkbox> (usamos um Switch no mobile) */}
         <View style={styles.switchContainer}>
           <Text style={styles.checkboxLabel}>Enviar esta avaliação anonimamente</Text>
           <Switch
@@ -158,9 +146,8 @@ export default function AvaliarScreen() {
           />
         </View>
 
-        {/* Botão de Envio */}
-        <TouchableOpacity 
-          style={styles.actionButton} 
+        <TouchableOpacity
+          style={styles.actionButton}
           onPress={handleSubmit}
           disabled={isSubmitting}
         >
@@ -173,9 +160,6 @@ export default function AvaliarScreen() {
   );
 }
 
-// 
-// Estilos (CSS) MÍNIMOS para este ecrã
-// 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -184,7 +168,7 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     padding: 20,
-    paddingBottom: 60, // Mais espaço no final
+    paddingBottom: 60,
   },
   backButton: {
     alignSelf: 'flex-start',
@@ -217,22 +201,19 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginBottom: 8,
   },
-  // Estrelas
   starRating: {
     flexDirection: 'row',
     justifyContent: 'center',
-    // gap: 8, // 'gap' pode ser instável na web, usando margem
     marginBottom: 24,
   },
   starIcon: {
     fontSize: 36,
-    color: '#c7c7c7', // Cinza (vazio)
+    color: '#c7c7c7',
     marginHorizontal: 4, // substituto para 'gap'
   },
   starFilled: {
     color: Cores.primaryPurple,
   },
-  // Select (Picker)
   pickerContainer: {
     backgroundColor: Cores.inputBg,
     borderRadius: 8,
@@ -242,7 +223,6 @@ const styles = StyleSheet.create({
     width: '100%',
     color: Cores.textColor,
   },
-  // Switch (Radio / Checkbox)
   switchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -256,7 +236,6 @@ const styles = StyleSheet.create({
     color: Cores.textColor,
     fontSize: 14,
   },
-  // Text Area
   textArea: {
     backgroundColor: Cores.inputBg,
     borderWidth: 0,
@@ -272,7 +251,6 @@ const styles = StyleSheet.create({
   problemDetailsContainer: {
     width: '100%',
   },
-  // Botão
   actionButton: {
     backgroundColor: Cores.primaryPurple,
     borderRadius: 8,

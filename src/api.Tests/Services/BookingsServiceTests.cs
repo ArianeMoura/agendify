@@ -58,8 +58,6 @@ namespace api.Tests.Services
             EndDateTime = end,
         };
 
-        // ───────────────────────── Double-booking (o que importa) ─────────────────────────
-
         [Test]
         public async Task Create_ShouldPersist_WhenNoOverlap()
         {
@@ -153,8 +151,7 @@ namespace api.Tests.Services
             Assert.That(ex!.Message, Does.Contain("passado"));
         }
 
-        // ───────────────────────── GATE DE CONCORRÊNCIA (Restrição 10) ─────────────────────────
-
+        // Gate de concorrência (Restrição 10).
         [Test]
         public async Task Create_Concurrent_SameSlot_ExactlyOnePersists()
         {
@@ -187,8 +184,6 @@ namespace api.Tests.Services
             Assert.That(check.Bookings.Count(b => b.SpaceId == SpaceId), Is.EqualTo(1),
                 "O banco deve conter exatamente uma reserva para o slot disputado.");
         }
-
-        // ───────────────────────── Leitura / join ─────────────────────────
 
         [Test]
         public async Task GetById_ShouldReturnBookingWithUserAndSpace()

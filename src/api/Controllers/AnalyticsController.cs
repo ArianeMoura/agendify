@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using api.Services;
+﻿using api.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers

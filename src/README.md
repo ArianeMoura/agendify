@@ -1,102 +1,111 @@
-# Instruções de utilização
+# Developer Guide (`src/`)
 
-## Como rodar o app mobile no simulador com Expo
+Per-application setup for the Agendify monorepo. For the system overview and the fastest
+path to a running backend, see the [root README](../README.md); for design rationale, see
+[docs/ARCHITECTURE.md](../docs/ARCHITECTURE.md).
 
-Siga os passos abaixo para executar o Agendify em um emulador ou dispositivo físico via Expo:
+```
+src/
+├─ api/        ASP.NET Core (.NET 9) Web API — source of truth
+├─ api.Tests/  NUnit integration tests (Testcontainers + PostgreSQL)
+├─ admin/      Next.js / React admin panel
+└─ mobile/     Expo / React Native app
+```
 
-### 1. Pré-requisitos:
+## API (`src/api`)
 
-- **Node.js** instalado (versão recomendada: 18+)
+**Prerequisites:** .NET 9 SDK, and a PostgreSQL 16 instance (locally via
+[`docker/docker-compose.yml`](../docker/docker-compose.yml)).
 
-- **Expo CLI** instalado globalmente:
+### 1. Start PostgreSQL
 
-`npm install -g expo-cli`
+```bash
+echo "POSTGRES_PASSWORD=change-me-locally" > docker/.env
+docker compose -f docker/docker-compose.yml up -d
+```
 
-**Emulador Android** (AVD) ou **Simulador iOS** (Xcode) configurado ou o app **Expo Go** no seu smartphone.
+### 2. Configure secrets (required)
 
-### 2. Passos:
-
-**Clone** o repositório:
-
-`git clone https://github.com/ArianeMoura/agendify.git`
-
-**Navegue** até a pasta do projeto mobile:
-
-`cd agendify`
-
-**Instale** as dependências:
-
-`npm install`
-
-**Inicie** o servidor Expo:
-
-`npx expo start`
-
-**Abra** o app:
-
-- No navegador de dev que abrirá após `expo start`, escaneie o **QR Code** com o **Expo Go** no celular.
-- No **emulador Android**, pressione `a` no terminal.
-- No **simulador iOS** (macOS + Xcode), pressione `i`.
-
-## Como rodar a API (.NET 9)
-
-### 1. Pré-requisitos:
-
-- **.NET SDK 9** instalado
-- Acesso a uma instância do **MongoDB** (Atlas ou local via `docker/docker-compose.yml`)
-
-### 2. Configuração dos segredos (obrigatório)
-
-Nenhum segredo é versionado. A string de conexão do MongoDB e o segredo JWT vêm de
-**User Secrets** (desenvolvimento) ou de **variáveis de ambiente** (produção). Sem isso, a API
-aborta no boot com uma mensagem indicando o que falta.
-
-Configure os segredos da API (uma vez):
+No secret is versioned. The database connection string and JWT secret come from **User
+Secrets** (development) or **environment variables** (production). The API fails fast at
+boot with a clear message if either is missing (`JwtSettings:Secret` must be ≥ 32 chars).
 
 ```bash
 cd src/api
-dotnet user-secrets set "DatabaseSettings:ConnectionString" "mongodb+srv://USUARIO:SENHA@host/?retryWrites=true&w=majority"
+dotnet user-secrets set "DatabaseSettings:ConnectionString" \
+  "Host=localhost;Port=5432;Database=agendify;Username=agendify;Password=change-me-locally"
 dotnet user-secrets set "JwtSettings:Secret" "$(openssl rand -base64 48)"
 ```
 
-Os valores ficam fora do repositório (macOS/Linux: `~/.microsoft/usersecrets/`; Windows:
-`%APPDATA%\Microsoft\UserSecrets\`). Em produção, defina `DatabaseSettings__ConnectionString`
-e `JwtSettings__Secret` como variáveis de ambiente (o `:` vira `__`). Veja o `.env.example`
-na raiz para a lista completa.
+Secrets are stored outside the repo (macOS/Linux: `~/.microsoft/usersecrets/`; Windows:
+`%APPDATA%\Microsoft\UserSecrets\`). In production, set `DatabaseSettings__ConnectionString`
+and `JwtSettings__Secret` as environment variables (`:` becomes `__`). See
+[`.env.example`](../.env.example) for the full list.
 
-### 3. Rodar a API
+> Managed Postgres providers (Neon, RDS, Azure) return a `postgresql://…` **URI**. Npgsql
+> does not parse URIs — convert to key=value form:
+> `Host=…;Database=…;Username=…;Password=…;SSL Mode=Require;Trust Server Certificate=true`.
+
+### 3. Run
 
 ```bash
 cd src/api
-dotnet run
+dotnet run    # http://localhost:5089  (health: /status, docs: /swagger in Development)
 ```
 
-### 4. Testes de integração
+In `Development`, EF Core migrations apply automatically on boot — creating the schema, the
+`btree_gist` extension, and the `no_overlap` exclusion constraint.
 
-Conectam a um Mongo real — pulam automaticamente se a variável não estiver definida:
+### 4. Integration tests
+
+The suite runs against a real PostgreSQL. If `AGENDIFY_TEST_POSTGRES` is unset, it spins up
+an ephemeral `postgres:16` container via Testcontainers (Docker required). See
+[docs/TESTING.md](../docs/TESTING.md).
 
 ```bash
-AGENDIFY_TEST_MONGO="mongodb+srv://USUARIO:SENHA@host/?..." dotnet test src/api.Tests/api.Tests.csproj
+dotnet test src/api.Tests/api.Tests.csproj
 ```
 
-### 5. Proteção contra vazamento de segredos
+### 5. Secret-leak protection
 
-Ative o hook de pre-commit (usa [gitleaks](https://github.com/gitleaks/gitleaks),
-`brew install gitleaks`):
+An opt-in pre-commit hook runs [gitleaks](https://github.com/gitleaks/gitleaks)
+(`brew install gitleaks`). Enable it once:
 
 ```bash
 git config core.hooksPath .githooks
 ```
 
-O CI (`.github/workflows/security.yml`) também roda o gitleaks em cada push/PR. Recomenda-se
-habilitar **Secret scanning + Push protection** nas configurações do repositório no GitHub.
+CI also runs gitleaks on every push/PR ([`.github/workflows/security.yml`](../.github/workflows/security.yml)).
 
-## Hospedagem e acesso
+## Admin (`src/admin`) — Next.js
 
-O ambiente de demonstração em nuvem (Azure App Service) foi **descontinuado**. A API (com a
-documentação Swagger em `/swagger`), a Web e o Mobile são executados **localmente** seguindo as
-instruções acima; o MongoDB de desenvolvimento é provido pelo `docker/docker-compose.yml`.
+**Prerequisites:** Node.js 20+.
 
-As **credenciais de demonstração** (perfis de administrador e usuário) são criadas via *seed*
-local sob solicitação e **não são versionadas** no repositório, por segurança. Consulte as
-diretrizes em [SECURITY.md](../SECURITY.md).
+```bash
+cd src/admin
+npm ci
+npm run dev     # http://localhost:3000
+```
+
+Reads the API base URL from `NEXT_PUBLIC_API_URL` (defaults to `http://localhost:5089`).
+Scripts: `dev`, `build`, `start`, `lint`.
+
+## Mobile (`src/mobile`) — Expo / React Native
+
+**Prerequisites:** Node.js 20+, and an Android emulator, iOS simulator (Xcode), or the
+**Expo Go** app.
+
+```bash
+cd src/mobile
+npm ci
+npx expo start   # press a (Android), i (iOS), or scan the QR with Expo Go
+```
+
+Reads the API base URL from `EXPO_PUBLIC_API_URL` (defaults to `http://localhost:5089`);
+build profiles are in [`eas.json`](mobile/eas.json).
+
+## Hosting
+
+The API is deployed on **Render** and the database on **Neon** (both free tier). See
+[docs/DEPLOYMENT.md](../docs/DEPLOYMENT.md). Demo credentials are created via a local seed on
+request and are never versioned — see [SECURITY.md](../SECURITY.md).

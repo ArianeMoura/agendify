@@ -76,7 +76,6 @@ namespace api.Tests.Services
             Assert.That(review.Comment, Is.Null);
             Assert.That(review.Rating, Is.EqualTo(5));
 
-            // Auditoria registrada.
             Assert.That(check.AuditLogs.Count(a => a.Action == "account_anonymized"), Is.EqualTo(1));
         }
 

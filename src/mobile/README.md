@@ -1,50 +1,34 @@
-# Welcome to your Expo app 👋
+# Agendify Mobile (Expo / React Native)
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Booking app for end users. Consumes the [Agendify API](../../README.md).
 
-## Get started
+## Prerequisites
 
-1. Install dependencies
+Node.js 20+, and an Android emulator, iOS simulator (Xcode), or the **Expo Go** app.
 
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Setup
 
 ```bash
-npm run reset-project
+npm ci
+npx expo start     # press a (Android), i (iOS), or scan the QR with Expo Go
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Environment
 
-## Learn more
+| Variable | Purpose |
+| :--- | :--- |
+| `EXPO_PUBLIC_API_URL` | API base URL (default `http://localhost:5089`); per-profile values in [`eas.json`](eas.json) |
 
-To learn more about developing your project with Expo, look at the following resources:
+## Scripts
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+`start` · `android` · `ios` · `web` · `lint`
 
-## Join the community
+## Stack
 
-Join our community of developers creating universal apps.
+Expo (~54) with expo-router, React Native 0.81, TypeScript, axios (token interceptors +
+silent refresh), TanStack Query, react-hook-form + zod. Tokens are stored securely in
+`expo-secure-store` (Keychain/Keystore).
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Build & distribution
+
+Via **Expo EAS** (see [docs/DEPLOYMENT.md](../../docs/DEPLOYMENT.md)).

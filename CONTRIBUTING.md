@@ -1,7 +1,7 @@
 # Guia de Contribuição
 
-Obrigado por contribuir com o **Agendify**. Este documento descreve o fluxo de trabalho, as
-convenções e os critérios de qualidade para colaborar no projeto de forma consistente.
+Obrigado por contribuir com o **Agendify**. Abaixo, o fluxo de trabalho, as convenções e os
+critérios de qualidade do projeto.
 
 ## Metodologia
 
@@ -15,7 +15,7 @@ incrementais. Todo o planejamento — backlog, priorização e acompanhamento �
 
 ## Ambiente de desenvolvimento
 
-Requisitos e passos de execução por camada (API, Web, Mobile) estão no
+Requisitos e passos de execução por camada (API, Admin, Mobile) estão no
 [Código Fonte](src/README.md). Antes do primeiro commit, ative o hook de proteção de segredos:
 
 ```bash
@@ -72,7 +72,7 @@ Um PR deve ser pequeno, focado e conter contexto suficiente para revisão. **Che
 
 - [ ] O PR está vinculado a uma Issue (`Closes #NN`).
 - [ ] O código segue o estilo do projeto e passou no *lint*/`format`.
-- [ ] Há testes cobrindo a mudança (ver [Estratégia de Testes](docs/08-Estratégia%20de%20Testes.md)).
+- [ ] Há testes cobrindo a mudança (ver [Estratégia de Testes](docs/TESTING.md)).
 - [ ] Toda a suíte de CI está verde (build, testes, *secret scan*, SAST).
 - [ ] Nenhum segredo, credencial ou URL sensível foi adicionado.
 - [ ] A documentação relevante foi atualizada.

@@ -4,7 +4,7 @@ A **interface** do Agendify foi projetada para oferecer uma experiência intuiti
 
 > A **interatividade** do fluxo do usuário, incluindo a **transição entre telas**, pode ser explorada no protótipo interativo: [Protótipo Interativo — Agendify (Figma)](https://www.figma.com/design/dcBmCPWXIaXNYU4aihH6JV/Agendify?node-id=0-1&t=OExO9hDiQW54JICv-1).
 
-As diretrizes de identidade visual (logo, paleta, tipografia) estão em [Design System](05-Design%20System.md).
+As diretrizes de identidade visual (logo, paleta, tipografia) estão em [Design System](DESIGN-SYSTEM.md).
 
 ## Diagramas de fluxo
 

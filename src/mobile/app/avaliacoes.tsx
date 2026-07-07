@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, StatusBar, ScrollView, ActivityIndicator } from 'react-native';
-import { useRouter } from 'expo-router'; // Para o botão "voltar"
-
+import { useRouter } from 'expo-router';
 
 const Cores = {
   primaryPurple: '#9345D9',
@@ -12,7 +11,6 @@ const Cores = {
   pageBg: '#FFFFFF',
 };
 
-// --- FUNÇÃO AJUDANTE 1: Deixar o nome do espaço bonito ---
 function getSpaceName(spaceID: string) {
   switch (spaceID) {
     case 'sala_a': return 'Sala de Reunião A';
@@ -23,13 +21,11 @@ function getSpaceName(spaceID: string) {
   }
 }
 
-// --- FUNÇÃO AJUDANTE 2: Converter CSV para Array ---
 function parseCSV(text: string): string[][] {
   const rows = text.split('\n').map(row => row.trim());
   return rows.map(row => row.split(','));
 }
 
-// Define a estrutura de um "Review"
 type Review = {
   id: string;
   timestamp: string;
@@ -38,17 +34,13 @@ type Review = {
   feedback: string;
 };
 
-// Componente do Ecrã de Ver Avaliações
 export default function VerAvaliacoesScreen() {
-  const router = useRouter(); // Para o botão "voltar"
+  const router = useRouter();
   
-  // Estados para controlar o carregamento e os dados
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
 
-  // useEffect é como o 'DOMContentLoaded'
-  // Vai rodar 1 vez quando o ecrã carregar
   useEffect(() => {
     const fetchReviews = async () => {
       const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT-w0r2V7VBPQr3L-6IahMta9GdAXiapgaJNpBoMIsPfz9xoRVSRP0CjdDyOxAQioSWck2NNnV5HcQP/pub?output=csv';
@@ -68,7 +60,7 @@ export default function VerAvaliacoesScreen() {
           // Validação básica para pular linhas vazias
           if (row && row.length > 6) { 
             const newReview: Review = {
-              id: `${i}-${row[0]}`, // Cria um ID único
+              id: `${i}-${row[0]}`,
               timestamp: row[0],
               spaceID: row[1],
               rating: row[2],
@@ -90,11 +82,9 @@ export default function VerAvaliacoesScreen() {
     };
 
     fetchReviews();
-  }, []); // O array vazio [] significa "rode 1 vez"
+  }, []);
 
-  // Função para renderizar o conteúdo
   const renderContent = () => {
-    // 1. Se estiver carregando
     if (isLoading) {
       return (
         <View style={styles.centeredMessage}>
@@ -103,7 +93,6 @@ export default function VerAvaliacoesScreen() {
         </View>
       );
     }
-    // 2. Se der erro
     if (error) {
       return (
         <View style={styles.centeredMessage}>
@@ -111,7 +100,6 @@ export default function VerAvaliacoesScreen() {
         </View>
       );
     }
-    // 3. Se não houver reviews
     if (reviews.length === 0) {
       return (
         <View style={styles.centeredMessage}>
@@ -120,7 +108,6 @@ export default function VerAvaliacoesScreen() {
       );
     }
     
-    // 4. Se houver reviews, mostra a lista
     return (
       <View style={styles.reviewsListContainer}>
         {reviews.map((review) => (
@@ -144,15 +131,12 @@ export default function VerAvaliacoesScreen() {
     );
   };
 
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" backgroundColor={Cores.headerPurple} />
       
-      {/* <header class="top-bar"> */}
       <View style={styles.topBar}>
         <View style={styles.topBarContent}>
-          {/* Botão Voltar (Manual) */}
           <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
             <Text style={styles.backButtonText}>{"< Voltar"}</Text>
           </TouchableOpacity>
@@ -161,7 +145,6 @@ export default function VerAvaliacoesScreen() {
         </View>
       </View>
 
-      {/* <main ...> */}
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.container}>
         {renderContent()}
       </ScrollView>
@@ -169,9 +152,6 @@ export default function VerAvaliacoesScreen() {
   );
 }
 
-// 
-// Estilos (CSS) para este ecrã
-// 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -185,7 +165,6 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingBottom: 60,
   },
-  // Header
   topBar: {
     width: '100%',
     height: 60,
@@ -213,7 +192,6 @@ const styles = StyleSheet.create({
   headerPlaceholder: {
     width: 60, // Espaço para o botão "voltar"
   },
-  // Mensagens
   centeredMessage: {
     flex: 1,
     justifyContent: 'center',
@@ -230,7 +208,6 @@ const styles = StyleSheet.create({
     color: 'red',
     textAlign: 'center',
   },
-  // Reviews
   reviewsListContainer: {
     width: '100%',
     maxWidth: 900,
@@ -239,7 +216,7 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: '#FAFAFA',
     borderRadius: 8,
-    padding: 24, // duvida!!
+    padding: 24,
     borderWidth: 1,
     borderColor: Cores.inputBg,
     marginBottom: 16, 
@@ -280,7 +257,6 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     marginBottom: 16,
     fontStyle: 'italic', 
-    // Componente do Ecrã de Obrigado
   },
   reviewDate: {
     fontSize: 14,

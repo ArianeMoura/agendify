@@ -18,7 +18,6 @@ public class UsersController : ControllerBase
         _usersService = usersService;
     }
 
-    // GET: api/users
     [HttpGet]
     [Authorize(Roles = "Administrator")]
     public async Task<ActionResult<List<UserDto>>> GetAll()
@@ -36,14 +35,12 @@ public class UsersController : ControllerBase
         return Ok(usersDto);
     }
 
-    // GET: api/users/{id}
     [HttpGet("{id}")]
     public async Task<ActionResult<UserDto>> GetById(string id)
     {
         var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         var currentUserRole = User.FindFirst(ClaimTypes.Role)?.Value;
 
-        // Usuários comuns só podem ver seus próprios dados
         if (currentUserRole != "Administrator" && currentUserId != id)
         {
             return Forbid();
@@ -68,12 +65,10 @@ public class UsersController : ControllerBase
         return Ok(userDto);
     }
 
-    // POST: api/users
     [HttpPost]
     [AllowAnonymous]
     public async Task<IActionResult> Create([FromBody] CreateUserRequest request)
     {
-        // Verificar se email já existe
         var existingUser = await _usersService.GetByEmailAsync(request.Email);
         if (existingUser != null)
         {
@@ -103,14 +98,12 @@ public class UsersController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = newUser.Id }, userDto);
     }
 
-    // PUT: api/users/{id}
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(string id, [FromBody] UpdateUserRequest request)
     {
         var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         var currentUserRole = User.FindFirst(ClaimTypes.Role)?.Value;
 
-        // Usuários comuns só podem editar seus próprios dados
         if (currentUserRole != "Administrator" && currentUserId != id)
         {
             return Forbid();
@@ -123,13 +116,11 @@ public class UsersController : ControllerBase
             return NotFound(new { message = "Usuário não encontrado" });
         }
 
-        // Atualizar campos se fornecidos
         if (!string.IsNullOrEmpty(request.Name))
             user.Name = request.Name;
 
         if (!string.IsNullOrEmpty(request.Email))
         {
-            // Verificar se novo email já existe
             var existingUser = await _usersService.GetByEmailAsync(request.Email);
             if (existingUser != null && existingUser.Id != id)
             {
@@ -143,7 +134,6 @@ public class UsersController : ControllerBase
 
         if (request.Profile.HasValue)
         {
-            // Apenas administradores podem alterar o perfil
             if (currentUserRole != "Administrator")
             {
                 return Forbid();
@@ -158,7 +148,6 @@ public class UsersController : ControllerBase
         return NoContent();
     }
 
-    // DELETE: api/users/{id}
     [HttpDelete("{id}")]
     [Authorize(Roles = "Administrator")]
     public async Task<IActionResult> Delete(string id)

@@ -11,7 +11,7 @@ import {
 import { useRouter } from 'expo-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, typography, borderRadius, shadows } from '@/constants/theme';
+import { colors, spacing, typography } from '@/constants/theme';
 import { Card } from '@/components/ui/Card';
 import { Loading } from '@/components/ui/Loading';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -214,17 +214,6 @@ export default function BookingsScreen() {
           />
         }
       />
-
-      {/* {bookings && bookings.length > 0 && (
-        <View style={styles.fabContainer}>
-          <TouchableOpacity
-            style={styles.fab}
-            onPress={() => router.push('/bookings/create')}
-          >
-            <Ionicons name="add" size={32} color={colors.white} />
-          </TouchableOpacity>
-        </View>
-      )} */}
     </View>
   );
 }
@@ -297,20 +286,6 @@ const styles = StyleSheet.create({
     ...typography.bodySmall,
     color: colors.textSecondary,
     marginTop: spacing.sm,
-  },
-  fabContainer: {
-    position: 'absolute',
-    bottom: spacing.xl,
-    right: spacing.xl,
-  },
-  fab: {
-    width: 56,
-    height: 56,
-    borderRadius: borderRadius.round,
-    backgroundColor: colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-    ...shadows.lg,
   },
 });
 

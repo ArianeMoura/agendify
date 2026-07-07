@@ -9,7 +9,6 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 builder.Services.Configure<DatabaseSettings>(options =>
 {
     options.ConnectionString = builder.Configuration["DatabaseSettings:ConnectionString"] ?? "";
@@ -22,7 +21,6 @@ if (string.IsNullOrWhiteSpace(connectionString))
     throw new InvalidOperationException(
         "DatabaseSettings:ConnectionString não configurado. Rode 'dotnet user-secrets set \"DatabaseSettings:ConnectionString\" ...' (dev) ou defina a variável de ambiente DatabaseSettings__ConnectionString (prod).");
 
-// PostgreSQL como fonte de verdade. O Npgsql gerencia o connection pool.
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
 
@@ -59,7 +57,6 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization(options =>
 {
-    // Policy nomeada para endpoints exclusivos de gestor.
     options.AddPolicy("AdminOnly", policy => policy.RequireRole("Administrator"));
 });
 
@@ -81,7 +78,6 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
     });
-
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -176,7 +172,6 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCors("AllowWebApp");
-
 
 var uploadPath = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME"))
     ? Path.Combine("D:\\home", "uploads") 

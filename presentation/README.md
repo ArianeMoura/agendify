@@ -19,5 +19,5 @@ organização, colaboração e entregas incrementais.
 ## Saiba mais
 
 - Visão de produto, stack e índice da documentação: [README principal](../README.md)
-- Arquitetura da solução: [docs/03-Arquitetura da Solução.md](../docs/03-Arquitetura%20da%20Solução.md)
-- Como executar (API, Web, Mobile): [Código Fonte](../src/README.md)
+- Arquitetura da solução: [docs/ARCHITECTURE.md](../docs/ARCHITECTURE.md)
+- Como executar (API, Admin, Mobile): [Código Fonte](../src/README.md)

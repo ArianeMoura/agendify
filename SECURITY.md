@@ -1,8 +1,8 @@
 # Política e Diretrizes de Segurança
 
 A segurança é um requisito de primeira classe do **Agendify**: a plataforma lida com dados
-pessoais e com o controle de acesso a espaços físicos. Este documento define a política de
-divulgação de vulnerabilidades e as diretrizes técnicas de segurança e privacidade.
+pessoais e com o controle de acesso a espaços físicos. A seguir, a política de divulgação de
+vulnerabilidades e as diretrizes técnicas de segurança e privacidade.
 
 ## Reporte de vulnerabilidades
 
@@ -21,7 +21,7 @@ divulgue publicamente até que uma correção esteja disponível (*coordinated d
   audiência e tempo de vida** em toda verificação — inclusive em clientes que apenas leem
   *claims*. Nunca reconstrua um `ClaimsPrincipal` a partir de um token sem validar a assinatura.
 - **Tokens de curta duração** (expiração configurável — RNF-001). *Refresh tokens* com rotação
-  e **MFA para administradores** estão previstos no [ROADMAP.md](ROADMAP.md).
+  já implementados; **MFA para administradores** previsto no [ROADMAP.md](ROADMAP.md).
 - **Autorização baseada em papéis** (`Administrator`, `Common`) aplicada nos *controllers*.
   Endpoints seguem o princípio do **menor privilégio**; apenas o cadastro inicial de usuário é
   anônimo.
@@ -43,8 +43,8 @@ divulgue publicamente até que uma correção esteja disponível (*coordinated d
 
 - **Em trânsito:** **HTTPS/TLS obrigatório** em todas as comunicações (API, Web, Mobile), com
   *HSTS*/redirecionamento e **CORS** restrito às origens conhecidas.
-- **Em repouso:** *encryption at rest* no armazenamento do banco (ex.: MongoDB Atlas) e, para
-  PII especialmente sensível, considerar **criptografia em nível de campo**.
+- **Em repouso:** *encryption at rest* no armazenamento do banco (PostgreSQL gerenciado — ex.:
+  Neon) e, para PII especialmente sensível, considerar **criptografia em nível de campo**.
 - **Chaves e segredos** de criptografia são gerenciados fora do código (ver abaixo).
 
 ## Gestão de segredos
@@ -63,12 +63,12 @@ divulgue publicamente até que uma correção esteja disponível (*coordinated d
 
 - **Validação de entrada** em todos os endpoints; nunca confiar em dados do cliente.
 - **Padrão de erros** sem vazamento de detalhes internos (usar `ProblemDetails`/RFC 7807).
-- **Prevenção de *double-booking*** com garantia atômica no banco (índice único + transação) —
-  ver [Arquitetura → Concorrência e Consistência](docs/03-Arquitetura%20da%20Solução.md#concorrência-e-consistência-prevenção-de-double-booking).
+- **Prevenção de *double-booking*** com garantia atômica no banco (*exclusion constraint*
+  `no_overlap` via `btree_gist`) — ver [Arquitetura](docs/ARCHITECTURE.md) e [ADR-0002](docs/adr/0002-db-enforced-invariant.md).
 - **Armazenamento seguro de tokens no cliente:** no mobile, usar `expo-secure-store`
   (Keychain/Keystore) em vez de `AsyncStorage` não criptografado.
 - **Dependências:** varredura contínua (Dependabot / `npm audit` / auditoria NuGet) e **SAST**
-  (CodeQL) na CI — ver [CI/CD](docs/07-CI-CD.md).
+  (CodeQL) na CI — ver [CI/CD](docs/CICD.md).
 - **Logs de auditoria** para autenticação e para o ciclo de vida de reservas, sem registrar
   dados sensíveis em texto plano.
 
@@ -91,6 +91,26 @@ O Agendify trata dados pessoais (nome, e-mail, histórico de reservas) e adere �
 - **Encarregado (DPO):** designar um responsável pelo tratamento de dados como ponto de contato.
 - **Rastreabilidade:** logs de auditoria apoiam a demonstração de conformidade
   (*accountability*).
+
+### Anonimização, pseudonimização e menor privilégio
+
+- **Apagamento por *tombstone* — o que o `PrivacyService` faz:** o direito ao esquecimento é
+  atendido mantendo a linha do usuário como *tombstone* e **sobrescrevendo a PII textual** (nome →
+  `[usuário removido]`, e-mail → placeholder derivado do id, senha esvaziada), limpando os
+  comentários de avaliações, revogando os *refresh tokens* e carimbando `anonymized_at`. As
+  **reservas são preservadas** (o `user_id` continua apontando para o *tombstone*), o que mantém os
+  relatórios de ocupação agregados. A operação é **idempotente**.
+- **Anonimização × pseudonimização:** distinguir **anonimização** (irreversível, fora do escopo da
+  LGPD) de **pseudonimização** (reversível — ainda é dado pessoal). A abordagem atual sobrescreve a
+  PII *in-place* preservando o vínculo agregado; descartar o vínculo `user_id` (ou usar um token sem
+  o id embutido) é um passo de *hardening* futuro para uma anonimização mais forte.
+- **Direitos do titular (RNF-019):** exportação (portabilidade) e apagamento/anonimização são
+  atendidos pelos endpoints de `/api/me`, ambos **auditados** (tabela `audit_logs`).
+- **Menor privilégio no banco:** a API usa um usuário de aplicação **sem `SUPERUSER`**, distinto
+  do administrativo.
+- **Criptografia de campo:** para PII especialmente sensível, considerar criptografia em nível de
+  campo (ex.: `pgcrypto`) com chaves geridas fora do banco — o *encryption-at-rest* do provedor
+  protege o disco, mas não o dado contra *dumps* lógicos.
 
 ## Escopo suportado
 

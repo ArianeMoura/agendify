@@ -96,7 +96,7 @@ export default function EditBookingScreen() {
     } finally {
       setIsLoadingAvailability(false);
     }
-  }, [booking?.spaceId, selectedDate]);
+  }, [booking?.spaceId, booking?.id, id, selectedDate]);
 
   useEffect(() => {
     if (booking) {
@@ -292,22 +292,6 @@ export default function EditBookingScreen() {
             </View>
           )}
 
-          {/* <Card variant="outlined" style={styles.tipsCard}>
-            <Text style={styles.tipsTitle}>💡 Dicas</Text>
-            <Text style={styles.tipsText}>• Selecione uma data para ver os horários</Text>
-            <Text style={styles.tipsText}>
-              • <Text style={styles.tipsBold}>Espaços de dia inteiro:</Text> Podem ser reservados
-              mesmo se o horário de início já passou
-            </Text>
-            <Text style={styles.tipsText}>
-              • <Text style={styles.tipsBold}>Espaços por hora:</Text> Horários passados não podem
-              ser reservados
-            </Text>
-            <Text style={styles.tipsText}>
-              • Você pode selecionar múltiplos horários consecutivos
-            </Text>
-          </Card> */}
-
           <View style={styles.buttonRow}>
             <Button
               title="Cancelar"
@@ -474,26 +458,6 @@ const styles = StyleSheet.create({
   },
   loadingContainer: {
     paddingVertical: spacing.xl,
-  },
-  tipsCard: {
-    backgroundColor: colors.accent + '10',
-    borderColor: colors.accent + '30',
-    marginBottom: spacing.lg,
-  },
-  tipsTitle: {
-    ...typography.h5,
-    color: colors.text,
-    marginBottom: spacing.sm,
-  },
-  tipsText: {
-    ...typography.bodySmall,
-    color: colors.textSecondary,
-    marginBottom: spacing.xs,
-    lineHeight: 18,
-  },
-  tipsBold: {
-    fontWeight: '600',
-    color: colors.text,
   },
   buttonRow: {
     flexDirection: 'row',

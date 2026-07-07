@@ -1,5 +1,3 @@
-using System.IO;
-
 namespace api.Services
 {
     public class FileUploadService
@@ -110,11 +108,6 @@ namespace api.Services
             {
                 _logger.LogError(ex, "Error deleting image: {ImageUrl}", imageUrl);
             }
-        }
-
-        public string GetUploadPath()
-        {
-            return _uploadPath;
         }
     }
 }

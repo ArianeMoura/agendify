@@ -1,8 +1,6 @@
-// Usa o cliente axios único (lib/api/config) — com Authorization e Base URL por
-// env. Antes ia pelo fetch de services/api.ts, sem token (removido).
+// Usa o cliente axios único (lib/api/config) — com Authorization e Base URL por env.
 import { api } from '../lib/api/config';
 
-// Tipo conforme o retorno da API de peak hours
 export type PeakHourDto = {
   startTime: string;        // "08:00"
   endTime: string;          // "09:00"

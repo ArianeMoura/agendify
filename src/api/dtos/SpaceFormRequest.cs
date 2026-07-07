@@ -10,7 +10,6 @@ namespace api.Models
         // JSON serializado do Space (desserializado no controller).
         public string SpaceData { get; set; } = string.Empty;
 
-        // Imagem opcional do espaço.
         public IFormFile? Image { get; set; }
     }
 }

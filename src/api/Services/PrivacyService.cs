@@ -8,7 +8,6 @@ namespace api.Services
     // e apagamento por anonimização — com trilha de auditoria.
     public class PrivacyService
     {
-        // Versão vigente do termo de consentimento.
         public const string CurrentConsentVersion = "1.0";
 
         private readonly AppDbContext _db;
@@ -29,7 +28,6 @@ namespace api.Services
             await _db.SaveChangesAsync();
         }
 
-        // Dump estruturado de todos os dados do titular (portabilidade/acesso).
         public async Task<object?> ExportAsync(string userId)
         {
             var user = await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId);

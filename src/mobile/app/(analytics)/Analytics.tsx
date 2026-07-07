@@ -1,4 +1,3 @@
-// app/(tabs)/Analytics.tsx
 import React from "react";
 import {
   View,
@@ -25,7 +24,6 @@ export default function AnalyticsScreen() {
         const result = await getPeakHours({
           year: now.getFullYear(),
           month: now.getMonth() + 1,
-          // spaceId: "SEU_SPACE_ID_AQUI", // descomente e ajuste se necessário
         });
 
         setData(result);

@@ -8,14 +8,14 @@ namespace api.Services
     {
         public int Year { get; set; }        // ex.: 2025
         public int Month { get; set; }       // 1..12
-        public string? SpaceId { get; set; } // opcional
+        public string? SpaceId { get; set; }
     }
 
     public class PeakHourResult
     {
         public string SpaceId { get; set; } = null!;
         public int Hour { get; set; }              // 0..23
-        public int ReservationsCount { get; set; } // contagem
+        public int ReservationsCount { get; set; }
     }
 
     public class AnalyticsService
@@ -33,7 +33,6 @@ namespace api.Services
             var start = new DateTime(req.Year, req.Month, 1, 0, 0, 0, DateTimeKind.Utc);
             var end = start.AddMonths(1);
 
-            // Filtro por período (e espaço, se informado) executado no banco.
             var query = _db.Bookings.AsNoTracking()
                 .Where(b => b.StartDateTime >= start && b.StartDateTime < end);
 

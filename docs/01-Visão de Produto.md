@@ -33,7 +33,7 @@ Oferecer uma plataforma para gerenciamento e reserva de espaços compartilhados 
 - Integrar notificações para confirmações, lembretes e alterações de reserva;
 - Disponibilizar relatórios e dashboards com métricas (taxa de ocupação, horários de pico, volume de reservas);
 - Garantir segurança (autenticação, autorização, criptografia e logs de auditoria);
-- Sustentar arquitetura distribuída e escalável (API em C#/.NET, banco de dados MongoDB, web em ASP.NET Razor Pages e mobile em React Native).
+- Sustentar arquitetura distribuída e escalável (API em C#/.NET, banco de dados PostgreSQL, admin web em Next.js e mobile em React Native).
 
 ## Justificativa
 

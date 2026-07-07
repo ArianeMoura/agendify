@@ -14,12 +14,14 @@ namespace api.Controllers
         private readonly SpacesService _spacesService;
         private readonly BookingsService _bookingsService;
         private readonly FileUploadService _fileUploadService;
+        private readonly ILogger<SpacesController> _logger;
 
-        public SpacesController(SpacesService spacesService, BookingsService bookingsService, FileUploadService fileUploadService)
+        public SpacesController(SpacesService spacesService, BookingsService bookingsService, FileUploadService fileUploadService, ILogger<SpacesController> logger)
         {
             _spacesService = spacesService;
             _bookingsService = bookingsService;
             _fileUploadService = fileUploadService;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -63,8 +65,9 @@ namespace api.Controllers
                         ? TimeZoneInfo.Utc
                         : TimeZoneInfo.FindSystemTimeZoneById(timezone);
                 }
-                catch
+                catch (Exception ex)
                 {
+                    _logger.LogWarning(ex, "Invalid timezone '{Timezone}', defaulting to UTC", timezone);
                     timeZone = TimeZoneInfo.Utc;
                 }
 
@@ -94,7 +97,6 @@ namespace api.Controllers
 
                         var startTimeUtc = TimeZoneInfo.ConvertTimeToUtc(startTimeLocal, timeZone);
                         var endTimeUtc = TimeZoneInfo.ConvertTimeToUtc(endTimeLocal, timeZone);
-
 
                         var isPast = endTimeLocal <= currentTimeInUserTz;
 
@@ -153,10 +155,10 @@ namespace api.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error checking availability: {ex.Message}");
+                _logger.LogError(ex, "Error checking availability for space {SpaceId}", id);
+                return StatusCode(500, "An error occurred while checking availability.");
             }
         }
-
 
         [HttpPost]
         [Authorize(Roles = "Administrator")]
@@ -204,7 +206,7 @@ namespace api.Controllers
                     return NotFound();
                 }
 
-                return CreatedAtAction(nameof(Post), new { id = newSpace.Id.ToString() }, newSpace);
+                return CreatedAtAction(nameof(Post), new { id = newSpace.Id }, newSpace);
             }
             catch (InvalidOperationException ex)
             {
@@ -212,7 +214,8 @@ namespace api.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                _logger.LogError(ex, "Unhandled error in SpacesController");
+                return StatusCode(500, "Internal server error.");
             }
         }
 
@@ -276,7 +279,8 @@ namespace api.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                _logger.LogError(ex, "Unhandled error in SpacesController");
+                return StatusCode(500, "Internal server error.");
             }
         }
 

@@ -197,13 +197,6 @@ export function TimeSlotPicker({
           );
         })}
       </ScrollView>
-
-      {/* <View style={styles.tipContainer}>
-        <Ionicons name="information-circle" size={16} color={colors.accent} />
-        <Text style={styles.tipText}>
-          Você pode selecionar múltiplos horários consecutivos para sua reserva.
-        </Text>
-      </View> */}
     </View>
   );
 }

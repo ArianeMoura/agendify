@@ -155,14 +155,14 @@ O Agendify é uma solução mobile e web para gerenciar reservas, uso e faturame
 
 Funcionalidades de plataforma moderna de reservas, priorizadas para a evolução do produto. O
 detalhamento arquitetural (incluindo a base de concorrência que sustenta *hold* e lista de
-espera) está em [Arquitetura da Solução](03-Arquitetura%20da%20Solução.md).
+espera) está em [Arquitetura](ARCHITECTURE.md).
 
 |ID    | Descrição do requisito  | Prioridade |
 |------|-----------------------------------------|----|
 |RF-016| O sistema deve permitir **reservas recorrentes** (diária, semanal ou mensal) por meio de uma regra de recorrência padrão **iCalendar RRULE (RFC 5545)**, criando as ocorrências livres e reportando as que estejam em conflito. | ALTA |
 |RF-017| O sistema deve oferecer **lista de espera** para horários indisponíveis: ao cancelar uma reserva, o slot liberado é ofertado ao próximo da fila com um bloqueio temporário; expirado o prazo, passa ao seguinte. | MÉDIA |
 |RF-018| O sistema deve permitir **check-in por QR code** e aplicar **política de no-show**: a ausência após o período de tolerância marca a reserva como não comparecida e libera o slot automaticamente. | MÉDIA |
-|RF-019| O sistema deve manter uma **reserva temporária (*hold*)** durante o fluxo de confirmação/pagamento, bloqueando o slot por um tempo limitado e liberando-o automaticamente (via *TTL index* do MongoDB) caso não seja confirmado. | ALTA |
+|RF-019| O sistema deve manter uma **reserva temporária (*hold*)** durante o fluxo de confirmação/pagamento, bloqueando o slot por um tempo limitado e liberando-o automaticamente (via expiração e limpeza de *holds* pendentes) caso não seja confirmado. | ALTA |
 |RF-020| O sistema deve **propagar a disponibilidade em tempo real** (reservas e cancelamentos) aos clientes conectados, sem necessidade de recarregar a tela, complementando o RF-008. | ALTA |
 
 ### Requisitos não funcionais
@@ -187,7 +187,7 @@ espera) está em [Arquitetura da Solução](03-Arquitetura%20da%20Solução.md).
 
 Requisitos de qualidade específicos de uma plataforma distribuída de reservas de alta
 disponibilidade. As decisões e o "porquê" de cada um estão em
-[Arquitetura da Solução](03-Arquitetura%20da%20Solução.md).
+[Arquitetura](ARCHITECTURE.md).
 
 | ID      | Descrição do requisito                                                              | Prioridade |
 |---------|-------------------------------------------------------------------------------------|------------|
@@ -205,7 +205,7 @@ disponibilidade. As decisões e o "porquê" de cada um estão em
 
 Regras críticas que orientam a implementação e os testes. A prevenção de conflitos (RN-01) é
 o coração do produto e o requisito de maior risco técnico — sua solução de concorrência está
-detalhada em [Arquitetura da Solução → Concorrência e Consistência](03-Arquitetura%20da%20Solução.md#concorrência-e-consistência-prevenção-de-double-booking).
+detalhada em [Arquitetura → Concorrência](ARCHITECTURE.md).
 
 | ID | Regra |
 |----|-------|
@@ -223,7 +223,7 @@ detalhada em [Arquitetura da Solução → Concorrência e Consistência](03-Arq
 |02| A aplicação deve integrar Web e Mobile.               |
 |03| A aplicação deve funcionar online.                    |
 |04| A aplicação deve funcionar nos sistemas Android e iOS.|
-|05| O MongoDB deve operar como **replica set** em todos os ambientes (inclusive local, via *single-node replica set* no `docker-compose`), para habilitar transações e garantir paridade dev/prod. |
+|05| O **PostgreSQL** deve garantir a integridade das reservas via *exclusion constraint* (`btree_gist`), com paridade dev/prod pelo mesmo engine em container (`docker-compose`) e banco gerenciado em produção. |
 |06| A API deve permanecer **stateless** (autenticação por JWT), sem *sticky sessions*, permitindo escala horizontal atrás de *load balancer*. |
 |07| Web e Mobile **não acessam o banco diretamente**: toda a lógica de negócio trafega pela API, que é a única fonte de verdade. |
 |08| A configuração sensível (connection strings, segredos, URLs de ambiente) deve vir de variáveis de ambiente / *User Secrets* — **nunca *hardcoded*** no código ou versionada. |

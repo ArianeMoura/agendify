@@ -19,7 +19,6 @@ export const bookingsApi = {
 
   create: async (data: CreateBookingRequest): Promise<BookingWithDetails> => {
     const response = await api.post<BookingWithDetails>('/bookings', data);
-    console.log(response.data);
     return response.data;
   },
 

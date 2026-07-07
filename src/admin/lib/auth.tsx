@@ -21,7 +21,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Client-only hydration of the persisted session. Reading localStorage in an effect
+    // (rather than a state initializer) is deliberate: it avoids an SSR/client hydration
+    // mismatch, since localStorage is unavailable during server rendering.
     const raw = localStorage.getItem(USER_KEY);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (raw && tokens.access) setUser(JSON.parse(raw));
     setLoading(false);
   }, []);

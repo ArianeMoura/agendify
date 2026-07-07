@@ -28,7 +28,6 @@ public class AuthController : ControllerBase
         return Ok(response);
     }
 
-    // Troca o refresh token por um novo par (access + refresh rotacionado).
     [HttpPost("refresh")]
     public async Task<IActionResult> Refresh([FromBody] RefreshRequest request)
     {
@@ -42,7 +41,6 @@ public class AuthController : ControllerBase
         return Ok(response);
     }
 
-    // Logout: revoga o refresh token apresentado.
     [HttpPost("logout")]
     public async Task<IActionResult> Logout([FromBody] RefreshRequest request)
     {

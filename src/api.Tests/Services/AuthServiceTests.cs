@@ -66,7 +66,6 @@ namespace api.Tests.Services
             var login = await NewAuth().LoginAsync(new LoginRequest { Email = Email, Password = Password });
             var oldRefresh = login!.RefreshToken;
 
-            // Rotaciona: emite novo par.
             var rotated = await NewAuth().RefreshAsync(oldRefresh);
             Assert.That(rotated, Is.Not.Null);
             Assert.That(rotated!.RefreshToken, Is.Not.EqualTo(oldRefresh));
@@ -75,7 +74,6 @@ namespace api.Tests.Services
             var reuseOld = await NewAuth().RefreshAsync(oldRefresh);
             Assert.That(reuseOld, Is.Null, "Refresh token já usado deve ser rejeitado.");
 
-            // O novo token funciona.
             var reuseNew = await NewAuth().RefreshAsync(rotated.RefreshToken);
             Assert.That(reuseNew, Is.Not.Null);
         }

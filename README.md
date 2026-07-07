@@ -4,58 +4,64 @@
 
 </div>
 
-## Sobre
+## Overview
 
-O Agendify é uma plataforma distribuída — **Web, Mobile e API** — para reservar e administrar ambientes compartilhados como salas de reunião, coworkings, auditórios, quadras, laboratórios e áreas comuns. A solução centraliza o catálogo de espaços, o calendário de disponibilidade e o ciclo de vida das reservas, atendendo tanto gestores (administração, regras e relatórios) quanto usuários finais (reserva rápida no navegador ou no celular).
+Agendify lets organizations publish a catalog of bookable spaces and lets users reserve them in real time from **web** (admin) and **mobile**. Its core guarantee — no two confirmed reservations may overlap in the same space — is enforced **atomically in PostgreSQL**, which makes double-booking impossible even under high concurrency (a naive check-then-insert cannot promise this).
 
-Os pilares do produto são **disponibilidade em tempo real**, **regras configuráveis de uso**, **prevenção de conflitos** e **segurança de dados** em conformidade com a LGPD.
+One backend is the single source of truth; every client talks to it over HTTPS/JSON. Deep documentation lives in [`docs/`](docs/).
 
-## Arquitetura
+## Tech stack
 
-Três aplicações independentes se comunicam por uma API RESTful, compartilhando a mesma fonte de verdade.
+| Area | Technology |
+| :--- | :--- |
+| API | ASP.NET Core (.NET 9), C# |
+| Data | PostgreSQL 16, EF Core + Npgsql |
+| Auth | JWT Bearer, BCrypt, refresh tokens |
+| Admin (web) | Next.js, React, TypeScript |
+| Mobile | Expo, React Native, TypeScript |
+| Infra | Docker; Render (API) + Neon (PostgreSQL) |
 
-| Camada | Stack | Responsabilidade |
-| :--- | :--- | :--- |
-| **API** | ASP.NET Core (.NET 9) · MongoDB | Regras de negócio, autenticação JWT e persistência |
-| **Web** | ASP.NET Core Razor Pages (.NET 9) | Painel administrativo responsivo |
-| **Mobile** | React Native · Expo · TypeScript | Aplicativo de reservas para Android e iOS |
+## Quick start (backend)
 
-Detalhes de arquitetura, modelo de dados e decisões técnicas em [Arquitetura da Solução](docs/03-Arquitetura%20da%20Solução.md).
-
-## Começando
-
-Requisitos e guias completos por camada estão no [Código Fonte](src/README.md).
+Prerequisites: **.NET 9 SDK** and **Docker** (running).
 
 ```bash
-# API — requer .NET SDK 9 e uma instância MongoDB
-cd src/api && dotnet run
+# 1) Local PostgreSQL 16 in a container
+echo "POSTGRES_PASSWORD=change-me-locally" > docker/.env
+docker compose -f docker/docker-compose.yml up -d
 
-# Web — requer .NET SDK 9
-cd src/web && dotnet run
+# 2) Secrets (never committed) via .NET User Secrets
+cd src/api
+dotnet user-secrets set "DatabaseSettings:ConnectionString" \
+  "Host=localhost;Port=5432;Database=agendify;Username=agendify;Password=change-me-locally"
+dotnet user-secrets set "JwtSettings:Secret" "$(openssl rand -base64 48)"
 
-# Mobile — requer Node.js 18+
-cd src/mobile && npm install && npx expo start
+# 3) Run — migrations apply automatically in Development
+dotnet run    # http://localhost:5089  (health: /status, docs: /swagger)
 ```
 
-Para desenvolvimento local, o [`docker/docker-compose.yml`](docker/docker-compose.yml) sobe o MongoDB e os serviços de apoio.
+Full setup, environment variables, and per-app guides: [`src/README.md`](src/README.md).
 
-> **Segredos nunca são versionados.** A string de conexão do MongoDB e o segredo JWT vêm de User Secrets (desenvolvimento) ou variáveis de ambiente (produção). Consulte o [`.env.example`](.env.example) e a seção de configuração no [Código Fonte](src/README.md).
+## Documentation
 
-## Documentação
-
-| Produto e arquitetura | Engenharia |
+| Engineering | Product (PT) |
 | :--- | :--- |
-| [Visão de Produto](docs/01-Visão%20de%20Produto.md) | [Contribuição e fluxo de trabalho](CONTRIBUTING.md) |
-| [Especificação do Projeto](docs/02-Especificação%20do%20Projeto.md) | [Segurança e privacidade](SECURITY.md) |
-| [Arquitetura da Solução](docs/03-Arquitetura%20da%20Solução.md) | [Estratégia de testes](docs/08-Estratégia%20de%20Testes.md) |
-| [Projeto de Interface](docs/04-Projeto%20de%20Interface.md) | [CI/CD e automação](docs/07-CI-CD.md) |
-| [Design System](docs/05-Design%20System.md) | [Roadmap](ROADMAP.md) |
-| [Referências](docs/06-Referências.md) | |
+| [Architecture](docs/ARCHITECTURE.md) | [Visão de Produto](docs/01-Visão%20de%20Produto.md) |
+| [Architecture Decision Records](docs/adr/) | [Especificação do Projeto](docs/02-Especificação%20do%20Projeto.md) |
+| [Testing strategy](docs/TESTING.md) | [Projeto de Interface](docs/04-Projeto%20de%20Interface.md) |
+| [CI/CD](docs/CICD.md) | [Referências](docs/06-Referências.md) |
+| [Deployment](docs/DEPLOYMENT.md) | |
+| [Design system](docs/DESIGN-SYSTEM.md) | |
+| [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md) · [Roadmap](ROADMAP.md) | |
 
-## Planejamento
+## Repository layout
 
-O backlog, a priorização e o acompanhamento de entregas são gerenciados no **GitHub Projects**, com cada tarefa rastreada por **Issues** vinculadas a Pull Requests. O fluxo completo está descrito em [CONTRIBUTING.md](CONTRIBUTING.md).
+```
+src/       api (.NET 9) · api.Tests · admin (Next.js) · mobile (Expo)
+docker/    docker-compose.yml (local PostgreSQL 16)
+docs/      architecture, ADRs, testing, CI/CD, deployment, design system, product docs
+```
 
-## Licença
+## License
 
-Distribuído sob os termos descritos em [LICENSE](LICENSE).
+Distributed under the terms in [LICENSE](LICENSE).

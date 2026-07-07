@@ -54,7 +54,6 @@ public class AuthService
         return await IssueSessionAsync(user);
     }
 
-    // Logout: revoga o refresh token apresentado (idempotente).
     public async Task RevokeAsync(string rawRefreshToken)
     {
         if (string.IsNullOrWhiteSpace(rawRefreshToken)) return;
