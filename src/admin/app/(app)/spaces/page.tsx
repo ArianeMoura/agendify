@@ -14,8 +14,8 @@ import {
   ConfirmDialog,
   EmptyState,
   PageHeader,
-  Skeleton,
   Table,
+  TableSkeleton,
   Td,
   Th,
   toast,
@@ -93,11 +93,7 @@ export default function SpacesPage() {
 
       <Card className="overflow-hidden">
         {isLoading ? (
-          <div className="space-y-3 p-5">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Skeleton key={i} className="h-12 w-full" />
-            ))}
-          </div>
+          <TableSkeleton />
         ) : spaces.length === 0 ? (
           <EmptyState
             icon={MapPin}

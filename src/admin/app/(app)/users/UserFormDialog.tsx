@@ -4,7 +4,7 @@ import { FormEvent, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ApiError, apiFetch } from "@/lib/api";
 import { CreateUserRequest, Profile, UpdateUserRequest, User } from "@/lib/types";
-import { Alert, Button, Dialog, Field, Input, Select, toast } from "@/components/ui";
+import { Alert, Dialog, DialogFooter, Field, Input, Select, toast } from "@/components/ui";
 
 interface UserFormDialogProps {
   open: boolean;
@@ -126,14 +126,11 @@ function UserForm({
         </Alert>
       )}
 
-      <div className="border-line flex justify-end gap-2 border-t pt-4">
-        <Button type="button" variant="ghost" onClick={onDone} disabled={mutation.isPending}>
-          Cancelar
-        </Button>
-        <Button type="submit" loading={mutation.isPending}>
-          {editing ? "Salvar" : "Criar usuário"}
-        </Button>
-      </div>
+      <DialogFooter
+        onCancel={onDone}
+        loading={mutation.isPending}
+        submitLabel={editing ? "Salvar" : "Criar usuário"}
+      />
     </form>
   );
 }

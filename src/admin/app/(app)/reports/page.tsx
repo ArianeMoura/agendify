@@ -11,8 +11,8 @@ import {
   Field,
   Input,
   PageHeader,
-  Skeleton,
   Table,
+  TableSkeleton,
   Td,
   Th,
 } from "@/components/ui";
@@ -68,11 +68,7 @@ export default function ReportsPage() {
 
       <Card className="overflow-hidden">
         {peaks.isLoading ? (
-          <div className="space-y-3 p-5">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Skeleton key={i} className="h-10 w-full" />
-            ))}
-          </div>
+          <TableSkeleton rowClassName="h-10" />
         ) : rows.length === 0 ? (
           <EmptyState
             icon={BarChart3}

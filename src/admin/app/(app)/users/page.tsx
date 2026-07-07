@@ -6,6 +6,7 @@ import { Pencil, Plus, Trash2, Users as UsersIcon } from "lucide-react";
 import { ApiError, apiFetch } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { User } from "@/lib/types";
+import { formatDate } from "@/lib/utils/date";
 import { useDisclosure } from "@/lib/hooks/useDisclosure";
 import {
   Avatar,
@@ -15,18 +16,14 @@ import {
   ConfirmDialog,
   EmptyState,
   PageHeader,
-  Skeleton,
   Table,
+  TableSkeleton,
   Td,
   Th,
   toast,
   Tooltip,
 } from "@/components/ui";
 import { UserFormDialog } from "./UserFormDialog";
-
-function fmtDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("pt-BR", { dateStyle: "medium" });
-}
 
 export default function UsersPage() {
   const qc = useQueryClient();
@@ -76,11 +73,7 @@ export default function UsersPage() {
 
       <Card className="overflow-hidden">
         {isLoading ? (
-          <div className="space-y-3 p-5">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Skeleton key={i} className="h-12 w-full" />
-            ))}
-          </div>
+          <TableSkeleton />
         ) : users.length === 0 ? (
           <EmptyState
             icon={UsersIcon}
@@ -125,7 +118,7 @@ export default function UsersPage() {
                       {u.profile === "Administrator" ? "Administrador" : "Comum"}
                     </Badge>
                   </Td>
-                  <Td className="text-ink-muted">{fmtDate(u.createdAt)}</Td>
+                  <Td className="text-ink-muted">{formatDate(u.createdAt)}</Td>
                   <Td>
                     <div className="flex justify-end gap-1">
                       <Tooltip content="Editar">

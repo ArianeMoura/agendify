@@ -45,21 +45,31 @@ export function imageUrl(path?: string): string | undefined {
   return path.startsWith("http") ? path : `${API_ROOT}${path}`;
 }
 
-async function tryRefresh(): Promise<boolean> {
-  const refresh = tokens.refresh;
-  if (!refresh) return false;
-  const res = await fetch(`${API_BASE}/auth/refresh`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ refreshToken: refresh }),
+// Refresh "single-flight": vários 401 concorrentes compartilham UMA renovação.
+// Sem isso, com rotação de refresh token no servidor, os requests mais lentos
+// mandariam o token já invalidado e limpariam os tokens recém-renovados.
+let refreshInFlight: Promise<boolean> | null = null;
+
+function tryRefresh(): Promise<boolean> {
+  refreshInFlight ??= (async () => {
+    const refresh = tokens.refresh;
+    if (!refresh) return false;
+    const res = await fetch(`${API_BASE}/auth/refresh`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refreshToken: refresh }),
+    });
+    if (!res.ok) {
+      tokens.clear();
+      return false;
+    }
+    const data = (await res.json()) as { token: string; refreshToken: string };
+    tokens.set(data.token, data.refreshToken);
+    return true;
+  })().finally(() => {
+    refreshInFlight = null;
   });
-  if (!res.ok) {
-    tokens.clear();
-    return false;
-  }
-  const data = (await res.json()) as { token: string; refreshToken: string };
-  tokens.set(data.token, data.refreshToken);
-  return true;
+  return refreshInFlight;
 }
 
 /**
@@ -69,11 +79,14 @@ async function tryRefresh(): Promise<boolean> {
  */
 async function request<T>(path: string, buildInit: () => RequestInit): Promise<T> {
   const run = () => fetch(`${API_BASE}${path}`, buildInit());
+  // Havia sessão? Um 401 numa requisição autenticada = sessão expirou; um 401
+  // SEM token prévio (ex.: login) = credenciais inválidas — aí vale a msg da API.
+  const wasAuthenticated = tokens.access != null;
 
   let res = await run();
   if (res.status === 401 && (await tryRefresh())) res = await run();
 
-  if (res.status === 401) {
+  if (res.status === 401 && wasAuthenticated) {
     tokens.clear();
     onSessionExpired?.();
     throw new ApiError(401, "Sessão expirada");

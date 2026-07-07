@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { BarChart3, CalendarCheck2, CalendarClock, MapPin, type LucideIcon } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { Booking, Space } from "@/lib/types";
+import { formatDateTime } from "@/lib/utils/date";
 import {
   Badge,
   Card,
@@ -13,6 +14,7 @@ import {
   EmptyState,
   PageHeader,
   Skeleton,
+  TableSkeleton,
 } from "@/components/ui";
 
 function StatCard({
@@ -41,10 +43,6 @@ function StatCard({
       )}
     </Card>
   );
-}
-
-function fmt(iso: string): string {
-  return new Date(iso).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" });
 }
 
 export default function DashboardPage() {
@@ -96,11 +94,7 @@ export default function DashboardPage() {
         </CardHeader>
         <CardContent className="p-0">
           {loading ? (
-            <div className="space-y-3 p-5">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <Skeleton key={i} className="h-12 w-full" />
-              ))}
-            </div>
+            <TableSkeleton rows={4} />
           ) : recent.length === 0 ? (
             <EmptyState
               icon={CalendarCheck2}
@@ -115,7 +109,7 @@ export default function DashboardPage() {
                     <p className="text-ink truncate text-sm font-medium">
                       {b.space?.name ?? b.spaceId}
                     </p>
-                    <p className="text-ink-muted text-xs">{fmt(b.startDateTime)}</p>
+                    <p className="text-ink-muted text-xs">{formatDateTime(b.startDateTime)}</p>
                   </div>
                   <Badge tone={b.status === "confirmed" ? "success" : "neutral"}>{b.status}</Badge>
                 </li>

@@ -1,9 +1,4 @@
-import {
-  InputHTMLAttributes,
-  SelectHTMLAttributes,
-  TextareaHTMLAttributes,
-  forwardRef,
-} from "react";
+import { InputHTMLAttributes, SelectHTMLAttributes, forwardRef } from "react";
 import { cn } from "@/lib/utils/cn";
 
 const fieldBase =
@@ -16,15 +11,6 @@ export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputE
     return <input ref={ref} className={cn(fieldBase, className)} {...props} />;
   }
 );
-
-export const Textarea = forwardRef<
-  HTMLTextAreaElement,
-  TextareaHTMLAttributes<HTMLTextAreaElement>
->(function Textarea({ className, ...props }, ref) {
-  return (
-    <textarea ref={ref} className={cn(fieldBase, "min-h-20 resize-y", className)} {...props} />
-  );
-});
 
 export const Select = forwardRef<HTMLSelectElement, SelectHTMLAttributes<HTMLSelectElement>>(
   function Select({ className, ...props }, ref) {

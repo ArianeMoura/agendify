@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ApiError, apiFetch } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { Booking, Space } from "@/lib/types";
-import { Alert, Button, Dialog, Field, Input, Select, toast } from "@/components/ui";
+import { Alert, Dialog, DialogFooter, Field, Input, Select, toast } from "@/components/ui";
 
 // datetime-local (sem timezone) tratado como UTC — casa com a normalização da API.
 function toUtcIso(local: string): string {
@@ -122,14 +122,7 @@ function BookingForm({ onDone }: { onDone: () => void }) {
         )}
       </Field>
 
-      <div className="border-line flex justify-end gap-2 border-t pt-4">
-        <Button type="button" variant="ghost" onClick={onDone} disabled={create.isPending}>
-          Cancelar
-        </Button>
-        <Button type="submit" loading={create.isPending}>
-          Criar reserva
-        </Button>
-      </div>
+      <DialogFooter onCancel={onDone} loading={create.isPending} submitLabel="Criar reserva" />
     </form>
   );
 }

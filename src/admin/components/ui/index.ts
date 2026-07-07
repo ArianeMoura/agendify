@@ -1,20 +1,16 @@
 // Biblioteca de componentes do Agendify Admin — ponto único de importação.
-export {
-  Button,
-  buttonVariants,
-  type ButtonProps,
-  type ButtonVariant,
-  type ButtonSize,
-} from "./Button";
-export { Input, Textarea, Select } from "./Input";
+export { Button, type ButtonProps, type ButtonVariant, type ButtonSize } from "./Button";
+export { Input, Select } from "./Input";
 export { Field } from "./Field";
 export { Card, CardHeader, CardTitle, CardContent } from "./Card";
 export { PageHeader } from "./PageHeader";
 export { Badge, type BadgeTone } from "./Badge";
-export { Spinner, LoadingBlock } from "./Spinner";
+export { LoadingBlock } from "./Spinner";
 export { Skeleton } from "./Skeleton";
+export { TableSkeleton } from "./TableSkeleton";
 export { Table, Th, Td } from "./Table";
 export { Dialog } from "./Dialog";
+export { DialogFooter } from "./DialogFooter";
 export { ConfirmDialog } from "./ConfirmDialog";
 export {
   DropdownMenu,
@@ -25,7 +21,6 @@ export {
   DropdownMenuSeparator,
 } from "./DropdownMenu";
 export { Tooltip, TooltipProvider } from "./Tooltip";
-export { Tabs, TabsList, TabsTrigger, TabsContent } from "./Tabs";
 export { Switch } from "./Switch";
 export { Avatar } from "./Avatar";
 export { Alert, type AlertTone } from "./Alert";

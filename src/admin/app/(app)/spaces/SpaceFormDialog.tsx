@@ -4,7 +4,7 @@ import { FormEvent, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ApiError, apiForm } from "@/lib/api";
 import { Space } from "@/lib/types";
-import { Button, Dialog, Field, Input, Switch, toast } from "@/components/ui";
+import { Dialog, DialogFooter, Field, Input, Switch, toast } from "@/components/ui";
 
 interface SpaceFormDialogProps {
   open: boolean;
@@ -118,14 +118,11 @@ function SpaceForm({ space, onDone }: { space?: Space | null; onDone: () => void
         <Switch id="space-availability" checked={availability} onCheckedChange={setAvailability} />
       </div>
 
-      <div className="border-line flex justify-end gap-2 border-t pt-4">
-        <Button type="button" variant="ghost" onClick={onDone} disabled={mutation.isPending}>
-          Cancelar
-        </Button>
-        <Button type="submit" loading={mutation.isPending}>
-          {editing ? "Salvar" : "Criar espaço"}
-        </Button>
-      </div>
+      <DialogFooter
+        onCancel={onDone}
+        loading={mutation.isPending}
+        submitLabel={editing ? "Salvar" : "Criar espaço"}
+      />
     </form>
   );
 }

@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { CalendarCheck2, Plus } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { Booking } from "@/lib/types";
+import { formatDateTime } from "@/lib/utils/date";
 import { useDisclosure } from "@/lib/hooks/useDisclosure";
 import {
   Badge,
@@ -11,16 +12,12 @@ import {
   Card,
   EmptyState,
   PageHeader,
-  Skeleton,
   Table,
+  TableSkeleton,
   Td,
   Th,
 } from "@/components/ui";
 import { BookingFormDialog } from "./BookingFormDialog";
-
-function fmt(iso: string): string {
-  return new Date(iso).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" });
-}
 
 export default function BookingsPage() {
   const form = useDisclosure();
@@ -46,11 +43,7 @@ export default function BookingsPage() {
 
       <Card className="overflow-hidden">
         {bookings.isLoading ? (
-          <div className="space-y-3 p-5">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Skeleton key={i} className="h-12 w-full" />
-            ))}
-          </div>
+          <TableSkeleton />
         ) : rows.length === 0 ? (
           <EmptyState
             icon={CalendarCheck2}
@@ -78,8 +71,8 @@ export default function BookingsPage() {
             {rows.map((b) => (
               <tr key={b.id} className="hover:bg-surface-muted/50 transition-colors">
                 <Td className="font-medium">{b.space?.name ?? b.spaceId}</Td>
-                <Td>{fmt(b.startDateTime)}</Td>
-                <Td>{fmt(b.endDateTime)}</Td>
+                <Td>{formatDateTime(b.startDateTime)}</Td>
+                <Td>{formatDateTime(b.endDateTime)}</Td>
                 <Td>
                   <Badge tone={b.status === "confirmed" ? "success" : "neutral"}>{b.status}</Badge>
                 </Td>
