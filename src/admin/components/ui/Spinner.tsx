@@ -9,7 +9,7 @@ interface SpinnerProps {
 export function Spinner({ className, label = "Carregando" }: SpinnerProps) {
   return (
     <span role="status" className={cn("inline-flex items-center justify-center", className)}>
-      <span className="size-6 animate-spin rounded-full border-2 border-brand-100 border-t-brand" />
+      <span className="border-brand-100 border-t-brand size-6 animate-spin rounded-full border-2" />
       <span className="sr-only">{label}…</span>
     </span>
   );

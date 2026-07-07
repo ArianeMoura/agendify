@@ -36,24 +36,24 @@ export function Dialog({
         <RadixDialog.Content
           className={cn(
             "fixed top-1/2 left-1/2 z-50 w-[calc(100vw-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2",
-            "rounded-[var(--radius-lg)] border border-line bg-surface shadow-[var(--shadow-lg)]",
+            "border-line bg-surface rounded-[var(--radius-lg)] border shadow-[var(--shadow-lg)]",
             "max-h-[calc(100vh-2rem)] overflow-y-auto focus:outline-none",
             className
           )}
         >
-          <div className="flex items-start justify-between gap-4 border-b border-line px-5 py-4">
+          <div className="border-line flex items-start justify-between gap-4 border-b px-5 py-4">
             <div className="space-y-1">
-              <RadixDialog.Title className="font-display text-lg font-semibold text-ink">
+              <RadixDialog.Title className="font-display text-ink text-lg font-semibold">
                 {title}
               </RadixDialog.Title>
               {description && (
-                <RadixDialog.Description className="text-sm text-ink-muted">
+                <RadixDialog.Description className="text-ink-muted text-sm">
                   {description}
                 </RadixDialog.Description>
               )}
             </div>
             <RadixDialog.Close
-              className="rounded-[var(--radius-sm)] p-1 text-ink-muted hover:bg-surface-muted hover:text-ink"
+              className="text-ink-muted hover:bg-surface-muted hover:text-ink rounded-[var(--radius-sm)] p-1"
               aria-label="Fechar"
             >
               <X className="size-5" aria-hidden />
@@ -61,7 +61,7 @@ export function Dialog({
           </div>
           <div className="p-5">{children}</div>
           {footer && (
-            <div className="flex justify-end gap-2 border-t border-line px-5 py-4">{footer}</div>
+            <div className="border-line flex justify-end gap-2 border-t px-5 py-4">{footer}</div>
           )}
         </RadixDialog.Content>
       </RadixDialog.Portal>

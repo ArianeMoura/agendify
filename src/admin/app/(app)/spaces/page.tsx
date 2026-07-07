@@ -4,7 +4,7 @@ import { FormEvent, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiFetch, apiForm, ApiError } from "@/lib/api";
 import { Space } from "@/lib/types";
-import { Badge, Button, Card, Input, Label, Spinner, Table } from "@/components/ui";
+import { Badge, Button, Card, Field, Input, LoadingBlock, Table } from "@/components/ui";
 
 export default function SpacesPage() {
   const qc = useQueryClient();
@@ -55,7 +55,7 @@ export default function SpacesPage() {
       <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
         <Card className="p-0">
           {isLoading ? (
-            <Spinner />
+            <LoadingBlock />
           ) : (
             <Table
               head={
@@ -75,7 +75,7 @@ export default function SpacesPage() {
                     {s.availableHours?.length ?? 0} horários
                   </td>
                   <td className="px-4 py-3">
-                    <Badge tone={s.availability ? "green" : "red"}>
+                    <Badge tone={s.availability ? "success" : "danger"}>
                       {s.availability ? "Disponível" : "Indisponível"}
                     </Badge>
                   </td>
@@ -95,25 +95,31 @@ export default function SpacesPage() {
         <Card className="h-fit p-5">
           <h2 className="mb-4 font-semibold">Novo espaço</h2>
           <form onSubmit={submit} className="space-y-3">
-            <div>
-              <Label>Nome</Label>
-              <Input value={name} onChange={(e) => setName(e.target.value)} required />
-            </div>
-            <div>
-              <Label>Capacidade</Label>
-              <Input
-                type="number"
-                min={1}
-                value={capacity}
-                onChange={(e) => setCapacity(Number(e.target.value))}
-                required
-              />
-            </div>
-            <div>
-              <Label>Horários (separados por vírgula)</Label>
-              <Input value={hours} onChange={(e) => setHours(e.target.value)} />
-            </div>
-            {error && <p className="text-sm text-red-600">{error}</p>}
+            <Field label="Nome" required>
+              {(p) => (
+                <Input {...p} value={name} onChange={(e) => setName(e.target.value)} required />
+              )}
+            </Field>
+            <Field label="Capacidade" required>
+              {(p) => (
+                <Input
+                  {...p}
+                  type="number"
+                  min={1}
+                  value={capacity}
+                  onChange={(e) => setCapacity(Number(e.target.value))}
+                  required
+                />
+              )}
+            </Field>
+            <Field label="Horários (separados por vírgula)">
+              {(p) => <Input {...p} value={hours} onChange={(e) => setHours(e.target.value)} />}
+            </Field>
+            {error && (
+              <p className="text-danger text-sm" role="alert">
+                {error}
+              </p>
+            )}
             <Button type="submit" className="w-full" disabled={create.isPending}>
               {create.isPending ? "Salvando..." : "Criar espaço"}
             </Button>

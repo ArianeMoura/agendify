@@ -14,10 +14,10 @@ export function Table({ head, children, caption, className }: TableProps) {
     <div className="overflow-x-auto">
       <table className={cn("w-full text-left text-sm", className)}>
         {caption && <caption className="sr-only">{caption}</caption>}
-        <thead className="border-b border-line text-xs font-medium tracking-wide text-ink-muted uppercase">
+        <thead className="border-line text-ink-muted border-b text-xs font-medium tracking-wide uppercase">
           {head}
         </thead>
-        <tbody className="divide-y divide-line">{children}</tbody>
+        <tbody className="divide-line divide-y">{children}</tbody>
       </table>
     </div>
   );
@@ -28,5 +28,5 @@ export function Th({ className, ...props }: ThHTMLAttributes<HTMLTableCellElemen
 }
 
 export function Td({ className, ...props }: TdHTMLAttributes<HTMLTableCellElement>) {
-  return <td className={cn("px-4 py-3 text-ink", className)} {...props} />;
+  return <td className={cn("text-ink px-4 py-3", className)} {...props} />;
 }

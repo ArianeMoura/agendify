@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api";
 import { PeakHour, Space } from "@/lib/types";
-import { Card, Input, Label, Spinner, Table } from "@/components/ui";
+import { Card, Field, Input, LoadingBlock, Table } from "@/components/ui";
 
 const nowRef = new Date();
 
@@ -30,31 +30,33 @@ export default function ReportsPage() {
       <h1 className="mb-6 text-2xl font-bold">Relatórios de ocupação</h1>
 
       <div className="mb-4 flex gap-3">
-        <div>
-          <Label>Ano</Label>
-          <Input
-            type="number"
-            value={year}
-            onChange={(e) => setYear(Number(e.target.value))}
-            className="w-28"
-          />
-        </div>
-        <div>
-          <Label>Mês</Label>
-          <Input
-            type="number"
-            min={1}
-            max={12}
-            value={month}
-            onChange={(e) => setMonth(Number(e.target.value))}
-            className="w-24"
-          />
-        </div>
+        <Field label="Ano" className="w-28">
+          {(p) => (
+            <Input
+              {...p}
+              type="number"
+              value={year}
+              onChange={(e) => setYear(Number(e.target.value))}
+            />
+          )}
+        </Field>
+        <Field label="Mês" className="w-24">
+          {(p) => (
+            <Input
+              {...p}
+              type="number"
+              min={1}
+              max={12}
+              value={month}
+              onChange={(e) => setMonth(Number(e.target.value))}
+            />
+          )}
+        </Field>
       </div>
 
       <Card className="p-0">
         {peaks.isLoading ? (
-          <Spinner />
+          <LoadingBlock />
         ) : (
           <Table
             head={

@@ -32,7 +32,7 @@ export function Field({ label, hint, error, required, className, children }: Fie
 
   return (
     <div className={cn("space-y-1.5", className)}>
-      <label htmlFor={id} className="block text-sm font-medium text-ink">
+      <label htmlFor={id} className="text-ink block text-sm font-medium">
         {label}
         {required && (
           <span className="text-danger" aria-hidden>
@@ -43,12 +43,12 @@ export function Field({ label, hint, error, required, className, children }: Fie
       </label>
       {children({ id, "aria-describedby": describedBy, "aria-invalid": error ? true : undefined })}
       {hint && !error && (
-        <p id={hintId} className="text-xs text-ink-muted">
+        <p id={hintId} className="text-ink-muted text-xs">
           {hint}
         </p>
       )}
       {error && (
-        <p id={errorId} role="alert" className="text-xs font-medium text-danger">
+        <p id={errorId} role="alert" className="text-danger text-xs font-medium">
           {error}
         </p>
       )}

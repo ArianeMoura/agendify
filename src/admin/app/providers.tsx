@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "next-themes";
 import { useState, ReactNode } from "react";
 import { AuthProvider } from "@/lib/auth";
+import { Toaster, TooltipProvider } from "@/components/ui";
 
 export function Providers({ children }: { children: ReactNode }) {
   const [client] = useState(
@@ -20,7 +21,10 @@ export function Providers({ children }: { children: ReactNode }) {
     // (enableSystem) mas permitindo o toggle manual persistido.
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
       <QueryClientProvider client={client}>
-        <AuthProvider>{children}</AuthProvider>
+        <TooltipProvider delayDuration={200}>
+          <AuthProvider>{children}</AuthProvider>
+          <Toaster />
+        </TooltipProvider>
       </QueryClientProvider>
     </ThemeProvider>
   );

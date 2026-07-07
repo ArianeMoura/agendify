@@ -3,7 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
-import { Button, Card, Input, Label } from "@/components/ui";
+import { Button, Card, Field, Input } from "@/components/ui";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -36,27 +36,35 @@ export default function LoginPage() {
         </div>
 
         <form onSubmit={submit} className="space-y-4">
-          <div>
-            <Label>Email</Label>
-            <Input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="gestor@agendify.dev"
-              required
-            />
-          </div>
-          <div>
-            <Label>Senha</Label>
-            <Input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
+          <Field label="Email" required>
+            {(p) => (
+              <Input
+                {...p}
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="gestor@agendify.dev"
+                required
+              />
+            )}
+          </Field>
+          <Field label="Senha" required>
+            {(p) => (
+              <Input
+                {...p}
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            )}
+          </Field>
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && (
+            <p className="text-danger text-sm" role="alert">
+              {error}
+            </p>
+          )}
 
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Entrando..." : "Entrar"}

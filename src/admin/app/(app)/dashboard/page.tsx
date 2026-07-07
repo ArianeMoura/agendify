@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api";
 import { Booking, Space } from "@/lib/types";
-import { Card, Spinner } from "@/components/ui";
+import { Card, LoadingBlock } from "@/components/ui";
 
 function Stat({ label, value }: { label: string; value: number | string }) {
   return (
@@ -21,7 +21,7 @@ export default function DashboardPage() {
     queryFn: () => apiFetch<Booking[]>("/bookings"),
   });
 
-  if (spaces.isLoading || bookings.isLoading) return <Spinner />;
+  if (spaces.isLoading || bookings.isLoading) return <LoadingBlock />;
 
   const now = new Date().toISOString();
   const upcoming = (bookings.data ?? []).filter((b) => b.startDateTime > now).length;

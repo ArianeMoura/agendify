@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiFetch, ApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { Booking, Space } from "@/lib/types";
-import { Badge, Button, Card, Input, Label, Select, Spinner, Table } from "@/components/ui";
+import { Badge, Button, Card, Field, Input, LoadingBlock, Select, Table } from "@/components/ui";
 
 // datetime-local (sem timezone) tratado como UTC — casa com a normalização da API.
 function toUtcIso(local: string): string {
@@ -68,10 +68,10 @@ export default function BookingsPage() {
 
   const feedbackColor =
     feedback?.kind === "ok"
-      ? "text-green-700"
+      ? "text-[var(--color-success)]"
       : feedback?.kind === "conflict"
-        ? "text-amber-700"
-        : "text-red-600";
+        ? "text-alert"
+        : "text-danger";
 
   return (
     <div>
@@ -80,7 +80,7 @@ export default function BookingsPage() {
       <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
         <Card className="p-0">
           {bookings.isLoading ? (
-            <Spinner />
+            <LoadingBlock />
           ) : (
             <Table
               head={
@@ -98,7 +98,9 @@ export default function BookingsPage() {
                   <td className="px-4 py-3">{fmt(b.startDateTime)}</td>
                   <td className="px-4 py-3">{fmt(b.endDateTime)}</td>
                   <td className="px-4 py-3">
-                    <Badge tone={b.status === "confirmed" ? "green" : "neutral"}>{b.status}</Badge>
+                    <Badge tone={b.status === "confirmed" ? "success" : "neutral"}>
+                      {b.status}
+                    </Badge>
                   </td>
                 </tr>
               ))}
@@ -116,36 +118,50 @@ export default function BookingsPage() {
         <Card className="h-fit p-5">
           <h2 className="mb-4 font-semibold">Nova reserva</h2>
           <form onSubmit={submit} className="space-y-3">
-            <div>
-              <Label>Espaço</Label>
-              <Select value={spaceId} onChange={(e) => setSpaceId(e.target.value)} required>
-                <option value="">Selecione…</option>
-                {(spaces.data ?? []).map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name}
-                  </option>
-                ))}
-              </Select>
-            </div>
-            <div>
-              <Label>Início</Label>
-              <Input
-                type="datetime-local"
-                value={start}
-                onChange={(e) => setStart(e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <Label>Fim</Label>
-              <Input
-                type="datetime-local"
-                value={end}
-                onChange={(e) => setEnd(e.target.value)}
-                required
-              />
-            </div>
-            {feedback && <p className={`text-sm ${feedbackColor}`}>{feedback.text}</p>}
+            <Field label="Espaço" required>
+              {(p) => (
+                <Select
+                  {...p}
+                  value={spaceId}
+                  onChange={(e) => setSpaceId(e.target.value)}
+                  required
+                >
+                  <option value="">Selecione…</option>
+                  {(spaces.data ?? []).map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name}
+                    </option>
+                  ))}
+                </Select>
+              )}
+            </Field>
+            <Field label="Início" required>
+              {(p) => (
+                <Input
+                  {...p}
+                  type="datetime-local"
+                  value={start}
+                  onChange={(e) => setStart(e.target.value)}
+                  required
+                />
+              )}
+            </Field>
+            <Field label="Fim" required>
+              {(p) => (
+                <Input
+                  {...p}
+                  type="datetime-local"
+                  value={end}
+                  onChange={(e) => setEnd(e.target.value)}
+                  required
+                />
+              )}
+            </Field>
+            {feedback && (
+              <p className={`text-sm ${feedbackColor}`} role="alert">
+                {feedback.text}
+              </p>
+            )}
             <Button type="submit" className="w-full" disabled={create.isPending}>
               {create.isPending ? "Reservando..." : "Criar reserva"}
             </Button>
