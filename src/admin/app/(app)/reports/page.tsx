@@ -2,9 +2,20 @@
 
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { BarChart3 } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { PeakHour, Space } from "@/lib/types";
-import { Card, Field, Input, LoadingBlock, Table } from "@/components/ui";
+import {
+  Card,
+  EmptyState,
+  Field,
+  Input,
+  PageHeader,
+  Skeleton,
+  Table,
+  Td,
+  Th,
+} from "@/components/ui";
 
 const nowRef = new Date();
 
@@ -23,13 +34,14 @@ export default function ReportsPage() {
     return (id: string) => map.get(id) ?? id;
   }, [spaces.data]);
 
-  const max = Math.max(1, ...(peaks.data ?? []).map((p) => p.reservationsCount));
+  const rows = peaks.data ?? [];
+  const max = Math.max(1, ...rows.map((p) => p.reservationsCount));
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-bold">Relatórios de ocupação</h1>
+      <PageHeader title="Relatórios de ocupação" description="Horários de pico por espaço." />
 
-      <div className="mb-4 flex gap-3">
+      <div className="mb-4 flex flex-wrap gap-3">
         <Field label="Ano" className="w-28">
           {(p) => (
             <Input
@@ -54,41 +66,48 @@ export default function ReportsPage() {
         </Field>
       </div>
 
-      <Card className="p-0">
+      <Card className="overflow-hidden">
         {peaks.isLoading ? (
-          <LoadingBlock />
+          <div className="space-y-3 p-5">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Skeleton key={i} className="h-10 w-full" />
+            ))}
+          </div>
+        ) : rows.length === 0 ? (
+          <EmptyState
+            icon={BarChart3}
+            title="Sem dados para o período"
+            description="Ajuste o mês e o ano ou registre reservas para gerar o relatório."
+          />
         ) : (
           <Table
+            caption="Horários de pico por espaço"
             head={
               <tr>
-                <th className="px-4 py-3">Espaço</th>
-                <th className="px-4 py-3">Horário de pico</th>
-                <th className="w-1/2 px-4 py-3">Reservas</th>
+                <Th>Espaço</Th>
+                <Th>Horário de pico</Th>
+                <Th className="w-1/2">Reservas</Th>
               </tr>
             }
           >
-            {(peaks.data ?? []).map((p, i) => (
+            {rows.map((p, i) => (
               <tr key={`${p.spaceId}-${p.hour}-${i}`}>
-                <td className="px-4 py-3 font-medium">{spaceName(p.spaceId)}</td>
-                <td className="px-4 py-3">{String(p.hour).padStart(2, "0")}:00</td>
-                <td className="px-4 py-3">
+                <Td className="font-medium">{spaceName(p.spaceId)}</Td>
+                <Td>{String(p.hour).padStart(2, "0")}:00</Td>
+                <Td>
                   <div className="flex items-center gap-2">
                     <div
-                      className="bg-brand-500 h-2 rounded-full"
-                      style={{ width: `${(p.reservationsCount / max) * 100}%`, minWidth: "8px" }}
+                      className="bg-brand h-2 rounded-full"
+                      style={{
+                        width: `${(p.reservationsCount / max) * 100}%`,
+                        minWidth: "8px",
+                      }}
                     />
-                    <span className="text-ink-soft">{p.reservationsCount}</span>
+                    <span className="text-ink-muted">{p.reservationsCount}</span>
                   </div>
-                </td>
+                </Td>
               </tr>
             ))}
-            {(peaks.data ?? []).length === 0 && (
-              <tr>
-                <td colSpan={3} className="text-ink-soft px-4 py-8 text-center">
-                  Sem dados para o período.
-                </td>
-              </tr>
-            )}
           </Table>
         )}
       </Card>

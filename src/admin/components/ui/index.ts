@@ -9,6 +9,7 @@ export {
 export { Input, Textarea, Select } from "./Input";
 export { Field } from "./Field";
 export { Card, CardHeader, CardTitle, CardContent } from "./Card";
+export { PageHeader } from "./PageHeader";
 export { Badge, type BadgeTone } from "./Badge";
 export { Spinner, LoadingBlock } from "./Spinner";
 export { Skeleton } from "./Skeleton";

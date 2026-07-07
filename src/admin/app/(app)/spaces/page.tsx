@@ -1,10 +1,27 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { useState } from "react";
+import Image from "next/image";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiFetch, apiForm, ApiError } from "@/lib/api";
+import { MapPin, Pencil, Plus, Trash2 } from "lucide-react";
+import { ApiError, apiFetch, imageUrl } from "@/lib/api";
 import { Space } from "@/lib/types";
-import { Badge, Button, Card, Field, Input, LoadingBlock, Table } from "@/components/ui";
+import { useDisclosure } from "@/lib/hooks/useDisclosure";
+import {
+  Badge,
+  Button,
+  Card,
+  ConfirmDialog,
+  EmptyState,
+  PageHeader,
+  Skeleton,
+  Table,
+  Td,
+  Th,
+  toast,
+  Tooltip,
+} from "@/components/ui";
+import { SpaceFormDialog } from "./SpaceFormDialog";
 
 export default function SpacesPage() {
   const qc = useQueryClient();
@@ -13,119 +30,143 @@ export default function SpacesPage() {
     queryFn: () => apiFetch<Space[]>("/spaces"),
   });
 
-  const [name, setName] = useState("");
-  const [capacity, setCapacity] = useState(10);
-  const [hours, setHours] = useState("08:00, 09:00, 10:00");
-  const [error, setError] = useState<string | null>(null);
+  const form = useDisclosure();
+  const [editing, setEditing] = useState<Space | null>(null);
+  const [toDelete, setToDelete] = useState<Space | null>(null);
 
-  const create = useMutation({
-    mutationFn: async () => {
-      const spaceData = {
-        name,
-        capacity,
-        availability: true,
-        isAllDayBooking: false,
-        availableHours: hours
-          .split(",")
-          .map((h) => h.trim())
-          .filter(Boolean),
-        resources: [],
-      };
-      const form = new FormData();
-      form.append("spaceData", JSON.stringify(spaceData));
-      return apiForm<Space>("/spaces", form);
-    },
+  const remove = useMutation({
+    mutationFn: (id: string) => apiFetch(`/spaces/${id}`, { method: "DELETE" }),
     onSuccess: () => {
-      setName("");
-      setError(null);
       qc.invalidateQueries({ queryKey: ["spaces"] });
+      toast.success("Espaço excluído.");
+      setToDelete(null);
     },
-    onError: (err) => setError(err instanceof ApiError ? err.message : "Erro ao criar espaço"),
+    onError: (err) => toast.error(err instanceof ApiError ? err.message : "Erro ao excluir."),
   });
 
-  const submit = (e: FormEvent) => {
-    e.preventDefault();
-    create.mutate();
+  const openCreate = () => {
+    setEditing(null);
+    form.onOpen();
   };
+  const openEdit = (space: Space) => {
+    setEditing(space);
+    form.onOpen();
+  };
+
+  const spaces = data ?? [];
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-bold">Espaços</h1>
+      <PageHeader
+        title="Espaços"
+        description="Gerencie os espaços reserváveis."
+        action={
+          <Button onClick={openCreate}>
+            <Plus className="size-4" aria-hidden />
+            Novo espaço
+          </Button>
+        }
+      />
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-        <Card className="p-0">
-          {isLoading ? (
-            <LoadingBlock />
-          ) : (
-            <Table
-              head={
-                <tr>
-                  <th className="px-4 py-3">Nome</th>
-                  <th className="px-4 py-3">Capacidade</th>
-                  <th className="px-4 py-3">Horários</th>
-                  <th className="px-4 py-3">Status</th>
-                </tr>
-              }
-            >
-              {(data ?? []).map((s) => (
-                <tr key={s.id}>
-                  <td className="px-4 py-3 font-medium">{s.name}</td>
-                  <td className="px-4 py-3">{s.capacity}</td>
-                  <td className="text-ink-soft px-4 py-3">
-                    {s.availableHours?.length ?? 0} horários
-                  </td>
-                  <td className="px-4 py-3">
-                    <Badge tone={s.availability ? "success" : "danger"}>
-                      {s.availability ? "Disponível" : "Indisponível"}
-                    </Badge>
-                  </td>
-                </tr>
-              ))}
-              {(data ?? []).length === 0 && (
-                <tr>
-                  <td colSpan={4} className="text-ink-soft px-4 py-8 text-center">
-                    Nenhum espaço cadastrado.
-                  </td>
-                </tr>
-              )}
-            </Table>
-          )}
-        </Card>
+      <Card className="overflow-hidden">
+        {isLoading ? (
+          <div className="space-y-3 p-5">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Skeleton key={i} className="h-12 w-full" />
+            ))}
+          </div>
+        ) : spaces.length === 0 ? (
+          <EmptyState
+            icon={MapPin}
+            title="Nenhum espaço cadastrado"
+            description="Crie o primeiro espaço para começar a receber reservas."
+            action={
+              <Button onClick={openCreate}>
+                <Plus className="size-4" aria-hidden />
+                Novo espaço
+              </Button>
+            }
+          />
+        ) : (
+          <Table
+            caption="Lista de espaços"
+            head={
+              <tr>
+                <Th className="w-14">Imagem</Th>
+                <Th>Nome</Th>
+                <Th>Capacidade</Th>
+                <Th>Horários</Th>
+                <Th>Status</Th>
+                <Th className="text-right">Ações</Th>
+              </tr>
+            }
+          >
+            {spaces.map((s) => (
+              <tr key={s.id} className="hover:bg-surface-muted/50 transition-colors">
+                <Td>
+                  {s.imageUrl ? (
+                    <Image
+                      src={imageUrl(s.imageUrl) ?? ""}
+                      alt=""
+                      width={40}
+                      height={40}
+                      className="size-10 rounded-[var(--radius-sm)] object-cover"
+                    />
+                  ) : (
+                    <span className="bg-surface-muted text-ink-muted flex size-10 items-center justify-center rounded-[var(--radius-sm)]">
+                      <MapPin className="size-4" aria-hidden />
+                    </span>
+                  )}
+                </Td>
+                <Td className="font-medium">{s.name}</Td>
+                <Td>{s.capacity}</Td>
+                <Td className="text-ink-muted">{s.availableHours?.length ?? 0} horários</Td>
+                <Td>
+                  <Badge tone={s.availability ? "success" : "danger"}>
+                    {s.availability ? "Disponível" : "Indisponível"}
+                  </Badge>
+                </Td>
+                <Td>
+                  <div className="flex justify-end gap-1">
+                    <Tooltip content="Editar">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => openEdit(s)}
+                        aria-label={`Editar ${s.name}`}
+                      >
+                        <Pencil className="size-4" aria-hidden />
+                      </Button>
+                    </Tooltip>
+                    <Tooltip content="Excluir">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setToDelete(s)}
+                        aria-label={`Excluir ${s.name}`}
+                      >
+                        <Trash2 className="text-danger size-4" aria-hidden />
+                      </Button>
+                    </Tooltip>
+                  </div>
+                </Td>
+              </tr>
+            ))}
+          </Table>
+        )}
+      </Card>
 
-        <Card className="h-fit p-5">
-          <h2 className="mb-4 font-semibold">Novo espaço</h2>
-          <form onSubmit={submit} className="space-y-3">
-            <Field label="Nome" required>
-              {(p) => (
-                <Input {...p} value={name} onChange={(e) => setName(e.target.value)} required />
-              )}
-            </Field>
-            <Field label="Capacidade" required>
-              {(p) => (
-                <Input
-                  {...p}
-                  type="number"
-                  min={1}
-                  value={capacity}
-                  onChange={(e) => setCapacity(Number(e.target.value))}
-                  required
-                />
-              )}
-            </Field>
-            <Field label="Horários (separados por vírgula)">
-              {(p) => <Input {...p} value={hours} onChange={(e) => setHours(e.target.value)} />}
-            </Field>
-            {error && (
-              <p className="text-danger text-sm" role="alert">
-                {error}
-              </p>
-            )}
-            <Button type="submit" className="w-full" disabled={create.isPending}>
-              {create.isPending ? "Salvando..." : "Criar espaço"}
-            </Button>
-          </form>
-        </Card>
-      </div>
+      <SpaceFormDialog open={form.open} onOpenChange={form.setOpen} space={editing} />
+
+      <ConfirmDialog
+        open={Boolean(toDelete)}
+        onOpenChange={(o) => !o && setToDelete(null)}
+        title="Excluir espaço"
+        description={`Remover "${toDelete?.name}"? Esta ação não pode ser desfeita.`}
+        confirmLabel="Excluir"
+        loading={remove.isPending}
+        onConfirm={() => toDelete && remove.mutate(toDelete.id)}
+      />
     </div>
   );
 }

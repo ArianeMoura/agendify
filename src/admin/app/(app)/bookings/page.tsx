@@ -1,173 +1,95 @@
 "use client";
 
-import { FormEvent, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiFetch, ApiError } from "@/lib/api";
-import { useAuth } from "@/lib/auth";
-import { Booking, Space } from "@/lib/types";
-import { Badge, Button, Card, Field, Input, LoadingBlock, Select, Table } from "@/components/ui";
-
-// datetime-local (sem timezone) tratado como UTC — casa com a normalização da API.
-function toUtcIso(local: string): string {
-  if (!local) return local;
-  const withSeconds = local.length === 16 ? `${local}:00` : local;
-  return `${withSeconds}Z`;
-}
+import { useQuery } from "@tanstack/react-query";
+import { CalendarCheck2, Plus } from "lucide-react";
+import { apiFetch } from "@/lib/api";
+import { Booking } from "@/lib/types";
+import { useDisclosure } from "@/lib/hooks/useDisclosure";
+import {
+  Badge,
+  Button,
+  Card,
+  EmptyState,
+  PageHeader,
+  Skeleton,
+  Table,
+  Td,
+  Th,
+} from "@/components/ui";
+import { BookingFormDialog } from "./BookingFormDialog";
 
 function fmt(iso: string): string {
   return new Date(iso).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" });
 }
 
 export default function BookingsPage() {
-  const qc = useQueryClient();
-  const { user } = useAuth();
-
+  const form = useDisclosure();
   const bookings = useQuery({
     queryKey: ["bookings"],
     queryFn: () => apiFetch<Booking[]>("/bookings"),
   });
-  const spaces = useQuery({ queryKey: ["spaces"], queryFn: () => apiFetch<Space[]>("/spaces") });
 
-  const [spaceId, setSpaceId] = useState("");
-  const [start, setStart] = useState("");
-  const [end, setEnd] = useState("");
-  const [feedback, setFeedback] = useState<{
-    kind: "ok" | "conflict" | "error";
-    text: string;
-  } | null>(null);
-
-  const create = useMutation({
-    mutationFn: () =>
-      apiFetch<Booking>("/bookings", {
-        method: "POST",
-        body: {
-          userId: user?.id,
-          spaceId,
-          startDateTime: toUtcIso(start),
-          endDateTime: toUtcIso(end),
-        },
-      }),
-    onSuccess: () => {
-      setFeedback({ kind: "ok", text: "Reserva criada." });
-      qc.invalidateQueries({ queryKey: ["bookings"] });
-    },
-    onError: (err) => {
-      if (err instanceof ApiError && err.status === 409) {
-        setFeedback({ kind: "conflict", text: err.message });
-      } else {
-        setFeedback({ kind: "error", text: err instanceof Error ? err.message : "Erro" });
-      }
-    },
-  });
-
-  const submit = (e: FormEvent) => {
-    e.preventDefault();
-    setFeedback(null);
-    create.mutate();
-  };
-
-  const feedbackColor =
-    feedback?.kind === "ok"
-      ? "text-[var(--color-success)]"
-      : feedback?.kind === "conflict"
-        ? "text-alert"
-        : "text-danger";
+  const rows = bookings.data ?? [];
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-bold">Reservas</h1>
+      <PageHeader
+        title="Reservas"
+        description="Acompanhe e crie reservas de espaços."
+        action={
+          <Button onClick={form.onOpen}>
+            <Plus className="size-4" aria-hidden />
+            Nova reserva
+          </Button>
+        }
+      />
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-        <Card className="p-0">
-          {bookings.isLoading ? (
-            <LoadingBlock />
-          ) : (
-            <Table
-              head={
-                <tr>
-                  <th className="px-4 py-3">Espaço</th>
-                  <th className="px-4 py-3">Início</th>
-                  <th className="px-4 py-3">Fim</th>
-                  <th className="px-4 py-3">Status</th>
-                </tr>
-              }
-            >
-              {(bookings.data ?? []).map((b) => (
-                <tr key={b.id}>
-                  <td className="px-4 py-3 font-medium">{b.space?.name ?? b.spaceId}</td>
-                  <td className="px-4 py-3">{fmt(b.startDateTime)}</td>
-                  <td className="px-4 py-3">{fmt(b.endDateTime)}</td>
-                  <td className="px-4 py-3">
-                    <Badge tone={b.status === "confirmed" ? "success" : "neutral"}>
-                      {b.status}
-                    </Badge>
-                  </td>
-                </tr>
-              ))}
-              {(bookings.data ?? []).length === 0 && (
-                <tr>
-                  <td colSpan={4} className="text-ink-soft px-4 py-8 text-center">
-                    Nenhuma reserva.
-                  </td>
-                </tr>
-              )}
-            </Table>
-          )}
-        </Card>
+      <Card className="overflow-hidden">
+        {bookings.isLoading ? (
+          <div className="space-y-3 p-5">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Skeleton key={i} className="h-12 w-full" />
+            ))}
+          </div>
+        ) : rows.length === 0 ? (
+          <EmptyState
+            icon={CalendarCheck2}
+            title="Nenhuma reserva"
+            description="Crie a primeira reserva para um espaço."
+            action={
+              <Button onClick={form.onOpen}>
+                <Plus className="size-4" aria-hidden />
+                Nova reserva
+              </Button>
+            }
+          />
+        ) : (
+          <Table
+            caption="Lista de reservas"
+            head={
+              <tr>
+                <Th>Espaço</Th>
+                <Th>Início</Th>
+                <Th>Fim</Th>
+                <Th>Status</Th>
+              </tr>
+            }
+          >
+            {rows.map((b) => (
+              <tr key={b.id} className="hover:bg-surface-muted/50 transition-colors">
+                <Td className="font-medium">{b.space?.name ?? b.spaceId}</Td>
+                <Td>{fmt(b.startDateTime)}</Td>
+                <Td>{fmt(b.endDateTime)}</Td>
+                <Td>
+                  <Badge tone={b.status === "confirmed" ? "success" : "neutral"}>{b.status}</Badge>
+                </Td>
+              </tr>
+            ))}
+          </Table>
+        )}
+      </Card>
 
-        <Card className="h-fit p-5">
-          <h2 className="mb-4 font-semibold">Nova reserva</h2>
-          <form onSubmit={submit} className="space-y-3">
-            <Field label="Espaço" required>
-              {(p) => (
-                <Select
-                  {...p}
-                  value={spaceId}
-                  onChange={(e) => setSpaceId(e.target.value)}
-                  required
-                >
-                  <option value="">Selecione…</option>
-                  {(spaces.data ?? []).map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.name}
-                    </option>
-                  ))}
-                </Select>
-              )}
-            </Field>
-            <Field label="Início" required>
-              {(p) => (
-                <Input
-                  {...p}
-                  type="datetime-local"
-                  value={start}
-                  onChange={(e) => setStart(e.target.value)}
-                  required
-                />
-              )}
-            </Field>
-            <Field label="Fim" required>
-              {(p) => (
-                <Input
-                  {...p}
-                  type="datetime-local"
-                  value={end}
-                  onChange={(e) => setEnd(e.target.value)}
-                  required
-                />
-              )}
-            </Field>
-            {feedback && (
-              <p className={`text-sm ${feedbackColor}`} role="alert">
-                {feedback.text}
-              </p>
-            )}
-            <Button type="submit" className="w-full" disabled={create.isPending}>
-              {create.isPending ? "Reservando..." : "Criar reserva"}
-            </Button>
-          </form>
-        </Card>
-      </div>
+      <BookingFormDialog open={form.open} onOpenChange={form.setOpen} />
     </div>
   );
 }
