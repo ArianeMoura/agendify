@@ -15,6 +15,20 @@ export interface LoginResponse {
   user: User;
 }
 
+export interface CreateUserRequest {
+  name: string;
+  email: string;
+  password: string;
+  profile: Profile;
+}
+
+export interface UpdateUserRequest {
+  name?: string;
+  email?: string;
+  password?: string;
+  profile?: Profile;
+}
+
 export interface SpaceResource {
   resourceId: string;
   quantity: number;

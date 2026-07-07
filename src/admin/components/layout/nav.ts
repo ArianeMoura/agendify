@@ -1,4 +1,11 @@
-import { CalendarCheck2, LayoutDashboard, MapPin, BarChart3, type LucideIcon } from "lucide-react";
+import {
+  BarChart3,
+  CalendarCheck2,
+  LayoutDashboard,
+  MapPin,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 
 export interface NavItem {
   href: string;
@@ -12,4 +19,5 @@ export const navItems: NavItem[] = [
   { href: "/spaces", label: "Espaços", Icon: MapPin },
   { href: "/bookings", label: "Reservas", Icon: CalendarCheck2 },
   { href: "/reports", label: "Relatórios", Icon: BarChart3 },
+  { href: "/users", label: "Usuários", Icon: Users },
 ];
