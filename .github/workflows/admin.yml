@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    name: Build & Lint (Next.js)
+    name: CI (Next.js)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -26,5 +26,9 @@ jobs:
         run: npm ci
       - name: Lint
         run: npm run lint
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Test
+        run: npm test
       - name: Build
         run: npm run build

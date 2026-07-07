@@ -41,12 +41,13 @@ serious and inviting.
 
 ## Typography
 
-- **Opun Mai** — section titles and subtitles. A display face with personality that stays legible;
-  it builds visual hierarchy and reinforces the modern identity.
-- **Oleo Script** — brand signature and large hero titles. A friendly, fluid script that adds a
-  human touch and echoes the "simplicity" value. Use sparingly, for brand moments only.
-- **Inter** — body copy, descriptions, and UI. Designed for screens, it offers excellent
-  legibility across sizes and platforms; it is the default for all running text.
+- **Sora** (700/800) — brand, headings, and highlight numbers (KPIs). A geometric display face
+  that builds hierarchy and carries the modern identity. Loaded via `next/font` (self-hosted).
+- **Manrope** (400–800) — body copy, UI, tables, and running text. Designed for screens, with
+  excellent legibility across sizes. The default for all UI text.
+
+Both are on Google Fonts (SIL Open Font License) and self-hosted through `next/font` in the admin
+(no external request, no layout shift).
 
 ## Logo usage
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useState, ReactNode } from "react";
-import { apiFetch, ApiError, tokens } from "./api";
+import { apiFetch, ApiError, setSessionExpiredHandler, tokens } from "./api";
 import { LoginResponse, User } from "./types";
 
 interface AuthState {
@@ -28,6 +28,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     if (raw && tokens.access) setUser(JSON.parse(raw));
     setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    // Sessão expirada (401 irrecuperável): limpa o usuário. O AppShell observa
+    // `user == null` e redireciona ao /login — sem acoplar a camada de dados a rotas.
+    setSessionExpiredHandler(() => {
+      localStorage.removeItem(USER_KEY);
+      setUser(null);
+    });
+    return () => setSessionExpiredHandler(null);
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
