@@ -2,7 +2,9 @@
 
 A **interface** do Agendify foi projetada para oferecer uma experiência intuitiva e eficiente na gestão de reservas em condomínios, coworkings e demais ambientes compartilhados. Cada tela foi desenvolvida para garantir usabilidade, clareza e acessibilidade, atendendo às necessidades dos usuários de forma prática e organizada. O projeto se apoia na norma técnica de qualidade de software **ISO/IEC 25010:2023**, buscando altos padrões de usabilidade, eficiência e confiabilidade.
 
-> A **interatividade** do fluxo do usuário, incluindo a **transição entre telas**, pode ser explorada no protótipo interativo: [Protótipo Interativo — Agendify (Figma)](https://www.figma.com/design/dcBmCPWXIaXNYU4aihH6JV/Agendify?node-id=0-1&t=OExO9hDiQW54JICv-1).
+O **painel administrativo (web)** já está **implementado** em **Next.js 16 / React 19**, seguindo o [Design System](DESIGN-SYSTEM.md), com **acessibilidade WCAG 2.2 AA**, **responsivo** (desktop, tablet e mobile) e **tema claro/escuro**.
+
+> A **interatividade** do fluxo do usuário, incluindo a **transição entre telas**, pode ser explorada no protótipo interativo: [Protótipo Interativo — Agendify (Figma)]().
 
 As diretrizes de identidade visual (logo, paleta, tipografia) estão em [Design System](DESIGN-SYSTEM.md).
 
@@ -22,39 +24,73 @@ As diretrizes de identidade visual (logo, paleta, tipografia) estão em [Design 
 
 <h4 align="center">Fluxo do Usuário</h4>
 
-## Wireframes
+## Telas do Painel Administrativo (implementadas)
+
+Telas reais do painel de gestão (perfil **Administrador**), na identidade final da marca. Todos os componentes seguem o mesmo design system tokenizado — os mesmos tokens trocam de valor entre os temas **claro** e **escuro**.
+
+### Login
+Acesso do gestor com e-mail e senha, com o lockup da marca e formulário acessível.
 
 <div align="center">
-<img width="900" alt="Wireframes gerais da aplicação" src="https://github.com/user-attachments/assets/f86f904c-e395-486e-821c-58bdf5c73e83" />
-</div>
-
-<h4 align="center">Visão geral dos wireframes</h4>
-
-### Tela de Login
-O usuário acessa sua conta inserindo e-mail e senha previamente cadastrados.
-
-<div align="center">
-<img width="300" alt="Wireframe da tela de login" src="https://github.com/user-attachments/assets/6b51e47b-4428-4580-9e49-7cf4ee9b1ebb" />
+<img width="820" alt="Tela de login do painel Agendify" src="img/admin/login.png" />
 </div>
 
 <br>
 
-### Dashboard Principal (Usuário)
-Oferece uma visão geral das reservas ativas do usuário e a ação de criar uma nova reserva.
+### Visão geral (Dashboard)
+Resumo com KPIs (espaços, disponíveis, reservas totais e futuras) e a lista de reservas recentes.
 
 <div align="center">
-<img width="300" alt="Wireframe do dashboard principal do usuário" src="https://github.com/user-attachments/assets/6f80319d-3fa6-4060-92c8-86a06f393e4e" />
+<img width="820" alt="Dashboard do painel — tema claro" src="img/admin/dashboard-light.png" />
+</div>
+
+<div align="center">
+<img width="820" alt="Dashboard do painel — tema escuro" src="img/admin/dashboard-dark.png" />
+</div>
+
+<h4 align="center">Tema claro e escuro</h4>
+
+<br>
+
+### Espaços
+Listagem dos espaços reserváveis com status, e criação/edição em modal (nome, capacidade, horários, imagem e disponibilidade).
+
+<div align="center">
+<img width="820" alt="Tela de gestão de espaços" src="img/admin/spaces.png" />
 </div>
 
 <br>
 
-### Tela de Reserva
-Dedicada ao registro de novas reservas. O usuário informa o espaço, o sistema retorna as datas e horários disponíveis e o usuário avança para a confirmação no horário selecionado.
+### Reservas
+Acompanhamento e criação de reservas; conflitos de horário (RN-01) são destacados em coral no formulário.
 
 <div align="center">
-<img width="300" alt="Wireframe da tela de reserva - seleção de espaço" src="https://github.com/user-attachments/assets/58b7f0cb-8f95-4ea7-919c-09612ed437ea" />
+<img width="820" alt="Tela de gestão de reservas" src="img/admin/bookings.png" />
 </div>
 
+<br>
+
+### Relatórios de ocupação
+Horários de pico por espaço, com filtro por ano/mês.
+
 <div align="center">
-<img width="300" alt="Wireframe da tela de reserva - confirmação de horário" src="https://github.com/user-attachments/assets/1bb42b04-9bd8-4a15-8832-1b7546fd6c6b" />
+<img width="820" alt="Tela de relatórios de ocupação" src="img/admin/reports.png" />
+</div>
+
+<br>
+
+### Usuários
+Gestão de acessos ao sistema (criar, editar e excluir), com salvaguardas de perfil (o gestor não exclui a si mesmo nem altera o próprio perfil).
+
+<div align="center">
+<img width="820" alt="Tela de gestão de usuários" src="img/admin/users.png" />
+</div>
+
+<br>
+
+### Navegação mobile
+Abaixo de `lg`, a barra lateral vira um **drawer** acessível, aberto por um botão hambúrguer.
+
+<div align="center">
+<img width="300" alt="Navegação mobile do painel — drawer" src="img/admin/mobile-drawer.png" />
 </div>

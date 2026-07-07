@@ -102,7 +102,7 @@ admin (no external request, no layout shift).
 
 ## Logo, icon & favicon
 
-<img src="img/agendify-icon.png" alt="Agendify icon" width="96" height="96" />
+<img src="img/agendify-icon.png" alt="Agendify icon" width="146" height="146" />
 
 Brand marks are **React SVG components** in `src/admin/components/brand/` and static assets in
 `src/admin/public/` (generated reproducibly by `src/admin/scripts/generate-icons.mjs` with `sharp`):

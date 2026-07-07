@@ -6,7 +6,7 @@ Esta seção detalha as especificações do **Agendify**, apresentando uma visã
 
 As personas a seguir representam os principais arquétipos de usuário do Agendify, cobrindo tanto o uso residencial (condomínios) quanto o uso comercial (operadores de espaços compartilhados).
 
-| Sofia Almeida | <div align="center"><img width="200" alt="Foto de Sofia Almeida" src="https://github.com/user-attachments/assets/92cc7311-eba7-4a05-acd8-db85f54a6384" /></div> |
+| Sofia Almeida | <div align="center"><img width="200" alt="Avatar de Sofia Almeida" src="img/personas/sofia.svg" /></div> |
 | :--- | :--- |
 | **Idade:** | 38 |
 | **Ocupação:** | Arquiteta (moradora) |
@@ -14,7 +14,7 @@ As personas a seguir representam os principais arquétipos de usuário do Agendi
 | **Objetivos:** | Reservar piscina, brinquedoteca e salão de festas de forma centralizada, aproveitando a estrutura do condomínio sem conflitos de horário. |
 | **Frustrações:** | O sistema atual de agendamento é ineficiente e já causou conflitos de horário com outros moradores. A comunicação sobre interdição de áreas é falha. |
 
-| Bruno Guedes | <div align="center"><img width="200" alt="Foto de Bruno Guedes" src="https://github.com/user-attachments/assets/9f241350-4b40-4d99-b9e5-43f7a4e2fbeb" /></div> |
+| Bruno Guedes | <div align="center"><img width="200" alt="Avatar de Bruno Guedes" src="img/personas/bruno.svg" /></div> |
 | :--- | :--- |
 | **Idade:** | 26 |
 | **Ocupação:** | Desenvolvedor de Software (morador, home office) |
@@ -22,7 +22,7 @@ As personas a seguir representam os principais arquétipos de usuário do Agendi
 | **Objetivos:** | Encontrar e reservar com antecedência horários no coworking, na quadra e na academia, inclusive nos horários de pico. |
 | **Frustrações:** | O coworking fica lotado sem previsibilidade e ele perde tempo de trabalho. Achar um horário livre para a quadra depois das 18h é quase impossível sem um sistema claro de agendamento. |
 
-| Carlos Vasconcelos | <div align="center"><img width="200" alt="Foto de Carlos Vasconcelos" src="https://github.com/user-attachments/assets/29bf1ef4-17e7-461e-b000-a9086dd5819c" /></div> |
+| Carlos Vasconcelos | <div align="center"><img width="200" alt="Avatar de Carlos Vasconcelos" src="img/personas/carlos.svg" /></div> |
 | :--- | :--- |
 | **Idade:** | 52 |
 | **Ocupação:** | Síndico Profissional (administrador) |
@@ -30,7 +30,7 @@ As personas a seguir representam os principais arquétipos de usuário do Agendi
 | **Objetivos:** | Centralizar regras, limites de capacidade e comunicação, além de obter dados concretos de utilização para planejar melhorias e reduzir conflitos. |
 | **Frustrações:** | Gasta muito tempo resolvendo disputas por agendamentos. A comunicação é pulverizada (grupos de mensagens, e-mails, murais) e ele não tem controle sobre quem recebeu os comunicados. |
 
-| Helena Martins | <div align="center"><img width="200" alt="Foto de Helena Martins" src="https://github.com/user-attachments/assets/12db0c3b-6d42-4d88-a327-e4eea1d60bb2" /></div> |
+| Helena Martins | <div align="center"><img width="200" alt="Avatar de Helena Martins" src="img/personas/helena.svg" /></div> |
 | :--- | :--- |
 | **Idade:** | 31 |
 | **Ocupação:** | Prestadora de Serviço (Personal Trainer) |
@@ -38,7 +38,7 @@ As personas a seguir representam os principais arquétipos de usuário do Agendi
 | **Objetivos:** | Reservar horários recorrentes na academia e no salão multiuso, com confirmação e alerta de conflitos, divulgando seus serviços de forma oficial. |
 | **Frustrações:** | A dificuldade em divulgar o trabalho e a confusão para conciliar a agenda com a disponibilidade dos espaços, muitas vezes resultando em cancelamentos. |
 
-| Rafael Nunes | <div align="center"><img width="200" alt="Foto de Rafael Nunes" src="https://github.com/user-attachments/assets/e38c3ff5-7e5e-45aa-b5c8-0be12aebdb42" /></div> |
+| Rafael Nunes | <div align="center"><img width="200" alt="Avatar de Rafael Nunes" src="img/personas/rafael.svg" /></div> |
 | :--- | :--- |
 | **Idade:** | 40 |
 | **Ocupação:** | Gerente de Operações de Coworking (operador comercial) |
