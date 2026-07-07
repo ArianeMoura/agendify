@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
+import { Logo } from "@/components/brand";
 import { Button, Card, Field, Input } from "@/components/ui";
 
 export default function LoginPage() {
@@ -30,9 +31,9 @@ export default function LoginPage() {
   return (
     <div className="grid min-h-screen place-items-center px-4">
       <Card className="w-full max-w-sm p-8">
-        <div className="mb-6 text-center">
-          <div className="text-brand-700 text-2xl font-bold">Agendify</div>
-          <p className="text-ink-soft mt-1 text-sm">Painel de gestão</p>
+        <div className="mb-8 flex flex-col items-center gap-3 text-center">
+          <Logo orientation="vertical" iconClassName="size-12" />
+          <p className="text-ink-muted text-sm">Painel de gestão</p>
         </div>
 
         <form onSubmit={submit} className="space-y-4">

@@ -55,6 +55,13 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full">
+        {/* Skip-link (WCAG 2.4.1): pula direto ao conteúdo via teclado. */}
+        <a
+          href="#main"
+          className="focus:bg-brand sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:rounded-[var(--radius-sm)] focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white"
+        >
+          Pular para o conteúdo
+        </a>
         <Providers>{children}</Providers>
       </body>
     </html>
