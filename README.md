@@ -64,4 +64,8 @@ docs/      architecture, ADRs, testing, CI/CD, deployment, design system, produc
 
 ## License
 
-Distributed under the terms in [LICENSE](LICENSE).
+**Proprietary — All rights reserved.** © 2025–2026 Ariane Silveira Almeida Moura.
+
+This repository is published for portfolio and evaluation purposes only. Viewing the code grants
+no right to use, copy, modify, distribute, or build a competing product from it. See
+[LICENSE](LICENSE). Third-party components remain under their own licenses.
