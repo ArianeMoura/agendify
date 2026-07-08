@@ -1,3 +1,4 @@
+using api.Tenancy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
@@ -18,7 +19,9 @@ namespace api.Data
                 .UseNpgsql(connectionString)
                 .Options;
 
-            return new AppDbContext(options);
+            // Design-time (migrations) não escreve dados de negócio, então um tenant
+            // context vazio basta — nada será carimbado.
+            return new AppDbContext(options, new TenantContext());
         }
     }
 }

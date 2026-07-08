@@ -2,11 +2,14 @@ using System.ComponentModel.DataAnnotations;
 
 namespace api.Models
 {
-    public class User
+    public class User : ITenantScoped
     {
         // PK textual (uuid armazenado como texto) — mantém o contrato de Id string
         // consumido por controllers, DTOs e claims do JWT sem churn.
         public string? Id { get; set; }
+
+        // Tenant dono deste registro (FK Organization). Isola os dados por organização.
+        public string TenantId { get; set; } = null!;
 
         [Required]
         public string Name { get; set; } = string.Empty;

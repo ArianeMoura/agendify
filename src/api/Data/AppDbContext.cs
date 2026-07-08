@@ -1,4 +1,5 @@
 using api.Models;
+using api.Tenancy;
 using Microsoft.EntityFrameworkCore;
 
 namespace api.Data
@@ -9,8 +10,18 @@ namespace api.Data
     // não modela nativamente (coluna GENERATED + EXCLUDE USING gist).
     public class AppDbContext : DbContext
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+        // Tenant do request atual. Usado para carimbar tenant_id nas escritas
+        // (SaveChanges) — e, na Fase 2, para o global query filter de leitura.
+        // Nullable porque o tooling de design-time constrói o contexto sem tenant.
+        private readonly ITenantContext? _tenant;
 
+        public AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext tenant)
+            : base(options)
+        {
+            _tenant = tenant;
+        }
+
+        public DbSet<Organization> Organizations => Set<Organization>();
         public DbSet<User> Users => Set<User>();
         public DbSet<Space> Spaces => Set<Space>();
         public DbSet<Resource> Resources => Set<Resource>();
@@ -23,6 +34,21 @@ namespace api.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Raiz do multi-tenancy. Toda tabela de dados referencia organizations
+            // por tenant_id (configurado no loop ao final deste método).
+            modelBuilder.Entity<Organization>(e =>
+            {
+                e.ToTable("organizations");
+                e.HasKey(x => x.Id);
+                e.Property(x => x.Id).HasColumnName("id");
+                e.Property(x => x.Name).HasColumnName("name");
+                e.Property(x => x.Slug).HasColumnName("slug");
+                e.Property(x => x.Status).HasColumnName("status");
+                e.Property(x => x.CreatedAt).HasColumnName("created_at");
+                e.Property(x => x.UpdatedAt).HasColumnName("updated_at");
+                e.HasIndex(x => x.Slug).IsUnique();
+            });
+
             modelBuilder.Entity<User>(e =>
             {
                 e.ToTable("users");
@@ -154,6 +180,61 @@ namespace api.Data
                 e.HasIndex(x => x.SpaceId);
                 e.HasIndex(x => x.UserId);
             });
+
+            // Configuração comum de tenancy aplicada a TODA entidade ITenantScoped,
+            // varrendo o modelo — em vez de repetir em cada bloco acima. Cada uma
+            // ganha: coluna snake_case tenant_id, índice (para o filtro por tenant da
+            // Fase 2) e uma FK real para organizations. A FK é uma exceção consciente
+            // à convenção "sem FK no banco": tenant_id é a espinha do isolamento e
+            // merece integridade referencial garantida pelo Postgres. OnDelete
+            // Restrict impede apagar uma organização que ainda tenha dados.
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes()
+                         .Where(t => typeof(ITenantScoped).IsAssignableFrom(t.ClrType)))
+            {
+                modelBuilder.Entity(entityType.ClrType, b =>
+                {
+                    b.Property(nameof(ITenantScoped.TenantId)).HasColumnName("tenant_id");
+                    b.HasIndex(nameof(ITenantScoped.TenantId));
+                    b.HasOne(typeof(Organization))
+                        .WithMany()
+                        .HasForeignKey(nameof(ITenantScoped.TenantId))
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+            }
+        }
+
+        // Auto-stamp de tenant: antes de persistir, toda entidade ITenantScoped
+        // adicionada OU modificada SEM tenant_id herda o tenant do request atual. Cobrir
+        // Modified é essencial para o padrão "substitui a linha inteira" (ex.:
+        // BookingsService.Update reconstrói o Booking sem tenant) — sem isso o UPDATE
+        // tentaria gravar tenant_id NULL. Remove a chance de um serviço esquecer o tenant
+        // (segurança por padrão) e mantém a coluna NOT NULL satisfeita. TenantId já
+        // preenchido é respeitado (útil para os testes fixarem o tenant e, na Fase 2,
+        // impede trocar o tenant de uma linha ao editá-la).
+        public override int SaveChanges(bool acceptAllChangesOnSuccess)
+        {
+            StampTenant();
+            return base.SaveChanges(acceptAllChangesOnSuccess);
+        }
+
+        public override Task<int> SaveChangesAsync(
+            bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+        {
+            StampTenant();
+            return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        }
+
+        private void StampTenant()
+        {
+            var tenantId = _tenant?.CurrentTenantId;
+            if (string.IsNullOrEmpty(tenantId)) return;
+
+            foreach (var entry in ChangeTracker.Entries<ITenantScoped>())
+            {
+                if ((entry.State == EntityState.Added || entry.State == EntityState.Modified)
+                    && string.IsNullOrEmpty(entry.Entity.TenantId))
+                    entry.Entity.TenantId = tenantId;
+            }
         }
     }
 }

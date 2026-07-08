@@ -15,9 +15,12 @@ namespace api.Models
         public Resource? Resource { get; set; }
     }
 
-    public class Space
+    public class Space : ITenantScoped
     {
         public string? Id { get; set; }
+
+        // Tenant dono deste registro (FK Organization). Isola os dados por organização.
+        public string TenantId { get; set; } = null!;
 
         public string Name { get; set; } = null!;
         public string? Description { get; set; } = null;

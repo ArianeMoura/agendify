@@ -2,6 +2,7 @@ using System.Text;
 using api.Data;
 using api.Models;
 using api.Services;
+using api.Tenancy;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -59,6 +60,11 @@ builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOnly", policy => policy.RequireRole("Administrator"));
 });
+
+// Tenant do request (multi-tenancy). Scoped: uma instância por request, injetada no
+// AppDbContext para carimbar tenant_id nas escritas. Na Fase 2 será preenchido por um
+// middleware a partir das claims do JWT.
+builder.Services.AddScoped<ITenantContext, TenantContext>();
 
 // Services que dependem do AppDbContext (scoped) precisam ser Scoped também.
 builder.Services.AddScoped<UsersService>();

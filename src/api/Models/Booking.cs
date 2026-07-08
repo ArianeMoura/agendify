@@ -1,8 +1,11 @@
 namespace api.Models
 {
-    public class Booking
+    public class Booking : ITenantScoped
     {
         public string? Id { get; set; }
+
+        // Tenant dono deste registro (FK Organization). Isola os dados por organização.
+        public string TenantId { get; set; } = null!;
 
         public string? UserId { get; set; }
 
