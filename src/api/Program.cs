@@ -195,6 +195,11 @@ app.UseStaticFiles(new StaticFileOptions
 });
 
 app.UseAuthentication();
+
+// Resolve o tenant do request (das claims do JWT) para o ITenantContext ANTES da
+// autorização e dos controllers — a partir daqui o AppDbContext filtra por tenant.
+app.UseMiddleware<TenantResolutionMiddleware>();
+
 app.UseAuthorization();
 
 app.MapControllers();

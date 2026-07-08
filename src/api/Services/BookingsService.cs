@@ -122,23 +122,50 @@ namespace api.Services
             await _db.SaveChangesAsync();
         }
 
-        // O banco é o árbitro do invariante RN-01: se duas requisições concorrentes
-        // tentam o mesmo slot, exatamente uma persiste; a(s) outra(s) recebem
-        // 23P01 (exclusion_violation), aqui traduzido em BookingConflictException.
+        // Nº máximo de tentativas ao salvar sob contenção. Cada deadlock transitório
+        // reduz a concorrência (o vencedor commita e sai), então poucas retentativas
+        // convergem — mantemos folga para o gate de 100 requisições simultâneas.
+        private const int MaxSaveAttempts = 10;
+
+        // O banco é o árbitro do invariante RN-01. Sob concorrência, salvar uma reserva
+        // termina de três formas:
+        //  1) sucesso — persistiu;
+        //  2) 23P01 (exclusion_violation) — conflito DEFINITIVO de sobreposição → 409;
+        //  3) 40P01/40001 (deadlock/serialization) — falha TRANSITÓRIA de contenção.
+        //     Multi-tenancy introduziu uma FK bookings.tenant_id → organizations; sob
+        //     100 inserts simultâneos, checar a FK + a exclusion constraint envolve dois
+        //     recursos de lock e o Postgres pode abortar uma transação por deadlock em
+        //     vez de exclusion_violation. NÃO é conflito: reprocessamos (a doc do Postgres
+        //     recomenda repetir em 40P01/40001). Na retentativa o vencedor já commitou,
+        //     então esta tentativa recebe um 23P01 limpo (→ 409) ou persiste se o slot
+        //     vagou. Exatamente uma das concorrentes ainda persiste.
         private async Task SaveArbitratingOverlapAsync(Booking booking)
         {
-            try
+            for (var attempt = 1; ; attempt++)
             {
-                await _db.SaveChangesAsync();
-            }
-            catch (DbUpdateException ex) when (ex.InnerException is PostgresException pg
-                                               && pg.SqlState == PostgresErrorCodes.ExclusionViolation)
-            {
-                // Descarta o rastreamento da entidade que falhou para não vazar estado.
-                _db.ChangeTracker.Clear();
-                throw new BookingConflictException(
-                    $"O espaço '{booking.SpaceId}' já está reservado no horário solicitado. " +
-                    "Por favor, escolha outro horário.");
+                try
+                {
+                    await _db.SaveChangesAsync();
+                    return;
+                }
+                catch (DbUpdateException ex) when (ex.InnerException is PostgresException pg
+                                                   && pg.SqlState == PostgresErrorCodes.ExclusionViolation)
+                {
+                    // Descarta o rastreamento da entidade que falhou para não vazar estado.
+                    _db.ChangeTracker.Clear();
+                    throw new BookingConflictException(
+                        $"O espaço '{booking.SpaceId}' já está reservado no horário solicitado. " +
+                        "Por favor, escolha outro horário.");
+                }
+                catch (DbUpdateException ex) when (ex.InnerException is PostgresException pg
+                                                   && (pg.SqlState == PostgresErrorCodes.DeadlockDetected
+                                                       || pg.SqlState == PostgresErrorCodes.SerializationFailure)
+                                                   && attempt < MaxSaveAttempts)
+                {
+                    // A entidade segue rastreada como Added/Modified; espera um instante
+                    // (backoff com jitter para dispersar as concorrentes) e tenta de novo.
+                    await Task.Delay(TimeSpan.FromMilliseconds(Random.Shared.Next(10, 40) * attempt));
+                }
             }
         }
     }

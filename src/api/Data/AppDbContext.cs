@@ -1,3 +1,4 @@
+using System.Reflection;
 using api.Models;
 using api.Tenancy;
 using Microsoft.EntityFrameworkCore;
@@ -11,9 +12,9 @@ namespace api.Data
     public class AppDbContext : DbContext
     {
         // Tenant do request atual. Usado para carimbar tenant_id nas escritas
-        // (SaveChanges) — e, na Fase 2, para o global query filter de leitura.
-        // Nullable porque o tooling de design-time constrói o contexto sem tenant.
-        private readonly ITenantContext? _tenant;
+        // (SaveChanges) e para o global query filter de leitura. Sempre injetado
+        // (DI em runtime; TenantContext explícito no design-time e nos testes).
+        private readonly ITenantContext _tenant;
 
         public AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext tenant)
             : base(options)
@@ -200,7 +201,30 @@ namespace api.Data
                         .HasForeignKey(nameof(ITenantScoped.TenantId))
                         .OnDelete(DeleteBehavior.Restrict);
                 });
+
+                // Global query filter: toda LEITURA da entidade ganha, automaticamente,
+                // um WHERE tenant_id = <tenant do request>. É a rede de segurança do
+                // isolamento — mesmo que um serviço esqueça de filtrar, o EF filtra.
+                // Aplicado via método genérico (o HasQueryFilter tipado exige o T).
+                ApplyTenantFilterMethod
+                    .MakeGenericMethod(entityType.ClrType)
+                    .Invoke(this, new object[] { modelBuilder });
             }
+        }
+
+        private static readonly MethodInfo ApplyTenantFilterMethod =
+            typeof(AppDbContext).GetMethod(nameof(ApplyTenantFilter),
+                BindingFlags.NonPublic | BindingFlags.Instance)!;
+
+        // O filtro referencia _tenant (membro de instância do contexto); o EF Core
+        // reavalia esse acesso a CADA query, lendo o tenant atual — por isso funciona
+        // mesmo com o modelo em cache. BypassTenantFilter=true (Platform Owner) desliga
+        // o filtro e faz o contexto enxergar todos os tenants.
+        private void ApplyTenantFilter<TEntity>(ModelBuilder modelBuilder)
+            where TEntity : class, ITenantScoped
+        {
+            modelBuilder.Entity<TEntity>().HasQueryFilter(
+                e => _tenant.BypassTenantFilter || e.TenantId == _tenant.CurrentTenantId);
         }
 
         // Auto-stamp de tenant: antes de persistir, toda entidade ITenantScoped
@@ -226,7 +250,7 @@ namespace api.Data
 
         private void StampTenant()
         {
-            var tenantId = _tenant?.CurrentTenantId;
+            var tenantId = _tenant.CurrentTenantId;
             if (string.IsNullOrEmpty(tenantId)) return;
 
             foreach (var entry in ChangeTracker.Entries<ITenantScoped>())

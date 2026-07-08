@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using api.Data;
 using api.Models;
+using api.Tenancy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -40,12 +41,17 @@ public class AuthService
     {
         if (string.IsNullOrWhiteSpace(rawRefreshToken)) return null;
 
+        // Refresh é PRÉ-tenant: o token identifica o usuário (e o tenant) antes de
+        // qualquer contexto estar resolvido. Busca por hash (globalmente único)
+        // ignorando o filtro por tenant; idem o reload do usuário.
         var hash = Hash(rawRefreshToken);
-        var stored = await _db.RefreshTokens.FirstOrDefaultAsync(t => t.TokenHash == hash);
+        var stored = await _db.RefreshTokens.IgnoreQueryFilters()
+            .FirstOrDefaultAsync(t => t.TokenHash == hash);
 
         if (stored is null || !stored.IsActive) return null;
 
-        var user = await _usersService.GetByIdAsync(stored.UserId);
+        var user = await _db.Users.IgnoreQueryFilters().AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Id == stored.UserId);
         if (user is null || user.AnonymizedAt is not null) return null;
 
         stored.RevokedAt = DateTime.UtcNow;
@@ -59,7 +65,8 @@ public class AuthService
         if (string.IsNullOrWhiteSpace(rawRefreshToken)) return;
 
         var hash = Hash(rawRefreshToken);
-        var stored = await _db.RefreshTokens.FirstOrDefaultAsync(t => t.TokenHash == hash);
+        var stored = await _db.RefreshTokens.IgnoreQueryFilters()
+            .FirstOrDefaultAsync(t => t.TokenHash == hash);
         if (stored is not null && stored.RevokedAt is null)
         {
             stored.RevokedAt = DateTime.UtcNow;
@@ -77,6 +84,9 @@ public class AuthService
         {
             Id = Guid.NewGuid().ToString(),
             UserId = user.Id!,
+            // Setado explicitamente: login/refresh são anônimos, então o auto-stamp do
+            // AppDbContext (que lê o tenant do request) não teria de onde preencher.
+            TenantId = user.TenantId,
             TokenHash = Hash(rawRefresh),
             ExpiresAt = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenDays),
         });
@@ -94,7 +104,9 @@ public class AuthService
     private string GenerateJwtToken(User user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(_jwtSettings.Secret);
+        // UTF-8 para casar com a validação em Program.cs (antes era ASCII aqui e UTF-8
+        // lá — inofensivo só enquanto o secret fosse ASCII puro; agora está consistente).
+        var key = Encoding.UTF8.GetBytes(_jwtSettings.Secret);
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
@@ -103,7 +115,10 @@ public class AuthService
                 new Claim(ClaimTypes.NameIdentifier, user.Id!),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Name, user.Name),
-                new Claim(ClaimTypes.Role, user.Profile.ToString())
+                new Claim(ClaimTypes.Role, user.Profile.ToString()),
+                // Tenant do usuário: é o que o middleware injeta no ITenantContext para
+                // filtrar toda query por tenant. Sem isso, não há isolamento por request.
+                new Claim(TenantClaims.TenantId, user.TenantId)
             }),
             Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpirationInMinutes),
             Issuer = _jwtSettings.Issuer,
