@@ -58,7 +58,7 @@ namespace api.Data
                 e.Property(x => x.Name).HasColumnName("name");
                 e.Property(x => x.Email).HasColumnName("email");
                 e.Property(x => x.Password).HasColumnName("password");
-                e.Property(x => x.Profile).HasColumnName("profile").HasConversion<string>();
+                e.Property(x => x.Role).HasColumnName("role").HasConversion<string>();
                 e.Property(x => x.CreatedAt).HasColumnName("created_at");
                 e.Property(x => x.UpdatedAt).HasColumnName("updated_at");
                 e.Property(x => x.AnonymizedAt).HasColumnName("anonymized_at");

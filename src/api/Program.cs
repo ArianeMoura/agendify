@@ -58,7 +58,13 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Administrator"));
+    // Hierarquia de papéis: PlatformOwner (dona da plataforma) sempre passa; OrgAdmin
+    // administra o próprio tenant; Member é o usuário final. As políticas embutem a
+    // herança (quem é OrgAdmin também cobre ações de Member) para não repetir listas de
+    // roles em cada controller.
+    options.AddPolicy("OrgAdmin", p => p.RequireRole("OrgAdmin", "PlatformOwner"));
+    options.AddPolicy("Member", p => p.RequireRole("Member", "OrgAdmin", "PlatformOwner"));
+    options.AddPolicy("PlatformOwner", p => p.RequireRole("PlatformOwner"));
 });
 
 // Tenant do request (multi-tenancy). Scoped: uma instância por request, injetada no

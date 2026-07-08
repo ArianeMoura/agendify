@@ -12,5 +12,5 @@ public class UpdateUserRequest
     [MinLength(6)]
     public string? Password { get; set; }
 
-    public Profile? Profile { get; set; }
+    public Role? Role { get; set; }
 }

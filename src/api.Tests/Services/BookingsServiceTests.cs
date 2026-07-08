@@ -29,7 +29,7 @@ namespace api.Tests.Services
                 Name = "João Silva",
                 Email = "joao@exemplo.com.br",
                 Password = "hash",
-                Profile = Profile.Common,
+                Role = Role.Member,
             });
             db.Spaces.Add(new Space
             {

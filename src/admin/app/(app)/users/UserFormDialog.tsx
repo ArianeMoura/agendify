@@ -3,7 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ApiError, apiFetch } from "@/lib/api";
-import { CreateUserRequest, Profile, UpdateUserRequest, User } from "@/lib/types";
+import { CreateUserRequest, Role, UpdateUserRequest, User } from "@/lib/types";
 import { Alert, Dialog, DialogFooter, Field, Input, Select, toast } from "@/components/ui";
 
 interface UserFormDialogProps {
@@ -45,16 +45,16 @@ function UserForm({
   const [name, setName] = useState(user?.name ?? "");
   const [email, setEmail] = useState(user?.email ?? "");
   const [password, setPassword] = useState("");
-  const [profile, setProfile] = useState<Profile>(user?.profile ?? "Common");
+  const [role, setRole] = useState<Role>(user?.role ?? "Member");
 
   const mutation = useMutation({
     mutationFn: () => {
       if (editing && user) {
-        const body: UpdateUserRequest = { name, email, profile };
+        const body: UpdateUserRequest = { name, email, role };
         if (password) body.password = password;
         return apiFetch(`/users/${user.id}`, { method: "PUT", body });
       }
-      const body: CreateUserRequest = { name, email, password, profile };
+      const body: CreateUserRequest = { name, email, password, role };
       return apiFetch("/users", { method: "POST", body });
     },
     onSuccess: () => {
@@ -111,12 +111,12 @@ function UserForm({
         {(p) => (
           <Select
             {...p}
-            value={profile}
-            onChange={(e) => setProfile(e.target.value as Profile)}
+            value={role}
+            onChange={(e) => setRole(e.target.value as Role)}
             disabled={isSelf}
           >
-            <option value="Common">Comum (app)</option>
-            <option value="Administrator">Administrador (painel)</option>
+            <option value="Member">Comum (app)</option>
+            <option value="OrgAdmin">Administrador (painel)</option>
           </Select>
         )}
       </Field>

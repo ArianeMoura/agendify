@@ -1,10 +1,14 @@
 ﻿using api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
 {
     [ApiController]
     [Route("api/analytics")]
+    // Analytics agregado é dado de gestão do tenant → exige admin do tenant. Antes o
+    // controller era anônimo (qualquer um lia as métricas); agora escopado por tenant.
+    [Authorize(Policy = "OrgAdmin")]
     public class AnalyticsController : ControllerBase
     {
         private readonly AnalyticsService _analyticsService;

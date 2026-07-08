@@ -18,8 +18,11 @@ public class UsersController : ControllerBase
         _usersService = usersService;
     }
 
+    // Admin do tenant: OrgAdmin ou PlatformOwner (que herda os poderes de OrgAdmin).
+    private bool IsAdmin() => User.IsInRole("OrgAdmin") || User.IsInRole("PlatformOwner");
+
     [HttpGet]
-    [Authorize(Roles = "Administrator")]
+    [Authorize(Policy = "OrgAdmin")]
     public async Task<ActionResult<List<UserDto>>> GetAll()
     {
         var users = await _usersService.GetAsync();
@@ -28,7 +31,7 @@ public class UsersController : ControllerBase
             Id = u.Id!,
             Name = u.Name,
             Email = u.Email,
-            Profile = u.Profile,
+            Role = u.Role,
             CreatedAt = u.CreatedAt
         }).ToList();
 
@@ -39,9 +42,8 @@ public class UsersController : ControllerBase
     public async Task<ActionResult<UserDto>> GetById(string id)
     {
         var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        var currentUserRole = User.FindFirst(ClaimTypes.Role)?.Value;
 
-        if (currentUserRole != "Administrator" && currentUserId != id)
+        if (!IsAdmin() && currentUserId != id)
         {
             return Forbid();
         }
@@ -58,7 +60,7 @@ public class UsersController : ControllerBase
             Id = user.Id!,
             Name = user.Name,
             Email = user.Email,
-            Profile = user.Profile,
+            Role = user.Role,
             CreatedAt = user.CreatedAt
         };
 
@@ -80,7 +82,7 @@ public class UsersController : ControllerBase
             Name = request.Name,
             Email = request.Email,
             Password = BCrypt.Net.BCrypt.HashPassword(request.Password),
-            Profile = request.Profile,
+            Role = request.Role,
             CreatedAt = DateTime.UtcNow
         };
 
@@ -91,7 +93,7 @@ public class UsersController : ControllerBase
             Id = newUser.Id!,
             Name = newUser.Name,
             Email = newUser.Email,
-            Profile = newUser.Profile,
+            Role = newUser.Role,
             CreatedAt = newUser.CreatedAt
         };
 
@@ -102,9 +104,8 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> Update(string id, [FromBody] UpdateUserRequest request)
     {
         var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        var currentUserRole = User.FindFirst(ClaimTypes.Role)?.Value;
 
-        if (currentUserRole != "Administrator" && currentUserId != id)
+        if (!IsAdmin() && currentUserId != id)
         {
             return Forbid();
         }
@@ -132,13 +133,14 @@ public class UsersController : ControllerBase
         if (!string.IsNullOrEmpty(request.Password))
             user.Password = BCrypt.Net.BCrypt.HashPassword(request.Password);
 
-        if (request.Profile.HasValue)
+        if (request.Role.HasValue)
         {
-            if (currentUserRole != "Administrator")
+            // Só um admin do tenant pode alterar papel (evita autoescalonamento).
+            if (!IsAdmin())
             {
                 return Forbid();
             }
-            user.Profile = request.Profile.Value;
+            user.Role = request.Role.Value;
         }
 
         user.UpdatedAt = DateTime.UtcNow;
@@ -149,7 +151,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    [Authorize(Roles = "Administrator")]
+    [Authorize(Policy = "OrgAdmin")]
     public async Task<IActionResult> Delete(string id)
     {
         var user = await _usersService.GetByIdAsync(id);

@@ -42,7 +42,7 @@ namespace api.Services
 
             return new
             {
-                user = new { user.Id, user.Name, user.Email, Profile = user.Profile.ToString(), user.CreatedAt },
+                user = new { user.Id, user.Name, user.Email, Role = user.Role.ToString(), user.CreatedAt },
                 bookings,
                 reviews,
                 consents,

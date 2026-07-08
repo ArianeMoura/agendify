@@ -22,7 +22,7 @@ namespace api.Models
         public string Password { get; set; } = string.Empty;
 
         [Required]
-        public Profile Profile { get; set; }
+        public Role Role { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
@@ -33,9 +33,14 @@ namespace api.Models
         public DateTime? AnonymizedAt { get; set; }
     }
 
-    public enum Profile
+    // Papéis do multi-tenancy, em hierarquia:
+    //  PlatformOwner — a dona da plataforma; enxerga todos os tenants (bypass do filtro).
+    //  OrgAdmin      — administra o próprio tenant (o antigo "Administrator").
+    //  Member        — usuário final do app dentro do tenant (o antigo "Common").
+    public enum Role
     {
-        Administrator,
-        Common
+        PlatformOwner,
+        OrgAdmin,
+        Member
     }
 }

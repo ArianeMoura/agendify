@@ -46,8 +46,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       body: { email, password },
     });
 
-    // Painel exclusivo de gestores.
-    if (res.user.profile !== "Administrator") {
+    // Painel exclusivo de gestores: Org Admin (gestor do tenant) ou Platform Owner.
+    if (res.user.role !== "OrgAdmin" && res.user.role !== "PlatformOwner") {
       throw new ApiError(403, "Acesso restrito a gestores.");
     }
 

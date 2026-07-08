@@ -3,11 +3,11 @@ import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '@/constants/theme';
 import { useAuth } from '@/lib/contexts/AuthContext';
-import { Profile } from '@/lib/types';
+import { Role } from '@/lib/types';
 
 export default function TabLayout() {
   const { user } = useAuth();
-  const isAdmin = user?.profile === Profile.Administrator;
+  const isAdmin = user?.role === Role.OrgAdmin || user?.role === Role.PlatformOwner;
 
   return (
     <Tabs

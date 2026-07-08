@@ -18,7 +18,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { DateFilter } from '@/components/ui/DateFilter';
 import { useAuth } from '@/lib/contexts/AuthContext';
 import { bookingsApi } from '@/lib/api/bookings';
-import { BookingWithDetails, Profile } from '@/lib/types';
+import { BookingWithDetails, Role } from '@/lib/types';
 
 export default function BookingsScreen() {
   const router = useRouter();
@@ -27,7 +27,10 @@ export default function BookingsScreen() {
 
   const queryClient = useQueryClient();
 
-  const isAdmin = useMemo(() => user?.profile === Profile.Administrator, [user]);
+  const isAdmin = useMemo(
+    () => user?.role === Role.OrgAdmin || user?.role === Role.PlatformOwner,
+    [user],
+  );
 
   const [filterStartDate, setFilterStartDate] = useState<Date | null>(null);
   const [filterEndDate, setFilterEndDate] = useState<Date | null>(null);

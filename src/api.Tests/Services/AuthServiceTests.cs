@@ -38,7 +38,7 @@ namespace api.Tests.Services
                 Name = "User",
                 Email = Email,
                 Password = BCrypt.Net.BCrypt.HashPassword(Password),
-                Profile = Profile.Common,
+                Role = Role.Member,
             });
             await db.SaveChangesAsync();
         }

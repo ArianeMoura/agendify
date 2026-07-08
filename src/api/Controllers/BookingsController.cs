@@ -21,8 +21,16 @@ namespace api.Controllers
             _idempotencyService = idempotencyService;
         }
 
+        private string? CurrentUserId => User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        // Admin do tenant: OrgAdmin ou PlatformOwner. Enxerga/gerencia as reservas de
+        // todos os membros do tenant; um Member só acessa as próprias. (O isolamento
+        // entre tenants já é garantido pelo global query filter — isto é ownership
+        // DENTRO do tenant.)
+        private bool IsAdmin() => User.IsInRole("OrgAdmin") || User.IsInRole("PlatformOwner");
+
         [HttpGet("{id}")]
-        [Authorize(Roles = "Administrator, Common")]
+        [Authorize(Policy = "Member")]
         public async Task<IActionResult> Get(string id)
         {
             var booking = await _bookingsService.GetById(id);
@@ -32,26 +40,41 @@ namespace api.Controllers
                 return NotFound();
             }
 
+            // Member não pode ver reserva de outro usuário (some como se não existisse).
+            if (!IsAdmin() && booking.UserId != CurrentUserId)
+            {
+                return NotFound();
+            }
+
             return Ok(booking);
         }
 
         [HttpGet("user/{userId}")]
-        [Authorize(Roles = "Administrator, Common")]
+        [Authorize(Policy = "Member")]
         public async Task<IActionResult> GetByUserId(string userId)
         {
+            if (!IsAdmin() && userId != CurrentUserId)
+            {
+                return Forbid();
+            }
+
             var bookings = await _bookingsService.GetByUserId(userId);
             return Ok(bookings);
         }
 
         [HttpGet]
-        [Authorize(Roles = "Administrator, Common")]
-        public async Task<List<BookingWithUserAndSpace>> Get() => await _bookingsService.GetAsync();
+        [Authorize(Policy = "Member")]
+        public async Task<List<BookingWithUserAndSpace>> Get() =>
+            // Admin vê todas as reservas do tenant; Member vê só as próprias.
+            IsAdmin()
+                ? await _bookingsService.GetAsync()
+                : await _bookingsService.GetByUserId(CurrentUserId ?? string.Empty);
 
         [HttpPost]
-        [Authorize(Roles = "Administrator, Common")]
+        [Authorize(Policy = "Member")]
         public async Task<IActionResult> Post(Booking booking)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? booking.UserId ?? string.Empty;
+            var userId = CurrentUserId ?? booking.UserId ?? string.Empty;
 
             // Idempotência (RNF-014): replay com a mesma chave devolve a resposta original.
             var idemKey = Request.Headers["Idempotency-Key"].FirstOrDefault();
@@ -69,10 +92,13 @@ namespace api.Controllers
                 }
             }
 
+            // Member só reserva para si; admin pode reservar em nome de outro membro.
+            var ownerId = IsAdmin() ? (booking.UserId ?? userId) : userId;
+
             var newBooking = new Booking
             {
                 Id = Guid.NewGuid().ToString(),
-                UserId = booking.UserId,
+                UserId = ownerId,
                 SpaceId = booking.SpaceId,
                 StartDateTime = ToUtc(booking.StartDateTime),
                 EndDateTime = ToUtc(booking.EndDateTime),
@@ -108,7 +134,7 @@ namespace api.Controllers
         }
 
         [HttpPut()]
-        [Authorize(Roles = "Administrator, Common")]
+        [Authorize(Policy = "Member")]
         public async Task<IActionResult> Put(Booking booking)
         {
             var dbBooking = await _bookingsService.GetById(booking.Id!);
@@ -118,10 +144,17 @@ namespace api.Controllers
                 return NotFound();
             }
 
+            // Member só edita as próprias reservas.
+            if (!IsAdmin() && dbBooking.UserId != CurrentUserId)
+            {
+                return Forbid();
+            }
+
             var updated = new Booking
             {
                 Id = dbBooking.Id,
-                UserId = booking.UserId,
+                // Dono preservado: o PUT não reatribui a reserva a outro usuário.
+                UserId = dbBooking.UserId,
                 SpaceId = booking.SpaceId,
                 StartDateTime = ToUtc(booking.StartDateTime),
                 EndDateTime = ToUtc(booking.EndDateTime),
@@ -154,9 +187,21 @@ namespace api.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Administrator, Common")]
+        [Authorize(Policy = "Member")]
         public async Task<IActionResult> Delete(string id)
         {
+            var booking = await _bookingsService.GetById(id);
+            if (booking == null)
+            {
+                return NoContent();
+            }
+
+            // Member só apaga as próprias reservas.
+            if (!IsAdmin() && booking.UserId != CurrentUserId)
+            {
+                return Forbid();
+            }
+
             await _bookingsService.Delete(id);
 
             return NoContent();

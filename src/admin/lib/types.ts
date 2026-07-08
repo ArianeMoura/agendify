@@ -1,10 +1,10 @@
-export type Profile = "Administrator" | "Common";
+export type Role = "PlatformOwner" | "OrgAdmin" | "Member";
 
 export interface User {
   id: string;
   name: string;
   email: string;
-  profile: Profile;
+  role: Role;
   createdAt: string;
 }
 
@@ -19,14 +19,14 @@ export interface CreateUserRequest {
   name: string;
   email: string;
   password: string;
-  profile: Profile;
+  role: Role;
 }
 
 export interface UpdateUserRequest {
   name?: string;
   email?: string;
   password?: string;
-  profile?: Profile;
+  role?: Role;
 }
 
 export interface SpaceResource {

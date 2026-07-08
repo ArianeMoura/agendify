@@ -29,7 +29,7 @@ namespace api.Controllers
         public async Task<List<Space>> Get() => await _spacesService.GetAsync();
 
         [HttpGet("{id}")]
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Policy = "OrgAdmin")]
         public async Task<IActionResult> Get(string id)
         {
             var space = await _spacesService.GetById(id);
@@ -161,7 +161,7 @@ namespace api.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Policy = "OrgAdmin")]
         public async Task<IActionResult> Post([FromForm] SpaceFormRequest request)
         {
             try
@@ -220,7 +220,7 @@ namespace api.Controllers
         }
 
         [HttpPut()]
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Policy = "OrgAdmin")]
         public async Task<IActionResult> Put([FromForm] SpaceFormRequest request)
         {
             try
@@ -285,7 +285,7 @@ namespace api.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Policy = "OrgAdmin")]
         public async Task<IActionResult> Delete(string id)
         {
             var space = await _spacesService.GetById(id);

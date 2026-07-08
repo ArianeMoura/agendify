@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing, typography, borderRadius } from '@/constants/theme';
 import { Card } from '@/components/ui/Card';
 import { useAuth } from '@/lib/contexts/AuthContext';
-import { Profile } from '@/lib/types';
+import { Role } from '@/lib/types';
 
 export const DashboardCard = ({
   icon,
@@ -34,7 +34,7 @@ export const DashboardCard = ({
 export default function DashboardScreen() {
   const router = useRouter();
   const { user } = useAuth();
-  const isAdmin = user?.profile === Profile.Administrator;
+  const isAdmin = user?.role === Role.OrgAdmin || user?.role === Role.PlatformOwner;
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>

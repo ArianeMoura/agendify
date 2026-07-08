@@ -15,7 +15,7 @@ import { Card } from '@/components/ui/Card';
 import { Loading } from '@/components/ui/Loading';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { usersApi } from '@/lib/api/users';
-import { User, Profile } from '@/lib/types';
+import { User, Role } from '@/lib/types';
 
 export default function UsersScreen() {
   const queryClient = useQueryClient();
@@ -73,7 +73,7 @@ export default function UsersScreen() {
                 styles.roleBadge,
                 {
                   backgroundColor:
-                    item.profile === Profile.Administrator
+                    item.role !== Role.Member
                       ? colors.primary + '20'
                       : colors.success + '20',
                 },
@@ -84,13 +84,13 @@ export default function UsersScreen() {
                   styles.roleText,
                   {
                     color:
-                      item.profile === Profile.Administrator
+                      item.role !== Role.Member
                         ? colors.primary
                         : colors.success,
                   },
                 ]}
               >
-                {item.profile === Profile.Administrator ? 'Admin' : 'Usuário'}
+                {item.role !== Role.Member ? 'Admin' : 'Usuário'}
               </Text>
             </View>
           </View>

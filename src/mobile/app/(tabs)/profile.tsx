@@ -13,7 +13,7 @@ import { colors, spacing, typography, borderRadius } from '@/constants/theme';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/lib/contexts/AuthContext';
-import { Profile } from '@/lib/types';
+import { Role } from '@/lib/types';
 
 export const MenuItem = ({
   icon,
@@ -42,7 +42,7 @@ export const MenuItem = ({
 export default function ProfileScreen() {
   const router = useRouter();
   const { user, logout } = useAuth();
-  const isAdmin = user?.profile === Profile.Administrator;
+  const isAdmin = user?.role === Role.OrgAdmin || user?.role === Role.PlatformOwner;
 
   const handleLogout = useCallback(() => {
     Alert.alert('Sair', 'Tem certeza que deseja sair?', [

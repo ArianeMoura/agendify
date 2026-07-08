@@ -16,5 +16,5 @@ public class CreateUserRequest
     public string Password { get; set; } = string.Empty;
 
     [Required]
-    public Profile Profile { get; set; }
+    public Role Role { get; set; }
 }

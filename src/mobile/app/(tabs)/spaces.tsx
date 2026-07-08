@@ -19,13 +19,13 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { useAuth } from '@/lib/contexts/AuthContext';
 import { spacesApi } from '@/lib/api/spaces';
 import { getImageUrl } from '@/lib/api/config';
-import { Space, Profile } from '@/lib/types';
+import { Space, Role } from '@/lib/types';
 
 export default function SpacesScreen() {
   const router = useRouter();
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const isAdmin = user?.profile === Profile.Administrator;
+  const isAdmin = user?.role === Role.OrgAdmin || user?.role === Role.PlatformOwner;
 
   const { data: spaces, isLoading, refetch } = useQuery({
     queryKey: ['spaces'],

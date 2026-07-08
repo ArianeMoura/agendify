@@ -15,7 +15,7 @@ namespace api.Tests.Services
         {
             await TestDatabaseFixture.ResetAsync();
             await using var db = TestDatabaseFixture.CreateContext();
-            db.Users.Add(new User { Id = UserId, Name = "João", Email = "joao@x.dev", Password = "hash", Profile = Profile.Common });
+            db.Users.Add(new User { Id = UserId, Name = "João", Email = "joao@x.dev", Password = "hash", Role = Role.Member });
             db.Spaces.Add(new Space { Id = SpaceId, Name = "Sala", Availability = true });
             db.Bookings.Add(new Booking
             {

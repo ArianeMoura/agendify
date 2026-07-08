@@ -115,7 +115,7 @@ public class AuthService
                 new Claim(ClaimTypes.NameIdentifier, user.Id!),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Name, user.Name),
-                new Claim(ClaimTypes.Role, user.Profile.ToString()),
+                new Claim(ClaimTypes.Role, user.Role.ToString()),
                 // Tenant do usuário: é o que o middleware injeta no ITenantContext para
                 // filtrar toda query por tenant. Sem isso, não há isolamento por request.
                 new Claim(TenantClaims.TenantId, user.TenantId)
@@ -144,7 +144,7 @@ public class AuthService
         Id = user.Id!,
         Name = user.Name,
         Email = user.Email,
-        Profile = user.Profile,
+        Role = user.Role,
         CreatedAt = user.CreatedAt
     };
 }

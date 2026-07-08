@@ -114,8 +114,12 @@ export default function UsersPage() {
                   </Td>
                   <Td className="text-ink-muted">{u.email}</Td>
                   <Td>
-                    <Badge tone={u.profile === "Administrator" ? "brand" : "neutral"}>
-                      {u.profile === "Administrator" ? "Administrador" : "Comum"}
+                    <Badge tone={u.role === "Member" ? "neutral" : "brand"}>
+                      {u.role === "PlatformOwner"
+                        ? "Dona da plataforma"
+                        : u.role === "OrgAdmin"
+                          ? "Administrador"
+                          : "Comum"}
                     </Badge>
                   </Td>
                   <Td className="text-ink-muted">{formatDate(u.createdAt)}</Td>

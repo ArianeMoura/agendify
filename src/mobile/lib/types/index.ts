@@ -1,13 +1,16 @@
-export enum Profile {
-  Administrator = 'Administrator',
-  Common = 'Common',
+// Papéis do multi-tenancy: PlatformOwner (dona da plataforma) > OrgAdmin (gestor do
+// tenant) > Member (usuário final do app). No mobile, "admin" = OrgAdmin ou PlatformOwner.
+export enum Role {
+  PlatformOwner = 'PlatformOwner',
+  OrgAdmin = 'OrgAdmin',
+  Member = 'Member',
 }
 
 export interface User {
   id: string;
   name: string;
   email: string;
-  profile: Profile;
+  role: Role;
   createdAt: string;
   updatedAt?: string;
 }
@@ -43,14 +46,14 @@ export interface CreateUserRequest {
   name: string;
   email: string;
   password: string;
-  profile: Profile;
+  role: Role;
 }
 
 export interface UpdateUserRequest {
   name?: string;
   email?: string;
   password?: string;
-  profile?: Profile;
+  role?: Role;
 }
 
 export interface Space {

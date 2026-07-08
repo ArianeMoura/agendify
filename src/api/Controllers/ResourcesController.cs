@@ -18,7 +18,7 @@ namespace api.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Policy = "OrgAdmin")]
         public async Task<IActionResult> Get(string id)
         {
             var resource = await _resourcesService.GetById(id);
@@ -32,11 +32,11 @@ namespace api.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Policy = "OrgAdmin")]
         public async Task<List<Resource>> Get() => await _resourcesService.GetAsync();
 
         [HttpPost]
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Policy = "OrgAdmin")]
         public async Task<IActionResult> Post(Resource resource)
         {
             var newResource = new Resource
@@ -52,7 +52,7 @@ namespace api.Controllers
         }
 
         [HttpPut()]
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Policy = "OrgAdmin")]
         public async Task<IActionResult> Put(Resource resource)
         {
             var dbResource = await _resourcesService.GetById(resource.Id!);
@@ -72,7 +72,7 @@ namespace api.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Policy = "OrgAdmin")]
         public async Task<IActionResult> Delete(string id)
         {
             await _resourcesService.Delete(id);
