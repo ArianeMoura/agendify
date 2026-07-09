@@ -21,11 +21,14 @@ namespace api.Services
 
         // Busca por e-mail é CROSS-TENANT por natureza: o e-mail é globalmente único
         // (índice unique em users.email), e o login precisa achar o usuário antes de
-        // conhecer o tenant. Ignora o filtro por tenant de propósito — usada no login e
-        // na checagem de e-mail duplicado. (Se um dia o e-mail virar único por tenant,
-        // este método precisa ser revisto.)
-        public async Task<User?> GetByEmailAsync(string email) =>
-            await _db.Users.IgnoreQueryFilters().AsNoTracking().FirstOrDefaultAsync(x => x.Email == email);
+        // conhecer o tenant. O escopo cross-tenant desliga o filtro do EF E o RLS do
+        // Postgres. Usada no login e na checagem de e-mail duplicado. (Se um dia o e-mail
+        // virar único por tenant, este método precisa ser revisto.)
+        public async Task<User?> GetByEmailAsync(string email)
+        {
+            using var crossTenant = _db.Tenant.EnterCrossTenant();
+            return await _db.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Email == email);
+        }
 
         public async Task CreateAsync(User newUser)
         {

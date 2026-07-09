@@ -22,8 +22,11 @@ if (string.IsNullOrWhiteSpace(connectionString))
     throw new InvalidOperationException(
         "DatabaseSettings:ConnectionString não configurado. Rode 'dotnet user-secrets set \"DatabaseSettings:ConnectionString\" ...' (dev) ou defina a variável de ambiente DatabaseSettings__ConnectionString (prod).");
 
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(connectionString));
+// Interceptor scoped: seta as GUCs de RLS por conexão a partir do tenant do request.
+builder.Services.AddScoped<TenantConnectionInterceptor>();
+builder.Services.AddDbContext<AppDbContext>((sp, options) =>
+    options.UseNpgsql(connectionString)
+           .AddInterceptors(sp.GetRequiredService<TenantConnectionInterceptor>()));
 
 builder.Services.AddLogging();
 

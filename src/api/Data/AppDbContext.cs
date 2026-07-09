@@ -22,6 +22,10 @@ namespace api.Data
             _tenant = tenant;
         }
 
+        // Tenant do request, exposto para os serviços abrirem escopos cross-tenant
+        // (EnterCrossTenant) em operações pré-tenant (login, signup, aceite de convite).
+        public ITenantContext Tenant => _tenant;
+
         public DbSet<Organization> Organizations => Set<Organization>();
         public DbSet<User> Users => Set<User>();
         public DbSet<Space> Spaces => Set<Space>();

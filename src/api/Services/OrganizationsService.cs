@@ -20,8 +20,12 @@ namespace api.Services
         // request, que aqui não há.
         public async Task<OrganizationCreatedResponse> SignUpAsync(CreateOrganizationRequest req)
         {
-            // E-mail é globalmente único; a checagem ignora o filtro por tenant (pré-tenant).
-            var existing = await _db.Users.IgnoreQueryFilters()
+            // Signup é PRÉ-tenant: checa e-mail (cross-tenant) e grava org+admin num tenant
+            // que ainda não é "o do request". O escopo desliga o filtro EF e o RLS.
+            using var crossTenant = _db.Tenant.EnterCrossTenant();
+
+            // E-mail é globalmente único.
+            var existing = await _db.Users
                 .FirstOrDefaultAsync(u => u.Email == req.AdminEmail);
             if (existing is not null)
                 throw new InvalidOperationException("E-mail já cadastrado.");

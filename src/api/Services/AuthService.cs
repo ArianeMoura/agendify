@@ -26,6 +26,10 @@ public class AuthService
 
     public async Task<LoginResponse?> LoginAsync(LoginRequest request)
     {
+        // Login é PRÉ-tenant: acha o usuário (cross-tenant) e grava o refresh token no
+        // tenant dele — o escopo desliga o filtro EF e o RLS por toda a operação.
+        using var crossTenant = _db.Tenant.EnterCrossTenant();
+
         var user = await _usersService.GetByEmailAsync(request.Email);
 
         // Conta anonimizada (LGPD) não autentica.
@@ -42,16 +46,15 @@ public class AuthService
         if (string.IsNullOrWhiteSpace(rawRefreshToken)) return null;
 
         // Refresh é PRÉ-tenant: o token identifica o usuário (e o tenant) antes de
-        // qualquer contexto estar resolvido. Busca por hash (globalmente único)
-        // ignorando o filtro por tenant; idem o reload do usuário.
+        // qualquer contexto estar resolvido. Escopo cross-tenant por toda a operação.
+        using var crossTenant = _db.Tenant.EnterCrossTenant();
+
         var hash = Hash(rawRefreshToken);
-        var stored = await _db.RefreshTokens.IgnoreQueryFilters()
-            .FirstOrDefaultAsync(t => t.TokenHash == hash);
+        var stored = await _db.RefreshTokens.FirstOrDefaultAsync(t => t.TokenHash == hash);
 
         if (stored is null || !stored.IsActive) return null;
 
-        var user = await _db.Users.IgnoreQueryFilters().AsNoTracking()
-            .FirstOrDefaultAsync(u => u.Id == stored.UserId);
+        var user = await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == stored.UserId);
         if (user is null || user.AnonymizedAt is not null) return null;
 
         stored.RevokedAt = DateTime.UtcNow;
@@ -64,9 +67,10 @@ public class AuthService
     {
         if (string.IsNullOrWhiteSpace(rawRefreshToken)) return;
 
+        using var crossTenant = _db.Tenant.EnterCrossTenant();
+
         var hash = Hash(rawRefreshToken);
-        var stored = await _db.RefreshTokens.IgnoreQueryFilters()
-            .FirstOrDefaultAsync(t => t.TokenHash == hash);
+        var stored = await _db.RefreshTokens.FirstOrDefaultAsync(t => t.TokenHash == hash);
         if (stored is not null && stored.RevokedAt is null)
         {
             stored.RevokedAt = DateTime.UtcNow;

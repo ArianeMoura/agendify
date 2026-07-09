@@ -51,19 +51,23 @@ namespace api.Services
             return new InviteCreatedResponse { Token = rawToken, ExpiresAt = expiresAt };
         }
 
-        // Aceite ANÔNIMO: valida o token (busca por hash, pré-tenant → IgnoreQueryFilters),
-        // cria o usuário no tenant do convite (TenantId explícito) e marca como aceito.
-        // Retorna null se o convite não existe, expirou ou já foi usado.
+        // Aceite ANÔNIMO: valida o token (busca por hash, cross-tenant), cria o usuário no
+        // tenant do convite (TenantId explícito) e marca como aceito. Retorna null se o
+        // convite não existe, expirou ou já foi usado.
         public async Task<User?> AcceptAsync(AcceptInvitationRequest req)
         {
+            // Aceite é PRÉ-tenant: acha o convite (cross-tenant) e cria o usuário no tenant
+            // dele. O escopo desliga o filtro EF e o RLS por toda a operação.
+            using var crossTenant = _db.Tenant.EnterCrossTenant();
+
             var hash = Hash(req.Token);
-            var invitation = await _db.Invitations.IgnoreQueryFilters()
+            var invitation = await _db.Invitations
                 .FirstOrDefaultAsync(i => i.TokenHash == hash);
 
             if (invitation is null || !invitation.IsPending)
                 return null;
 
-            var existing = await _db.Users.IgnoreQueryFilters()
+            var existing = await _db.Users
                 .FirstOrDefaultAsync(u => u.Email == invitation.Email);
             if (existing is not null)
                 throw new InvalidOperationException("E-mail já cadastrado.");
