@@ -6,11 +6,19 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    groups:
+      api-nuget:
+        patterns:
+          - "*"
   - package-ecosystem: nuget
     directory: /src/api.Tests
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    groups:
+      api-tests-nuget:
+        patterns:
+          - "*"
 
   # Admin web (Next.js)
   - package-ecosystem: npm
@@ -18,6 +26,10 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    groups:
+      admin-npm:
+        patterns:
+          - "*"
 
   # Mobile (Expo)
   - package-ecosystem: npm
@@ -25,9 +37,17 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    groups:
+      mobile-npm:
+        patterns:
+          - "*"
 
   # Workflows do próprio CI
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
+    groups:
+      github-actions:
+        patterns:
+          - "*"
