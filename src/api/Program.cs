@@ -87,6 +87,9 @@ builder.Services.AddScoped<PrivacyService>();
 builder.Services.AddScoped<ReviewsService>();
 builder.Services.AddScoped<OrganizationsService>();
 builder.Services.AddScoped<InvitationsService>();
+// Envio de convite. Hoje só registra o link nos logs (enxuto p/ testes); trocar por um
+// sender real (Resend) quando for para produção.
+builder.Services.AddScoped<IEmailSender, LoggingEmailSender>();
 // FileUploadService só toca o filesystem — pode continuar Singleton.
 builder.Services.AddSingleton<FileUploadService>();
 

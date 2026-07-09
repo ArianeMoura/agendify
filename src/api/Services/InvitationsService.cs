@@ -9,11 +9,13 @@ namespace api.Services
     public class InvitationsService
     {
         private readonly AppDbContext _db;
+        private readonly IEmailSender _emailSender;
         private static readonly TimeSpan Ttl = TimeSpan.FromDays(7);
 
-        public InvitationsService(AppDbContext db)
+        public InvitationsService(AppDbContext db, IEmailSender emailSender)
         {
             _db = db;
+            _emailSender = emailSender;
         }
 
         // OrgAdmin convida alguém para o SEU tenant. O tenant_id do convite é carimbado
@@ -47,6 +49,19 @@ namespace api.Services
             });
 
             await _db.SaveChangesAsync();
+
+            // Entrega best-effort: monta o deep link do app e manda ao sender (hoje, logs).
+            // O token base64 pode conter +//= — precisa de URL-encode. Se o envio falhar,
+            // o convite JÁ está salvo e o token volta na resposta (fallback do painel).
+            var acceptLink = $"agendify://accept-invite?token={Uri.EscapeDataString(rawToken)}";
+            try
+            {
+                await _emailSender.SendInvitationAsync(email, acceptLink, expiresAt);
+            }
+            catch
+            {
+                // Não falha o convite se a entrega do e-mail falhar.
+            }
 
             return new InviteCreatedResponse { Token = rawToken, ExpiresAt = expiresAt };
         }
