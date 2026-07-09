@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Pencil, Plus, Trash2, Users as UsersIcon } from "lucide-react";
+import { Pencil, Plus, Trash2, UserPlus, Users as UsersIcon } from "lucide-react";
 import { ApiError, apiFetch } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { User } from "@/lib/types";
@@ -24,6 +24,7 @@ import {
   Tooltip,
 } from "@/components/ui";
 import { UserFormDialog } from "./UserFormDialog";
+import { InviteMemberDialog } from "./InviteMemberDialog";
 
 export default function UsersPage() {
   const qc = useQueryClient();
@@ -34,6 +35,7 @@ export default function UsersPage() {
   });
 
   const form = useDisclosure();
+  const invite = useDisclosure();
   const [editing, setEditing] = useState<User | null>(null);
   const [toDelete, setToDelete] = useState<User | null>(null);
 
@@ -64,10 +66,16 @@ export default function UsersPage() {
         title="Usuários"
         description="Gerencie os acessos ao sistema."
         action={
-          <Button onClick={openCreate}>
-            <Plus className="size-4" aria-hidden />
-            Novo usuário
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={invite.onOpen}>
+              <UserPlus className="size-4" aria-hidden />
+              Convidar
+            </Button>
+            <Button onClick={openCreate}>
+              <Plus className="size-4" aria-hidden />
+              Novo usuário
+            </Button>
+          </div>
         }
       />
 
@@ -161,6 +169,8 @@ export default function UsersPage() {
         user={editing}
         isSelf={editing?.id === me?.id}
       />
+
+      <InviteMemberDialog open={invite.open} onOpenChange={invite.setOpen} />
 
       <ConfirmDialog
         open={Boolean(toDelete)}

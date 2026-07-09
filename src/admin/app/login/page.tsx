@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { Logo } from "@/components/brand";
@@ -70,6 +71,13 @@ export default function LoginPage() {
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Entrando..." : "Entrar"}
           </Button>
+
+          <p className="text-ink-muted text-center text-sm">
+            Ainda não tem uma organização?{" "}
+            <Link href="/signup" className="font-medium underline underline-offset-4 hover:opacity-80">
+              Criar organização
+            </Link>
+          </p>
         </form>
       </Card>
     </div>

@@ -29,6 +29,33 @@ export interface UpdateUserRequest {
   role?: Role;
 }
 
+// Self-signup de organização (POST /api/organizations, anônimo).
+export interface CreateOrganizationRequest {
+  organizationName: string;
+  adminName: string;
+  adminEmail: string;
+  adminPassword: string;
+}
+
+export interface CreateOrganizationResponse {
+  organizationId: string;
+  organizationName: string;
+  slug: string;
+  adminUserId: string;
+  adminEmail: string;
+}
+
+// Convite de membro (POST /api/invitations, OrgAdmin autenticado).
+export interface CreateInvitationRequest {
+  email: string;
+  role: Role;
+}
+
+export interface CreateInvitationResponse {
+  token: string;
+  expiresAt: string;
+}
+
 export interface SpaceResource {
   resourceId: string;
   quantity: number;
