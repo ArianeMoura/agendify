@@ -67,10 +67,19 @@ public class UsersController : ControllerBase
         return Ok(userDto);
     }
 
+    // Criação direta de usuário pelo OrgAdmin (no próprio tenant, via auto-stamp).
+    // Deixou de ser anônima: o cadastro público agora é POST /api/organizations
+    // (self-signup) e o convite (POST /api/invitations). Um OrgAdmin não pode criar
+    // um PlatformOwner (evita autoescalonamento acima do próprio nível).
     [HttpPost]
-    [AllowAnonymous]
+    [Authorize(Policy = "OrgAdmin")]
     public async Task<IActionResult> Create([FromBody] CreateUserRequest request)
     {
+        if (request.Role == Role.PlatformOwner)
+        {
+            return Forbid();
+        }
+
         var existingUser = await _usersService.GetByEmailAsync(request.Email);
         if (existingUser != null)
         {

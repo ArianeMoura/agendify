@@ -32,6 +32,7 @@ namespace api.Data
         public DbSet<Consent> Consents => Set<Consent>();
         public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
         public DbSet<Review> Reviews => Set<Review>();
+        public DbSet<Invitation> Invitations => Set<Invitation>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -180,6 +181,22 @@ namespace api.Data
                 e.Property(x => x.CreatedAt).HasColumnName("created_at");
                 e.HasIndex(x => x.SpaceId);
                 e.HasIndex(x => x.UserId);
+            });
+
+            modelBuilder.Entity<Invitation>(e =>
+            {
+                e.ToTable("invitations");
+                e.HasKey(x => x.Id);
+                e.Property(x => x.Id).HasColumnName("id");
+                e.Property(x => x.Email).HasColumnName("email");
+                e.Property(x => x.Role).HasColumnName("role").HasConversion<string>();
+                e.Property(x => x.TokenHash).HasColumnName("token_hash");
+                e.Property(x => x.ExpiresAt).HasColumnName("expires_at");
+                e.Property(x => x.AcceptedAt).HasColumnName("accepted_at");
+                e.Property(x => x.InvitedByUserId).HasColumnName("invited_by_user_id");
+                e.Property(x => x.CreatedAt).HasColumnName("created_at");
+                e.Ignore(x => x.IsPending);
+                e.HasIndex(x => x.TokenHash).IsUnique();
             });
 
             // Configuração comum de tenancy aplicada a TODA entidade ITenantScoped,

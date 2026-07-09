@@ -69,7 +69,7 @@ namespace api.Tests
             await using var db = CreateContext();
             await db.Database.ExecuteSqlRawAsync(
                 "TRUNCATE organizations, bookings, spaces, resources, users, idempotency_keys, " +
-                "refresh_tokens, consents, audit_logs, reviews RESTART IDENTITY CASCADE;");
+                "refresh_tokens, consents, audit_logs, reviews, invitations RESTART IDENTITY CASCADE;");
 
             await db.Database.ExecuteSqlRawAsync(
                 "INSERT INTO organizations (id, name, slug, status, created_at) " +

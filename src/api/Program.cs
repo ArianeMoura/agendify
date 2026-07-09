@@ -82,6 +82,8 @@ builder.Services.AddScoped<AnalyticsService>();
 builder.Services.AddScoped<IdempotencyService>();
 builder.Services.AddScoped<PrivacyService>();
 builder.Services.AddScoped<ReviewsService>();
+builder.Services.AddScoped<OrganizationsService>();
+builder.Services.AddScoped<InvitationsService>();
 // FileUploadService só toca o filesystem — pode continuar Singleton.
 builder.Services.AddSingleton<FileUploadService>();
 
