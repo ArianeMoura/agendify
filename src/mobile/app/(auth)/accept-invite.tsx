@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
@@ -19,42 +19,51 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { useAuth } from '@/lib/contexts/AuthContext';
 import { authApi } from '@/lib/api/auth';
-import { loginSchema, LoginFormData } from '@/lib/schemas/auth';
+import { acceptInviteSchema, AcceptInviteFormData } from '@/lib/schemas/auth';
 
-export default function LoginScreen() {
+export default function AcceptInviteScreen() {
   const router = useRouter();
   const { setAuthData } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
+
+  // O token pode vir de um deep link (agendify://accept-invite?token=...) ou ser colado.
+  const { token: tokenParam } = useLocalSearchParams<{ token?: string }>();
 
   const {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
+  } = useForm<AcceptInviteFormData>({
+    resolver: zodResolver(acceptInviteSchema),
     defaultValues: {
-      email: '',
+      token: tokenParam ?? '',
+      name: '',
       password: '',
     },
   });
 
-  const { mutateAsync: login, isPending } = useMutation({
-    mutationFn: authApi.login,
-    onSuccess: async (data) => {
-      await setAuthData(data);
+  // Aceita o convite e, em seguida, faz login com o e-mail retornado + a senha
+  // escolhida (o accept não devolve tokens).
+  const { mutateAsync: accept, isPending } = useMutation({
+    mutationFn: async (data: AcceptInviteFormData) => {
+      const account = await authApi.acceptInvitation(data);
+      return authApi.login({ email: account.email, password: data.password });
+    },
+    onSuccess: async (loginData) => {
+      await setAuthData(loginData);
       router.replace('/(tabs)');
     },
     onError: (error: any) => {
       Alert.alert(
-        'Erro ao fazer login',
-        error.response?.data?.message || 'Verifique suas credenciais e tente novamente.'
+        'Erro ao aceitar convite',
+        error.response?.data?.message || 'Convite inválido ou expirado.'
       );
     },
   });
 
-  const onSubmit = useCallback(async (data: LoginFormData) => {
-    await login(data);
-  }, [login]);
+  const onSubmit = useCallback(async (data: AcceptInviteFormData) => {
+    await accept(data);
+  }, [accept]);
 
   return (
     <KeyboardAvoidingView
@@ -67,24 +76,40 @@ export default function LoginScreen() {
       >
         <View style={styles.header}>
           <Text style={styles.brandTitle}>Agendify</Text>
-          <Text style={styles.subtitle}>Sistema de Reservas de Espaços</Text>
+          <Text style={styles.subtitle}>Aceitar convite</Text>
         </View>
 
         <View style={styles.form}>
           <Controller
             control={control}
-            name="email"
+            name="token"
             render={({ field: { onChange, onBlur, value } }) => (
               <Input
-                label="Email"
-                placeholder="seu@email.com"
+                label="Token do convite"
+                placeholder="Cole o token recebido"
                 value={value}
                 onChangeText={onChange}
                 onBlur={onBlur}
-                error={errors.email?.message}
-                keyboardType="email-address"
+                error={errors.token?.message}
                 autoCapitalize="none"
-                leftIcon={<Ionicons name="mail-outline" size={20} color={colors.textSecondary} />}
+                autoCorrect={false}
+                leftIcon={<Ionicons name="key-outline" size={20} color={colors.textSecondary} />}
+              />
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="name"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Input
+                label="Seu nome"
+                placeholder="Como você se chama"
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                error={errors.name?.message}
+                leftIcon={<Ionicons name="person-outline" size={20} color={colors.textSecondary} />}
               />
             )}
           />
@@ -94,7 +119,7 @@ export default function LoginScreen() {
             name="password"
             render={({ field: { onChange, onBlur, value } }) => (
               <Input
-                label="Senha"
+                label="Defina uma senha"
                 placeholder="••••••••"
                 value={value}
                 onChangeText={onChange}
@@ -116,22 +141,18 @@ export default function LoginScreen() {
           />
 
           <Button
-            title="Entrar"
+            title="Aceitar e entrar"
             onPress={handleSubmit(onSubmit)}
             isLoading={isPending}
             fullWidth
-            style={styles.loginButton}
+            style={styles.submitButton}
           />
 
-          <TouchableOpacity
-            style={styles.registerLink}
-            onPress={() => router.push('/(auth)/accept-invite')}
-          >
-            <Text style={styles.registerText}>
-              Recebeu um convite? <Text style={styles.registerTextBold}>Aceitar</Text>
+          <TouchableOpacity style={styles.loginLink} onPress={() => router.replace('/(auth)/login')}>
+            <Text style={styles.loginText}>
+              Já tem conta? <Text style={styles.loginTextBold}>Entrar</Text>
             </Text>
           </TouchableOpacity>
-
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -168,20 +189,19 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.xl,
     padding: spacing.xl,
   },
-  loginButton: {
+  submitButton: {
     marginTop: spacing.md,
   },
-  registerLink: {
+  loginLink: {
     marginTop: spacing.lg,
     alignItems: 'center',
   },
-  registerText: {
+  loginText: {
     ...typography.body,
     color: colors.textSecondary,
   },
-  registerTextBold: {
+  loginTextBold: {
     fontWeight: '600',
     color: colors.primary,
   },
 });
-

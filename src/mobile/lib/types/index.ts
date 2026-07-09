@@ -27,6 +27,18 @@ export interface LoginResponse {
   user: User;
 }
 
+// Aceite de convite (POST /api/invitations/accept, anônimo).
+export interface AcceptInvitationRequest {
+  token: string;
+  name: string;
+  password: string;
+}
+
+export interface AcceptInvitationResponse {
+  id: string;
+  email: string;
+}
+
 export interface Review {
   id: string;
   userId: string;
