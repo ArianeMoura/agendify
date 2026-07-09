@@ -13,13 +13,13 @@
     "preview": {
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://agendify-api.fly.dev"
+        "EXPO_PUBLIC_API_URL": "https://agendify-api-j6da.onrender.com"
       }
     },
     "production": {
       "autoIncrement": true,
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://agendify-api.fly.dev"
+        "EXPO_PUBLIC_API_URL": "https://agendify-api-j6da.onrender.com"
       }
     }
   },

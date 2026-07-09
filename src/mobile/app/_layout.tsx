@@ -29,7 +29,10 @@ function RootLayoutNav() {
 
     if (!isAuthenticated && !inAuthGroup) {
       router.replace('/(auth)/login');
-    } else if (isAuthenticated && inAuthGroup) {
+    } else if (isAuthenticated && inAuthGroup && segments[1] !== 'accept-invite') {
+      // Exceção: um usuário logado que abre um deep link de convite
+      // (agendify://accept-invite?token=...) deve chegar à tela de aceite em vez de
+      // ser jogado para as tabs. O aceite cria uma nova conta e troca a sessão.
       router.replace('/(tabs)');
     }
   }, [isAuthenticated, isLoading, router, segments]);
