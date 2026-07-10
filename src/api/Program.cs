@@ -87,9 +87,21 @@ builder.Services.AddScoped<PrivacyService>();
 builder.Services.AddScoped<ReviewsService>();
 builder.Services.AddScoped<OrganizationsService>();
 builder.Services.AddScoped<InvitationsService>();
-// Envio de convite. Hoje só registra o link nos logs (enxuto p/ testes); trocar por um
-// sender real (Resend) quando for para produção.
-builder.Services.AddScoped<IEmailSender, LoggingEmailSender>();
+// Envio de convite. Com Email:ApiKey configurado → Resend (HTTPS, envio real); sem key →
+// LoggingEmailSender (só registra o link nos logs — dev/testes/CI rodam sem infra).
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Email"));
+var emailSettings = builder.Configuration.GetSection("Email").Get<EmailSettings>();
+if (!string.IsNullOrWhiteSpace(emailSettings?.ApiKey))
+{
+    if (string.IsNullOrWhiteSpace(emailSettings.FromAddress))
+        throw new InvalidOperationException(
+            "Email:ApiKey configurado, mas Email:FromAddress ausente. Defina o remetente verificado (User Secrets em dev / Email__FromAddress em prod).");
+    builder.Services.AddHttpClient<IEmailSender, ResendEmailSender>();
+}
+else
+{
+    builder.Services.AddScoped<IEmailSender, LoggingEmailSender>();
+}
 // FileUploadService só toca o filesystem — pode continuar Singleton.
 builder.Services.AddSingleton<FileUploadService>();
 

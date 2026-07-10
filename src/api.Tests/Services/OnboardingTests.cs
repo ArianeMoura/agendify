@@ -16,7 +16,23 @@ namespace api.Tests.Services
         public async Task SetUp() => await TestDatabaseFixture.ResetAsync();
 
         private static OrganizationsService OrgSvc(AppDbContext db) => new(db);
-        private static InvitationsService InviteSvc(AppDbContext db) => new(db);
+        private static InvitationsService InviteSvc(AppDbContext db, IEmailSender? sender = null) =>
+            new(db, sender ?? new RecordingEmailSender());
+
+        // Sender de teste: em vez de enviar, guarda o último convite "entregue".
+        private sealed class RecordingEmailSender : IEmailSender
+        {
+            public string? LastToEmail { get; private set; }
+            public string? LastAcceptLink { get; private set; }
+
+            public Task SendInvitationAsync(
+                string toEmail, string acceptLink, DateTime expiresAt, CancellationToken ct = default)
+            {
+                LastToEmail = toEmail;
+                LastAcceptLink = acceptLink;
+                return Task.CompletedTask;
+            }
+        }
 
         private static CreateOrganizationRequest Signup(string org, string email) => new()
         {
@@ -132,6 +148,23 @@ namespace api.Tests.Services
                 await using var db = TestDatabaseFixture.CreateContext(Organization.DefaultOrganizationId);
                 await InviteSvc(db).CreateAsync("x@x.dev", Role.PlatformOwner, null);
             });
+        }
+
+        [Test]
+        public async Task Invite_SendsAcceptLinkToInvitee()
+        {
+            string tenant;
+            await using (var db = TestDatabaseFixture.CreateContext(tenantId: null))
+                tenant = (await OrgSvc(db).SignUpAsync(Signup("D", "d@d.dev"))).OrganizationId;
+
+            var sender = new RecordingEmailSender();
+            await using var ctx = TestDatabaseFixture.CreateContext(tenant);
+            var result = await InviteSvc(ctx, sender).CreateAsync("novo@d.dev", Role.Member, null);
+
+            Assert.That(sender.LastToEmail, Is.EqualTo("novo@d.dev"));
+            Assert.That(sender.LastAcceptLink, Does.StartWith("agendify://accept-invite?token="));
+            // O link carrega o token (URL-encoded) devolvido na resposta.
+            Assert.That(sender.LastAcceptLink, Does.Contain(Uri.EscapeDataString(result.Token)));
         }
     }
 }
