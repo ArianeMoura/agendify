@@ -1,12 +1,12 @@
-import React from "react";
+import React from 'react';
 import {
   View,
   Text,
   FlatList,
   ActivityIndicator,
   StyleSheet,
-} from "react-native";
-import { getPeakHours, PeakHourDto } from "../../services/analytics";
+} from 'react-native';
+import { getPeakHours, PeakHourDto } from '../../services/analytics';
 
 export default function AnalyticsScreen() {
   const [data, setData] = React.useState<PeakHourDto[]>([]);
@@ -28,8 +28,8 @@ export default function AnalyticsScreen() {
 
         setData(result);
       } catch (err: any) {
-        console.error("Erro ao buscar peak hours:", err);
-        setError(err.message ?? "Erro ao carregar horários de pico");
+        console.error('Erro ao buscar peak hours:', err);
+        setError(err.message ?? 'Erro ao carregar horários de pico');
       } finally {
         setLoading(false);
       }
@@ -92,40 +92,40 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
   },
   center: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     padding: 16,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
   },
   title: {
     fontSize: 20,
-    fontWeight: "600",
+    fontWeight: '600',
     marginBottom: 16,
   },
   text: {
     fontSize: 16,
   },
   errorText: {
-    color: "red",
-    textAlign: "center",
+    color: 'red',
+    textAlign: 'center',
   },
   item: {
     paddingVertical: 12,
   },
   hourText: {
     fontSize: 16,
-    fontWeight: "500",
+    fontWeight: '500',
   },
   countText: {
     fontSize: 14,
-    color: "#555",
+    color: '#555',
   },
   separator: {
     height: 1,
-    backgroundColor: "#eee",
+    backgroundColor: '#eee',
   },
 });

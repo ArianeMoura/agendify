@@ -42,7 +42,8 @@ export const MenuItem = ({
 export default function ProfileScreen() {
   const router = useRouter();
   const { user, logout } = useAuth();
-  const isAdmin = user?.role === Role.OrgAdmin || user?.role === Role.PlatformOwner;
+  const isAdmin =
+    user?.role === Role.OrgAdmin || user?.role === Role.PlatformOwner;
 
   const handleLogout = useCallback(() => {
     Alert.alert('Sair', 'Tem certeza que deseja sair?', [
@@ -59,7 +60,10 @@ export default function ProfileScreen() {
   }, [logout, router]);
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.scrollContent}
+    >
       <Card style={styles.profileCard}>
         <View style={styles.avatarContainer}>
           <View style={styles.avatar}>
@@ -92,7 +96,7 @@ export default function ProfileScreen() {
           onPress={() => router.push('/profile/change-password')}
         />
       </Card>
-      
+
       <Button
         title="Sair"
         variant="danger"
@@ -199,4 +203,3 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
 });
-

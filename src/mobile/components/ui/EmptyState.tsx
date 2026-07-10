@@ -25,11 +25,7 @@ export const EmptyState = ({
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.message}>{message}</Text>
       {actionLabel && onAction && (
-        <Button
-          title={actionLabel}
-          onPress={onAction}
-          style={styles.button}
-        />
+        <Button title={actionLabel} onPress={onAction} style={styles.button} />
       )}
     </View>
   );
@@ -59,4 +55,3 @@ const styles = StyleSheet.create({
     marginTop: spacing.lg,
   },
 });
-

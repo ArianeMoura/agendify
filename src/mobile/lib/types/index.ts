@@ -143,4 +143,3 @@ export interface SpaceAvailability {
   allDayStartTime?: string;
   allDayEndTime?: string;
 }
-

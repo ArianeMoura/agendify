@@ -35,7 +35,11 @@ export default function BookingsScreen() {
   const [filterStartDate, setFilterStartDate] = useState<Date | null>(null);
   const [filterEndDate, setFilterEndDate] = useState<Date | null>(null);
 
-  const { data: bookings, isLoading, refetch } = useQuery({
+  const {
+    data: bookings,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: isAdmin ? ['bookings'] : ['bookings', 'user', user?.id],
     queryFn: () =>
       isAdmin ? bookingsApi.getAll() : bookingsApi.getByUserId(user?.id || ''),
@@ -52,21 +56,41 @@ export default function BookingsScreen() {
     return bookings.filter((booking) => {
       const bookingDate = new Date(booking.startDateTime);
 
-      const bookingDay = new Date(bookingDate.getFullYear(), bookingDate.getMonth(), bookingDate.getDate());
+      const bookingDay = new Date(
+        bookingDate.getFullYear(),
+        bookingDate.getMonth(),
+        bookingDate.getDate(),
+      );
 
       if (filterStartDate && filterEndDate) {
-        const startDay = new Date(filterStartDate.getFullYear(), filterStartDate.getMonth(), filterStartDate.getDate());
-        const endDay = new Date(filterEndDate.getFullYear(), filterEndDate.getMonth(), filterEndDate.getDate());
+        const startDay = new Date(
+          filterStartDate.getFullYear(),
+          filterStartDate.getMonth(),
+          filterStartDate.getDate(),
+        );
+        const endDay = new Date(
+          filterEndDate.getFullYear(),
+          filterEndDate.getMonth(),
+          filterEndDate.getDate(),
+        );
         return bookingDay >= startDay && bookingDay <= endDay;
       }
 
       if (filterStartDate) {
-        const startDay = new Date(filterStartDate.getFullYear(), filterStartDate.getMonth(), filterStartDate.getDate());
+        const startDay = new Date(
+          filterStartDate.getFullYear(),
+          filterStartDate.getMonth(),
+          filterStartDate.getDate(),
+        );
         return bookingDay >= startDay;
       }
 
       if (filterEndDate) {
-        const endDay = new Date(filterEndDate.getFullYear(), filterEndDate.getMonth(), filterEndDate.getDate());
+        const endDay = new Date(
+          filterEndDate.getFullYear(),
+          filterEndDate.getMonth(),
+          filterEndDate.getDate(),
+        );
         return bookingDay <= endDay;
       }
 
@@ -74,10 +98,13 @@ export default function BookingsScreen() {
     });
   }, [bookings, filterStartDate, filterEndDate]);
 
-  const handleFilterChange = useCallback((startDate: Date | null, endDate: Date | null) => {
-    setFilterStartDate(startDate);
-    setFilterEndDate(endDate);
-  }, []);
+  const handleFilterChange = useCallback(
+    (startDate: Date | null, endDate: Date | null) => {
+      setFilterStartDate(startDate);
+      setFilterEndDate(endDate);
+    },
+    [],
+  );
 
   const deleteMutation = useMutation({
     mutationFn: bookingsApi.delete,
@@ -90,20 +117,23 @@ export default function BookingsScreen() {
     },
   });
 
-  const handleDelete = useCallback((id: string) => {
-    Alert.alert(
-      'Confirmar exclusão',
-      'Tem certeza que deseja excluir esta reserva?',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Excluir',
-          style: 'destructive',
-          onPress: () => deleteMutation.mutate(id),
-        },
-      ]
-    );
-  }, [deleteMutation]);
+  const handleDelete = useCallback(
+    (id: string) => {
+      Alert.alert(
+        'Confirmar exclusão',
+        'Tem certeza que deseja excluir esta reserva?',
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          {
+            text: 'Excluir',
+            style: 'destructive',
+            onPress: () => deleteMutation.mutate(id),
+          },
+        ],
+      );
+    },
+    [deleteMutation],
+  );
 
   const formatDate = useCallback((dateString: string) => {
     const date = new Date(dateString);
@@ -147,18 +177,30 @@ export default function BookingsScreen() {
 
       {isAdmin && item.user && (
         <View style={styles.userInfo}>
-          <Ionicons name="person-outline" size={16} color={colors.textSecondary} />
+          <Ionicons
+            name="person-outline"
+            size={16}
+            color={colors.textSecondary}
+          />
           <Text style={styles.userName}>{item.user.name}</Text>
         </View>
       )}
 
       <View style={styles.dateTimeContainer}>
         <View style={styles.dateTimeRow}>
-          <Ionicons name="calendar-outline" size={16} color={colors.textSecondary} />
+          <Ionicons
+            name="calendar-outline"
+            size={16}
+            color={colors.textSecondary}
+          />
           <Text style={styles.dateText}>{formatDate(item.startDateTime)}</Text>
         </View>
         <View style={styles.dateTimeRow}>
-          <Ionicons name="time-outline" size={16} color={colors.textSecondary} />
+          <Ionicons
+            name="time-outline"
+            size={16}
+            color={colors.textSecondary}
+          />
           <Text style={styles.timeText}>
             {formatTime(item.startDateTime)} - {formatTime(item.endDateTime)}
           </Text>
@@ -206,7 +248,11 @@ export default function BookingsScreen() {
                   ? 'Não há reservas cadastradas no sistema.'
                   : 'Você ainda não fez nenhuma reserva.'
             }
-            onAction={!filterStartDate && !filterEndDate ? () => router.push('/bookings/create') : undefined}
+            onAction={
+              !filterStartDate && !filterEndDate
+                ? () => router.push('/bookings/create')
+                : undefined
+            }
           />
         }
         refreshControl={
@@ -291,4 +337,3 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
   },
 });
-

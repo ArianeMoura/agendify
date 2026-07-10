@@ -1,5 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing, typography, borderRadius } from '@/constants/theme';
@@ -34,10 +40,14 @@ export const DashboardCard = ({
 export default function DashboardScreen() {
   const router = useRouter();
   const { user } = useAuth();
-  const isAdmin = user?.role === Role.OrgAdmin || user?.role === Role.PlatformOwner;
+  const isAdmin =
+    user?.role === Role.OrgAdmin || user?.role === Role.PlatformOwner;
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.scrollContent}
+    >
       <View style={styles.header}>
         <Text style={styles.greeting}>Bem-vindo,</Text>
         <Text style={styles.userName}>{user?.name}!</Text>
@@ -94,15 +104,27 @@ export default function DashboardScreen() {
       <Card style={styles.infoCard}>
         <Text style={styles.infoTitle}>Informações da Conta</Text>
         <View style={styles.infoRow}>
-          <Ionicons name="person-outline" size={20} color={colors.textSecondary} />
+          <Ionicons
+            name="person-outline"
+            size={20}
+            color={colors.textSecondary}
+          />
           <Text style={styles.infoText}>{user?.name}</Text>
         </View>
         <View style={styles.infoRow}>
-          <Ionicons name="mail-outline" size={20} color={colors.textSecondary} />
+          <Ionicons
+            name="mail-outline"
+            size={20}
+            color={colors.textSecondary}
+          />
           <Text style={styles.infoText}>{user?.email}</Text>
         </View>
         <View style={styles.infoRow}>
-          <Ionicons name="shield-checkmark-outline" size={20} color={colors.textSecondary} />
+          <Ionicons
+            name="shield-checkmark-outline"
+            size={20}
+            color={colors.textSecondary}
+          />
           <Text style={styles.infoText}>
             {isAdmin ? 'Administrador' : 'Usuário Comum'}
           </Text>

@@ -12,7 +12,13 @@ import {
 import { useRouter } from 'expo-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, typography, borderRadius, shadows } from '@/constants/theme';
+import {
+  colors,
+  spacing,
+  typography,
+  borderRadius,
+  shadows,
+} from '@/constants/theme';
 import { Card } from '@/components/ui/Card';
 import { Loading } from '@/components/ui/Loading';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -25,9 +31,14 @@ export default function SpacesScreen() {
   const router = useRouter();
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const isAdmin = user?.role === Role.OrgAdmin || user?.role === Role.PlatformOwner;
+  const isAdmin =
+    user?.role === Role.OrgAdmin || user?.role === Role.PlatformOwner;
 
-  const { data: spaces, isLoading, refetch } = useQuery({
+  const {
+    data: spaces,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ['spaces'],
     queryFn: spacesApi.getAll,
   });
@@ -43,20 +54,23 @@ export default function SpacesScreen() {
     },
   });
 
-  const handleDelete = useCallback((id: string) => {
-    Alert.alert(
-      'Confirmar exclusão',
-      'Tem certeza que deseja excluir este espaço?',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Excluir',
-          style: 'destructive',
-          onPress: () => deleteMutation.mutate(id),
-        },
-      ]
-    );
-  }, [deleteMutation]);
+  const handleDelete = useCallback(
+    (id: string) => {
+      Alert.alert(
+        'Confirmar exclusão',
+        'Tem certeza que deseja excluir este espaço?',
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          {
+            text: 'Excluir',
+            style: 'destructive',
+            onPress: () => deleteMutation.mutate(id),
+          },
+        ],
+      );
+    },
+    [deleteMutation],
+  );
 
   const renderSpaceItem = ({ item }: { item: Space }) => (
     <Card style={styles.spaceCard}>
@@ -75,7 +89,11 @@ export default function SpacesScreen() {
             <View
               style={[
                 styles.statusBadge,
-                { backgroundColor: item.availability ? colors.success + '20' : colors.danger + '20' },
+                {
+                  backgroundColor: item.availability
+                    ? colors.success + '20'
+                    : colors.danger + '20',
+                },
               ]}
             >
               <Text
@@ -95,13 +113,21 @@ export default function SpacesScreen() {
                 onPress={() => router.push(`/spaces/edit/${item.id}`)}
                 style={styles.iconButton}
               >
-                <Ionicons name="create-outline" size={20} color={colors.primary} />
+                <Ionicons
+                  name="create-outline"
+                  size={20}
+                  color={colors.primary}
+                />
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => handleDelete(item.id)}
                 style={styles.iconButton}
               >
-                <Ionicons name="trash-outline" size={20} color={colors.danger} />
+                <Ionicons
+                  name="trash-outline"
+                  size={20}
+                  color={colors.danger}
+                />
               </TouchableOpacity>
             </View>
           )}
@@ -115,13 +141,23 @@ export default function SpacesScreen() {
 
         <View style={styles.detailsContainer}>
           <View style={styles.detailRow}>
-            <Ionicons name="people-outline" size={16} color={colors.textSecondary} />
-            <Text style={styles.detailText}>Capacidade: {item.capacity} pessoas</Text>
+            <Ionicons
+              name="people-outline"
+              size={16}
+              color={colors.textSecondary}
+            />
+            <Text style={styles.detailText}>
+              Capacidade: {item.capacity} pessoas
+            </Text>
           </View>
 
           {item.resources && item.resources.length > 0 && (
             <View style={styles.detailRow}>
-              <Ionicons name="list-outline" size={16} color={colors.textSecondary} />
+              <Ionicons
+                name="list-outline"
+                size={16}
+                color={colors.textSecondary}
+              />
               <Text style={styles.detailText}>
                 {item.resources.length} recurso(s)
               </Text>
@@ -285,4 +321,3 @@ const styles = StyleSheet.create({
     ...shadows.lg,
   },
 });
-

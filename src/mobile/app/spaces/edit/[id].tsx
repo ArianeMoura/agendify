@@ -74,15 +74,18 @@ export default function EditSpaceScreen() {
 
   const isAllDayBooking = watch('isAllDayBooking');
 
-  const toggleHour = useCallback((hour: string) => {
-    setSelectedHours((prev) => {
-      const newHours = prev.includes(hour)
-        ? prev.filter((h) => h !== hour)
-        : [...prev, hour].sort();
-      setValue('availableHours', newHours);
-      return newHours;
-    });
-  }, [setValue]);
+  const toggleHour = useCallback(
+    (hour: string) => {
+      setSelectedHours((prev) => {
+        const newHours = prev.includes(hour)
+          ? prev.filter((h) => h !== hour)
+          : [...prev, hour].sort();
+        setValue('availableHours', newHours);
+        return newHours;
+      });
+    },
+    [setValue],
+  );
 
   const updateMutation = useMutation({
     mutationFn: (data: any) => spacesApi.update(id as string, data),
@@ -98,27 +101,30 @@ export default function EditSpaceScreen() {
     onError: (error: any) => {
       Alert.alert(
         'Erro',
-        error.response?.data?.message || 'Não foi possível atualizar o espaço.'
+        error.response?.data?.message || 'Não foi possível atualizar o espaço.',
       );
     },
   });
 
-  const onSubmit = useCallback((data: SpaceFormData) => {
-    const isNewImage = imageUri && !imageUri.startsWith('http');
-    
-    updateMutation.mutate({
-      name: data.name,
-      description: data.description,
-      capacity: Number(data.capacity),
-      resources: space?.resources || [],
-      availableHours: data.availableHours || space?.availableHours || [],
-      availability: data.availability,
-      isAllDayBooking: data.isAllDayBooking,
-      allDayStartTime: data.allDayStartTime,
-      allDayEndTime: data.allDayEndTime,
-      imageUri: isNewImage ? imageUri : undefined,
-    });
-  }, [imageUri, space, updateMutation]);
+  const onSubmit = useCallback(
+    (data: SpaceFormData) => {
+      const isNewImage = imageUri && !imageUri.startsWith('http');
+
+      updateMutation.mutate({
+        name: data.name,
+        description: data.description,
+        capacity: Number(data.capacity),
+        resources: space?.resources || [],
+        availableHours: data.availableHours || space?.availableHours || [],
+        availability: data.availability,
+        isAllDayBooking: data.isAllDayBooking,
+        allDayStartTime: data.allDayStartTime,
+        allDayEndTime: data.allDayEndTime,
+        imageUri: isNewImage ? imageUri : undefined,
+      });
+    },
+    [imageUri, space, updateMutation],
+  );
 
   if (spaceLoading) {
     return <Loading message="Carregando..." />;
@@ -151,7 +157,11 @@ export default function EditSpaceScreen() {
                 onBlur={onBlur}
                 error={errors.name?.message}
                 leftIcon={
-                  <Ionicons name="business-outline" size={20} color={colors.textSecondary} />
+                  <Ionicons
+                    name="business-outline"
+                    size={20}
+                    color={colors.textSecondary}
+                  />
                 }
               />
             )}
@@ -171,7 +181,11 @@ export default function EditSpaceScreen() {
                 multiline
                 numberOfLines={3}
                 leftIcon={
-                  <Ionicons name="document-text-outline" size={20} color={colors.textSecondary} />
+                  <Ionicons
+                    name="document-text-outline"
+                    size={20}
+                    color={colors.textSecondary}
+                  />
                 }
               />
             )}
@@ -190,7 +204,11 @@ export default function EditSpaceScreen() {
                 error={errors.capacity?.message}
                 keyboardType="numeric"
                 leftIcon={
-                  <Ionicons name="people-outline" size={20} color={colors.textSecondary} />
+                  <Ionicons
+                    name="people-outline"
+                    size={20}
+                    color={colors.textSecondary}
+                  />
                 }
               />
             )}
@@ -198,7 +216,11 @@ export default function EditSpaceScreen() {
 
           <View style={styles.switchContainer}>
             <View style={styles.switchLabel}>
-              <Ionicons name="checkmark-circle-outline" size={20} color={colors.textSecondary} />
+              <Ionicons
+                name="checkmark-circle-outline"
+                size={20}
+                color={colors.textSecondary}
+              />
               <Text style={styles.label}>Disponível</Text>
             </View>
             <Controller
@@ -208,7 +230,10 @@ export default function EditSpaceScreen() {
                 <Switch
                   value={value}
                   onValueChange={onChange}
-                  trackColor={{ false: colors.border, true: colors.primary + '60' }}
+                  trackColor={{
+                    false: colors.border,
+                    true: colors.primary + '60',
+                  }}
                   thumbColor={value ? colors.primary : colors.gray}
                 />
               )}
@@ -217,7 +242,11 @@ export default function EditSpaceScreen() {
 
           <View style={styles.switchContainer}>
             <View style={styles.switchLabel}>
-              <Ionicons name="calendar-outline" size={20} color={colors.textSecondary} />
+              <Ionicons
+                name="calendar-outline"
+                size={20}
+                color={colors.textSecondary}
+              />
               <View>
                 <Text style={styles.label}>Reserva de dia inteiro</Text>
                 <Text style={styles.sublabel}>Ex: Salão de festas</Text>
@@ -230,7 +259,10 @@ export default function EditSpaceScreen() {
                 <Switch
                   value={value}
                   onValueChange={onChange}
-                  trackColor={{ false: colors.border, true: colors.accent + '60' }}
+                  trackColor={{
+                    false: colors.border,
+                    true: colors.accent + '60',
+                  }}
                   thumbColor={value ? colors.accent : colors.gray}
                 />
               )}
@@ -240,7 +272,7 @@ export default function EditSpaceScreen() {
           {isAllDayBooking && (
             <View style={styles.allDayTimesContainer}>
               <Text style={styles.sectionTitle}>Horários do Dia Inteiro</Text>
-              
+
               <Controller
                 control={control}
                 name="allDayStartTime"
@@ -253,7 +285,11 @@ export default function EditSpaceScreen() {
                     onBlur={onBlur}
                     error={errors.allDayStartTime?.message}
                     leftIcon={
-                      <Ionicons name="time-outline" size={20} color={colors.textSecondary} />
+                      <Ionicons
+                        name="time-outline"
+                        size={20}
+                        color={colors.textSecondary}
+                      />
                     }
                   />
                 )}
@@ -271,14 +307,22 @@ export default function EditSpaceScreen() {
                     onBlur={onBlur}
                     error={errors.allDayEndTime?.message}
                     leftIcon={
-                      <Ionicons name="time-outline" size={20} color={colors.textSecondary} />
+                      <Ionicons
+                        name="time-outline"
+                        size={20}
+                        color={colors.textSecondary}
+                      />
                     }
                   />
                 )}
               />
 
               <View style={styles.infoBox}>
-                <Ionicons name="information-circle" size={18} color={colors.accent} />
+                <Ionicons
+                  name="information-circle"
+                  size={18}
+                  color={colors.accent}
+                />
                 <Text style={styles.infoText}>
                   Use o formato HH:MM (ex: 11:00, 22:00).
                 </Text>
@@ -292,7 +336,7 @@ export default function EditSpaceScreen() {
               <Text style={styles.sectionSubtitle}>
                 Selecione os horários em que o espaço estará disponível
               </Text>
-              
+
               <View style={styles.hoursGrid}>
                 {allAvailableHours.map((hour) => {
                   const isSelected = selectedHours.includes(hour);
@@ -313,7 +357,11 @@ export default function EditSpaceScreen() {
                         ]}
                       >
                         {isSelected && (
-                          <Ionicons name="checkmark" size={16} color={colors.white} />
+                          <Ionicons
+                            name="checkmark"
+                            size={16}
+                            color={colors.white}
+                          />
                         )}
                       </View>
                       <Text
@@ -330,9 +378,14 @@ export default function EditSpaceScreen() {
               </View>
 
               <View style={styles.infoBox}>
-                <Ionicons name="information-circle" size={18} color={colors.accent} />
+                <Ionicons
+                  name="information-circle"
+                  size={18}
+                  color={colors.accent}
+                />
                 <Text style={styles.infoText}>
-                  Selecione todos os horários em que o espaço estará disponível para reservas.
+                  Selecione todos os horários em que o espaço estará disponível
+                  para reservas.
                 </Text>
               </View>
             </View>
@@ -481,4 +534,3 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
-

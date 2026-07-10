@@ -37,16 +37,24 @@ export default function CreateBookingScreen() {
   const [selectedSpaceId] = useState<string>((params.spaceId as string) || '');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedTimeSlots, setSelectedTimeSlots] = useState<string[]>([]);
-  const [availability, setAvailability] = useState<SpaceAvailability | null>(null);
+  const [availability, setAvailability] = useState<SpaceAvailability | null>(
+    null,
+  );
   const [isLoadingAvailability, setIsLoadingAvailability] = useState(false);
 
-  const { data: spaces, isLoading: spacesLoading, error: spacesError } = useQuery({
+  const {
+    data: spaces,
+    isLoading: spacesLoading,
+    error: spacesError,
+  } = useQuery({
     queryKey: ['spaces'],
     queryFn: spacesApi.getAll,
   });
 
-  const selectedSpace = useMemo(() =>
-    spaces?.find((s) => s.id === selectedSpaceId), [spaces, selectedSpaceId]);
+  const selectedSpace = useMemo(
+    () => spaces?.find((s) => s.id === selectedSpaceId),
+    [spaces, selectedSpaceId],
+  );
 
   const fetchAvailability = useCallback(async () => {
     if (!selectedSpaceId || !selectedDate) return;
@@ -61,13 +69,14 @@ export default function CreateBookingScreen() {
       const availabilityData = await spacesApi.getAvailability(
         selectedSpaceId,
         dateStr,
-        timezone
+        timezone,
       );
       setAvailability(availabilityData);
     } catch (error: any) {
       Alert.alert(
         'Erro',
-        error.response?.data?.message || 'Não foi possível carregar os horários disponíveis.'
+        error.response?.data?.message ||
+          'Não foi possível carregar os horários disponíveis.',
       );
     } finally {
       setIsLoadingAvailability(false);
@@ -92,7 +101,7 @@ export default function CreateBookingScreen() {
     onError: (error: any) => {
       Alert.alert(
         'Erro',
-        error.response?.data?.message || 'Não foi possível criar a reserva.'
+        error.response?.data?.message || 'Não foi possível criar a reserva.',
       );
     },
   });
@@ -173,7 +182,8 @@ export default function CreateBookingScreen() {
       <View style={styles.container}>
         <Card>
           <Text style={styles.errorText}>
-            Erro ao carregar espaços: {(spacesError as any)?.message || 'Erro desconhecido'}
+            Erro ao carregar espaços:{' '}
+            {(spacesError as any)?.message || 'Erro desconhecido'}
           </Text>
           <Button title="Tentar novamente" onPress={() => router.back()} />
         </Card>
@@ -187,9 +197,14 @@ export default function CreateBookingScreen() {
         <Card>
           <Text style={styles.title}>Nenhum espaço disponível</Text>
           <Text style={styles.label}>
-            Não há espaços cadastrados no momento. Entre em contato com o administrador.
+            Não há espaços cadastrados no momento. Entre em contato com o
+            administrador.
           </Text>
-          <Button title="Voltar" onPress={() => router.back()} style={{ marginTop: spacing.lg }} />
+          <Button
+            title="Voltar"
+            onPress={() => router.back()}
+            style={{ marginTop: spacing.lg }}
+          />
         </Card>
       </View>
     );
@@ -212,12 +227,20 @@ export default function CreateBookingScreen() {
                 />
               )}
               <View style={styles.spacePreviewContent}>
-                <Text style={styles.spacePreviewTitle}>{selectedSpace.name}</Text>
+                <Text style={styles.spacePreviewTitle}>
+                  {selectedSpace.name}
+                </Text>
                 {selectedSpace.description && (
-                  <Text style={styles.spacePreviewDesc}>{selectedSpace.description}</Text>
+                  <Text style={styles.spacePreviewDesc}>
+                    {selectedSpace.description}
+                  </Text>
                 )}
                 <View style={styles.spacePreviewRow}>
-                  <Ionicons name="people-outline" size={16} color={colors.textSecondary} />
+                  <Ionicons
+                    name="people-outline"
+                    size={16}
+                    color={colors.textSecondary}
+                  />
                   <Text style={styles.spacePreviewText}>
                     Capacidade: {selectedSpace.capacity} pessoas
                   </Text>
@@ -225,7 +248,9 @@ export default function CreateBookingScreen() {
                 {selectedSpace.isAllDayBooking && (
                   <View style={styles.allDayBadge}>
                     <Ionicons name="calendar" size={14} color={colors.accent} />
-                    <Text style={styles.allDayBadgeText}>Reserva de dia inteiro</Text>
+                    <Text style={styles.allDayBadgeText}>
+                      Reserva de dia inteiro
+                    </Text>
                   </View>
                 )}
               </View>
@@ -244,7 +269,11 @@ export default function CreateBookingScreen() {
               >
                 <View style={styles.dateButtonContent}>
                   <View style={styles.dateIconContainer}>
-                    <Ionicons name="calendar" size={24} color={colors.primary} />
+                    <Ionicons
+                      name="calendar"
+                      size={24}
+                      color={colors.primary}
+                    />
                   </View>
                   <View style={styles.dateTextContainer}>
                     <Text style={styles.dateLabel}>Data selecionada</Text>
@@ -254,7 +283,11 @@ export default function CreateBookingScreen() {
                       })}
                     </Text>
                   </View>
-                  <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+                  <Ionicons
+                    name="chevron-forward"
+                    size={20}
+                    color={colors.textSecondary}
+                  />
                 </View>
               </Pressable>
             </View>
@@ -280,14 +313,16 @@ export default function CreateBookingScreen() {
 
           <Card variant="outlined" style={styles.tipsCard}>
             <Text style={styles.tipsTitle}>💡 Dicas</Text>
-            <Text style={styles.tipsText}>• Selecione um espaço e data para ver os horários</Text>
             <Text style={styles.tipsText}>
-              • <Text style={styles.tipsBold}>Espaços de dia inteiro:</Text> Podem ser reservados
-              mesmo se o horário de início já passou
+              • Selecione um espaço e data para ver os horários
             </Text>
             <Text style={styles.tipsText}>
-              • <Text style={styles.tipsBold}>Espaços por hora:</Text> Horários passados não podem
-              ser reservados
+              • <Text style={styles.tipsBold}>Espaços de dia inteiro:</Text>{' '}
+              Podem ser reservados mesmo se o horário de início já passou
+            </Text>
+            <Text style={styles.tipsText}>
+              • <Text style={styles.tipsBold}>Espaços por hora:</Text> Horários
+              passados não podem ser reservados
             </Text>
             <Text style={styles.tipsText}>
               • Você pode selecionar múltiplos horários consecutivos
@@ -516,4 +551,3 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
-

@@ -51,70 +51,64 @@ export function DatePickerPopover({
 
   return (
     <Portal hostName="root">
-      <Pressable 
-        style={styles.backdrop} 
-        onPress={onDismiss}
-      >
-        <View 
-          style={styles.container} 
-          onStartShouldSetResponder={() => true}
-        >
-            <View style={styles.header}>
-              <Text style={styles.title}>{title}</Text>
-              <TouchableOpacity onPress={onDismiss} style={styles.closeButton}>
-                <Ionicons name="close" size={24} color={colors.text} />
-              </TouchableOpacity>
-            </View>
+      <Pressable style={styles.backdrop} onPress={onDismiss}>
+        <View style={styles.container} onStartShouldSetResponder={() => true}>
+          <View style={styles.header}>
+            <Text style={styles.title}>{title}</Text>
+            <TouchableOpacity onPress={onDismiss} style={styles.closeButton}>
+              <Ionicons name="close" size={24} color={colors.text} />
+            </TouchableOpacity>
+          </View>
 
-            <View style={styles.pickerContainer}>
-              {Platform.OS === 'ios' ? (
-                <DateTimePicker
-                  value={tempDate}
-                  mode={mode}
-                  display="spinner"
-                  minimumDate={minimumDate}
-                  is24Hour={is24Hour}
-                  onChange={(event, selectedDate) => {
-                    if (selectedDate) {
-                      setTempDate(selectedDate);
-                    }
-                  }}
-                  style={styles.picker}
-                />
-              ) : (
-                <DateTimePicker
-                  value={tempDate}
-                  mode={mode}
-                  display="default"
-                  minimumDate={minimumDate}
-                  is24Hour={is24Hour}
-                  onChange={(event, selectedDate) => {
-                    if (event.type === 'set' && selectedDate) {
-                      onConfirm(selectedDate);
-                    }
-                    onDismiss();
-                  }}
-                />
-              )}
-            </View>
-
-            {Platform.OS === 'ios' && (
-              <View style={styles.buttonRow}>
-                <Button
-                  title="Cancelar"
-                  variant="outline"
-                  onPress={onDismiss}
-                  style={styles.button}
-                />
-                <Button
-                  title="Confirmar"
-                  onPress={handleConfirm}
-                  style={styles.button}
-                />
-              </View>
+          <View style={styles.pickerContainer}>
+            {Platform.OS === 'ios' ? (
+              <DateTimePicker
+                value={tempDate}
+                mode={mode}
+                display="spinner"
+                minimumDate={minimumDate}
+                is24Hour={is24Hour}
+                onChange={(event, selectedDate) => {
+                  if (selectedDate) {
+                    setTempDate(selectedDate);
+                  }
+                }}
+                style={styles.picker}
+              />
+            ) : (
+              <DateTimePicker
+                value={tempDate}
+                mode={mode}
+                display="default"
+                minimumDate={minimumDate}
+                is24Hour={is24Hour}
+                onChange={(event, selectedDate) => {
+                  if (event.type === 'set' && selectedDate) {
+                    onConfirm(selectedDate);
+                  }
+                  onDismiss();
+                }}
+              />
             )}
           </View>
-        </Pressable>
+
+          {Platform.OS === 'ios' && (
+            <View style={styles.buttonRow}>
+              <Button
+                title="Cancelar"
+                variant="outline"
+                onPress={onDismiss}
+                style={styles.button}
+              />
+              <Button
+                title="Confirmar"
+                onPress={handleConfirm}
+                style={styles.button}
+              />
+            </View>
+          )}
+        </View>
+      </Pressable>
     </Portal>
   );
 }
@@ -174,4 +168,3 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
-

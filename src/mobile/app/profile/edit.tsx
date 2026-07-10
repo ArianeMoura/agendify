@@ -64,7 +64,7 @@ export default function EditProfileScreen() {
     onError: (error: any) => {
       Alert.alert(
         'Erro',
-        error.response?.data?.message || 'Não foi possível atualizar o perfil.'
+        error.response?.data?.message || 'Não foi possível atualizar o perfil.',
       );
     },
   });
@@ -94,7 +94,11 @@ export default function EditProfileScreen() {
                 onBlur={onBlur}
                 error={errors.name?.message}
                 leftIcon={
-                  <Ionicons name="person-outline" size={20} color={colors.textSecondary} />
+                  <Ionicons
+                    name="person-outline"
+                    size={20}
+                    color={colors.textSecondary}
+                  />
                 }
               />
             )}
@@ -114,7 +118,11 @@ export default function EditProfileScreen() {
                 keyboardType="email-address"
                 autoCapitalize="none"
                 leftIcon={
-                  <Ionicons name="mail-outline" size={20} color={colors.textSecondary} />
+                  <Ionicons
+                    name="mail-outline"
+                    size={20}
+                    color={colors.textSecondary}
+                  />
                 }
               />
             )}
@@ -162,4 +170,3 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
-

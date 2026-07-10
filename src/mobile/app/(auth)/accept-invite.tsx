@@ -56,14 +56,17 @@ export default function AcceptInviteScreen() {
     onError: (error: any) => {
       Alert.alert(
         'Erro ao aceitar convite',
-        error.response?.data?.message || 'Convite inválido ou expirado.'
+        error.response?.data?.message || 'Convite inválido ou expirado.',
       );
     },
   });
 
-  const onSubmit = useCallback(async (data: AcceptInviteFormData) => {
-    await accept(data);
-  }, [accept]);
+  const onSubmit = useCallback(
+    async (data: AcceptInviteFormData) => {
+      await accept(data);
+    },
+    [accept],
+  );
 
   return (
     <KeyboardAvoidingView
@@ -93,7 +96,13 @@ export default function AcceptInviteScreen() {
                 error={errors.token?.message}
                 autoCapitalize="none"
                 autoCorrect={false}
-                leftIcon={<Ionicons name="key-outline" size={20} color={colors.textSecondary} />}
+                leftIcon={
+                  <Ionicons
+                    name="key-outline"
+                    size={20}
+                    color={colors.textSecondary}
+                  />
+                }
               />
             )}
           />
@@ -109,7 +118,13 @@ export default function AcceptInviteScreen() {
                 onChangeText={onChange}
                 onBlur={onBlur}
                 error={errors.name?.message}
-                leftIcon={<Ionicons name="person-outline" size={20} color={colors.textSecondary} />}
+                leftIcon={
+                  <Ionicons
+                    name="person-outline"
+                    size={20}
+                    color={colors.textSecondary}
+                  />
+                }
               />
             )}
           />
@@ -126,9 +141,17 @@ export default function AcceptInviteScreen() {
                 onBlur={onBlur}
                 error={errors.password?.message}
                 secureTextEntry={!showPassword}
-                leftIcon={<Ionicons name="lock-closed-outline" size={20} color={colors.textSecondary} />}
+                leftIcon={
+                  <Ionicons
+                    name="lock-closed-outline"
+                    size={20}
+                    color={colors.textSecondary}
+                  />
+                }
                 rightIcon={
-                  <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                  <TouchableOpacity
+                    onPress={() => setShowPassword(!showPassword)}
+                  >
                     <Ionicons
                       name={showPassword ? 'eye-outline' : 'eye-off-outline'}
                       size={20}
@@ -148,7 +171,10 @@ export default function AcceptInviteScreen() {
             style={styles.submitButton}
           />
 
-          <TouchableOpacity style={styles.loginLink} onPress={() => router.replace('/(auth)/login')}>
+          <TouchableOpacity
+            style={styles.loginLink}
+            onPress={() => router.replace('/(auth)/login')}
+          >
             <Text style={styles.loginText}>
               Já tem conta? <Text style={styles.loginTextBold}>Entrar</Text>
             </Text>

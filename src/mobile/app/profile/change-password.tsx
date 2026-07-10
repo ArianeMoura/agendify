@@ -69,7 +69,7 @@ export default function ChangePasswordScreen() {
     onError: (error: any) => {
       Alert.alert(
         'Erro',
-        error.response?.data?.message || 'Não foi possível alterar a senha.'
+        error.response?.data?.message || 'Não foi possível alterar a senha.',
       );
     },
   });
@@ -107,7 +107,9 @@ export default function ChangePasswordScreen() {
                   />
                 }
                 rightIcon={
-                  <TouchableOpacity onPress={() => setShowNewPassword(!showNewPassword)}>
+                  <TouchableOpacity
+                    onPress={() => setShowNewPassword(!showNewPassword)}
+                  >
                     <Ionicons
                       name={showNewPassword ? 'eye-outline' : 'eye-off-outline'}
                       size={20}
@@ -143,7 +145,9 @@ export default function ChangePasswordScreen() {
                     onPress={() => setShowConfirmPassword(!showConfirmPassword)}
                   >
                     <Ionicons
-                      name={showConfirmPassword ? 'eye-outline' : 'eye-off-outline'}
+                      name={
+                        showConfirmPassword ? 'eye-outline' : 'eye-off-outline'
+                      }
                       size={20}
                       color={colors.textSecondary}
                     />
@@ -195,4 +199,3 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
-

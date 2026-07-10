@@ -19,14 +19,20 @@ interface ImagePickerProps {
   error?: string;
 }
 
-export function ImagePicker({ imageUri, onImageSelect, label, error }: ImagePickerProps) {
+export function ImagePicker({
+  imageUri,
+  onImageSelect,
+  label,
+  error,
+}: ImagePickerProps) {
   const requestPermission = useCallback(async () => {
     if (Platform.OS !== 'web') {
-      const { status } = await ExpoImagePicker.requestMediaLibraryPermissionsAsync();
+      const { status } =
+        await ExpoImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== 'granted') {
         Alert.alert(
           'Permissão necessária',
-          'Precisamos de permissão para acessar suas fotos.'
+          'Precisamos de permissão para acessar suas fotos.',
         );
         return false;
       }
@@ -63,7 +69,7 @@ export function ImagePicker({ imageUri, onImageSelect, label, error }: ImagePick
       if (status !== 'granted') {
         Alert.alert(
           'Permissão necessária',
-          'Precisamos de permissão para usar a câmera.'
+          'Precisamos de permissão para usar a câmera.',
         );
         return;
       }
@@ -100,26 +106,22 @@ export function ImagePicker({ imageUri, onImageSelect, label, error }: ImagePick
           style: 'cancel',
         },
       ],
-      { cancelable: true }
+      { cancelable: true },
     );
   }, [takePhoto, pickImage]);
 
   const removeImage = useCallback(() => {
-    Alert.alert(
-      'Remover Imagem',
-      'Tem certeza que deseja remover a imagem?',
-      [
-        {
-          text: 'Cancelar',
-          style: 'cancel',
-        },
-        {
-          text: 'Remover',
-          style: 'destructive',
-          onPress: () => onImageSelect(''),
-        },
-      ]
-    );
+    Alert.alert('Remover Imagem', 'Tem certeza que deseja remover a imagem?', [
+      {
+        text: 'Cancelar',
+        style: 'cancel',
+      },
+      {
+        text: 'Remover',
+        style: 'destructive',
+        onPress: () => onImageSelect(''),
+      },
+    ]);
   }, [onImageSelect]);
 
   return (
@@ -128,20 +130,36 @@ export function ImagePicker({ imageUri, onImageSelect, label, error }: ImagePick
 
       {imageUri ? (
         <View style={styles.imageContainer}>
-          <Image source={{ uri: imageUri }} style={styles.image} resizeMode="cover" />
+          <Image
+            source={{ uri: imageUri }}
+            style={styles.image}
+            resizeMode="cover"
+          />
           <View style={styles.imageOverlay}>
-            <TouchableOpacity style={styles.overlayButton} onPress={showOptions}>
+            <TouchableOpacity
+              style={styles.overlayButton}
+              onPress={showOptions}
+            >
               <Ionicons name="pencil" size={20} color={colors.white} />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.overlayButton} onPress={removeImage}>
+            <TouchableOpacity
+              style={styles.overlayButton}
+              onPress={removeImage}
+            >
               <Ionicons name="trash" size={20} color={colors.white} />
             </TouchableOpacity>
           </View>
         </View>
       ) : (
         <TouchableOpacity style={styles.placeholder} onPress={showOptions}>
-          <Ionicons name="image-outline" size={48} color={colors.textSecondary} />
-          <Text style={styles.placeholderText}>Toque para adicionar uma imagem</Text>
+          <Ionicons
+            name="image-outline"
+            size={48}
+            color={colors.textSecondary}
+          />
+          <Text style={styles.placeholderText}>
+            Toque para adicionar uma imagem
+          </Text>
           <Text style={styles.placeholderSubtext}>
             Formatos: JPG, PNG, GIF (máximo 5MB)
           </Text>
@@ -219,4 +237,3 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs,
   },
 });
-

@@ -16,8 +16,13 @@ export const authApi = {
 
   // Aceita um convite (anônimo): cria a conta no tenant do convite. Não devolve
   // tokens — em seguida o chamador faz login com o e-mail retornado + a senha.
-  acceptInvitation: async (data: AcceptInvitationRequest): Promise<AcceptInvitationResponse> => {
-    const response = await api.post<AcceptInvitationResponse>('/invitations/accept', data);
+  acceptInvitation: async (
+    data: AcceptInvitationRequest,
+  ): Promise<AcceptInvitationResponse> => {
+    const response = await api.post<AcceptInvitationResponse>(
+      '/invitations/accept',
+      data,
+    );
     return response.data;
   },
 
@@ -27,7 +32,9 @@ export const authApi = {
   },
 
   refresh: async (refreshToken: string): Promise<LoginResponse> => {
-    const response = await api.post<LoginResponse>('/auth/refresh', { refreshToken });
+    const response = await api.post<LoginResponse>('/auth/refresh', {
+      refreshToken,
+    });
     return response.data;
   },
 

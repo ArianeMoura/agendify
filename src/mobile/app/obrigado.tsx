@@ -1,5 +1,12 @@
-import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, StatusBar } from 'react-native';
-import { Link } from 'expo-router'; 
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  SafeAreaView,
+  StatusBar,
+} from 'react-native';
+import { Link } from 'expo-router';
 
 const Cores = {
   primaryPurple: '#9543dcff',
@@ -10,31 +17,32 @@ const Cores = {
 };
 
 export default function ObrigadoScreen() {
-  
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor={Cores.headerPurple} />
-      
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor={Cores.headerPurple}
+      />
+
       <View style={styles.topBar}></View>
 
       <View style={styles.loginContainer}>
-
         <View style={styles.recoveryContent}>
           {/* O ícone de check foi removido para evitar erros de pacote */}
-          <Text style={styles.checkIcon}>✔</Text> 
-          
+          <Text style={styles.checkIcon}>✔</Text>
+
           <Text style={styles.recoveryTitle}>Avaliação Enviada!</Text>
           <Text style={styles.recoveryText}>
-            Obrigado pelo seu feedback. Sua opinião é muito importante para melhorarmos nossos espaços.
+            Obrigado pelo seu feedback. Sua opinião é muito importante para
+            melhorarmos nossos espaços.
           </Text>
-          
+
           <Link href="/(tabs)" asChild>
             <TouchableOpacity style={styles.actionButton}>
               <Text style={styles.actionButtonText}>AVALIAR OUTRO ESPAÇO</Text>
             </TouchableOpacity>
           </Link>
         </View>
-
       </View>
     </SafeAreaView>
   );
@@ -56,13 +64,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 20,
   },
-  
+
   recoveryContent: {
     width: '100%',
     maxWidth: 400,
     alignItems: 'center',
   },
-  
+
   checkIcon: {
     fontSize: 80,
     color: Cores.primaryPurple,
@@ -83,7 +91,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     textAlign: 'center',
   },
- 
+
   actionButton: {
     width: '100%',
     backgroundColor: Cores.primaryPurple,
@@ -91,7 +99,7 @@ const styles = StyleSheet.create({
     paddingVertical: 18,
     paddingHorizontal: 20,
     alignItems: 'center',
-    marginTop: 16, 
+    marginTop: 16,
   },
   actionButtonText: {
     color: 'white',

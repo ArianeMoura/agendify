@@ -1,8 +1,13 @@
-import { StyleSheet, View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+} from 'react-native';
 import { Link } from 'expo-router';
 
 export default function EscolherEspacoScreen() {
-
   const espacos = [
     { id: 'sala_a', nome: 'Sala de Reunião A' },
     { id: 'cabine_b', nome: 'Cabine Foco B' },
@@ -12,7 +17,6 @@ export default function EscolherEspacoScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-
       <Text style={styles.selectionTitle}>O que você gostaria de fazer?</Text>
 
       {espacos.map((espaco) => (
@@ -21,8 +25,8 @@ export default function EscolherEspacoScreen() {
 
           <Link
             href={{
-              pathname: "/avaliar",
-              params: { id: espaco.id, nome: espaco.nome }
+              pathname: '/avaliar',
+              params: { id: espaco.id, nome: espaco.nome },
             }}
             asChild
           >
@@ -38,7 +42,6 @@ export default function EscolherEspacoScreen() {
           <Text>Ver Avaliações Recebidas</Text>
         </TouchableOpacity>
       </Link>
-
     </ScrollView>
   );
 }
@@ -90,5 +93,5 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 380,
     alignItems: 'center',
-  }
+  },
 });

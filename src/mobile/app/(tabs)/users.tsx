@@ -20,7 +20,11 @@ import { User, Role } from '@/lib/types';
 export default function UsersScreen() {
   const queryClient = useQueryClient();
 
-  const { data: users, isLoading, refetch } = useQuery({
+  const {
+    data: users,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ['users'],
     queryFn: usersApi.getAll,
   });
@@ -36,20 +40,23 @@ export default function UsersScreen() {
     },
   });
 
-  const handleDelete = useCallback((id: string, name: string) => {
-    Alert.alert(
-      'Confirmar exclusão',
-      `Tem certeza que deseja excluir o usuário "${name}"?`,
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Excluir',
-          style: 'destructive',
-          onPress: () => deleteMutation.mutate(id),
-        },
-      ]
-    );
-  }, [deleteMutation]);
+  const handleDelete = useCallback(
+    (id: string, name: string) => {
+      Alert.alert(
+        'Confirmar exclusão',
+        `Tem certeza que deseja excluir o usuário "${name}"?`,
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          {
+            text: 'Excluir',
+            style: 'destructive',
+            onPress: () => deleteMutation.mutate(id),
+          },
+        ],
+      );
+    },
+    [deleteMutation],
+  );
 
   const formatDate = useCallback((dateString: string) => {
     const date = new Date(dateString);
@@ -60,7 +67,9 @@ export default function UsersScreen() {
     <Card style={styles.userCard}>
       <View style={styles.userHeader}>
         <View style={styles.avatar}>
-          <Text style={styles.avatarText}>{item.name.charAt(0).toUpperCase()}</Text>
+          <Text style={styles.avatarText}>
+            {item.name.charAt(0).toUpperCase()}
+          </Text>
         </View>
 
         <View style={styles.userInfo}>
@@ -96,7 +105,11 @@ export default function UsersScreen() {
           </View>
 
           <View style={styles.dateContainer}>
-            <Ionicons name="calendar-outline" size={12} color={colors.textLight} />
+            <Ionicons
+              name="calendar-outline"
+              size={12}
+              color={colors.textLight}
+            />
             <Text style={styles.dateText}>
               Criado em {formatDate(item.createdAt)}
             </Text>
@@ -211,4 +224,3 @@ const styles = StyleSheet.create({
     padding: spacing.xs,
   },
 });
-

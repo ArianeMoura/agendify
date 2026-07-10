@@ -7,7 +7,8 @@ import { Role } from '@/lib/types';
 
 export default function TabLayout() {
   const { user } = useAuth();
-  const isAdmin = user?.role === Role.OrgAdmin || user?.role === Role.PlatformOwner;
+  const isAdmin =
+    user?.role === Role.OrgAdmin || user?.role === Role.PlatformOwner;
 
   return (
     <Tabs

@@ -1,5 +1,15 @@
 import { useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, ScrollView, TextInput, Alert, Switch, StatusBar } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  TextInput,
+  Alert,
+  Switch,
+  StatusBar,
+} from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Picker } from '@react-native-picker/picker';
 import { reviewsApi } from '../../lib/api/reviews';
@@ -17,19 +27,22 @@ export default function AvaliarScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
 
-  const [rating, setRating] = useState<string>("0");
-  const [purpose, setPurpose] = useState<string>("");
+  const [rating, setRating] = useState<string>('0');
+  const [purpose, setPurpose] = useState<string>('');
   const [hadProblem, setHadProblem] = useState<boolean>(false);
-  const [problemDetails, setProblemDetails] = useState<string>("");
-  const [feedback, setFeedback] = useState<string>("");
+  const [problemDetails, setProblemDetails] = useState<string>('');
+  const [feedback, setFeedback] = useState<string>('');
   const [isAnonymous, setIsAnonymous] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   // Envia a avaliação para a própria API (RF-013), não mais a um Google Form de
   // terceiros. O usuário vem do token; os campos extras compõem o comentário.
   const handleSubmit = async () => {
-    if (rating === "0" || !purpose) {
-      Alert.alert("Campos Obrigatórios", "Por favor, selecione uma nota e um propósito.");
+    if (rating === '0' || !purpose) {
+      Alert.alert(
+        'Campos Obrigatórios',
+        'Por favor, selecione uma nota e um propósito.',
+      );
       return;
     }
 
@@ -37,7 +50,9 @@ export default function AvaliarScreen() {
 
     const commentParts = [
       `Propósito: ${purpose}`,
-      hadProblem ? `Problema: ${problemDetails || 'sim (sem detalhes)'}` : 'Sem problemas técnicos',
+      hadProblem
+        ? `Problema: ${problemDetails || 'sim (sem detalhes)'}`
+        : 'Sem problemas técnicos',
       feedback ? `Feedback: ${feedback}` : null,
     ].filter(Boolean);
 
@@ -50,7 +65,7 @@ export default function AvaliarScreen() {
       router.push('/obrigado');
     } catch (error) {
       console.error('Erro ao enviar avaliação:', error);
-      Alert.alert("Erro", "Falha ao enviar avaliação. Tente novamente.");
+      Alert.alert('Erro', 'Falha ao enviar avaliação. Tente novamente.');
       setIsSubmitting(false);
     }
   };
@@ -58,8 +73,16 @@ export default function AvaliarScreen() {
   const StarRating = () => (
     <View style={styles.starRating}>
       {[1, 2, 3, 4, 5].map((value) => (
-        <TouchableOpacity key={value} onPress={() => setRating(value.toString())}>
-          <Text style={[styles.starIcon, parseInt(rating) >= value ? styles.starFilled : {}]}>
+        <TouchableOpacity
+          key={value}
+          onPress={() => setRating(value.toString())}
+        >
+          <Text
+            style={[
+              styles.starIcon,
+              parseInt(rating) >= value ? styles.starFilled : {},
+            ]}
+          >
             ★
           </Text>
         </TouchableOpacity>
@@ -68,11 +91,14 @@ export default function AvaliarScreen() {
   );
 
   return (
-    <ScrollView style={styles.safeArea} contentContainerStyle={styles.container}>
+    <ScrollView
+      style={styles.safeArea}
+      contentContainerStyle={styles.container}
+    >
       <StatusBar barStyle="dark-content" backgroundColor={Cores.pageBg} />
 
       <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-        <Text style={styles.backButtonText}>{"< Voltar"}</Text>
+        <Text style={styles.backButtonText}>{'< Voltar'}</Text>
       </TouchableOpacity>
 
       <View style={styles.evaluationFormContainer}>
@@ -84,7 +110,9 @@ export default function AvaliarScreen() {
         <Text style={styles.formLabel}>Nota Geral:</Text>
         <StarRating />
 
-        <Text style={styles.formLabel}>Qual foi o propósito da sua reserva?</Text>
+        <Text style={styles.formLabel}>
+          Qual foi o propósito da sua reserva?
+        </Text>
         <View style={styles.pickerContainer}>
           <Picker
             selectedValue={purpose}
@@ -92,10 +120,19 @@ export default function AvaliarScreen() {
             style={styles.picker}
           >
             <Picker.Item label="Selecione uma opção..." value="" />
-            <Picker.Item label="Reunião com Cliente" value="Reunião com Cliente" />
+            <Picker.Item
+              label="Reunião com Cliente"
+              value="Reunião com Cliente"
+            />
             <Picker.Item label="Reunião Interna" value="Reunião Interna" />
-            <Picker.Item label="Trabalho Focado (Individual)" value="Trabalho Focado (Individual)" />
-            <Picker.Item label="Treinamento / Workshop" value="Treinamento / Workshop" />
+            <Picker.Item
+              label="Trabalho Focado (Individual)"
+              value="Trabalho Focado (Individual)"
+            />
+            <Picker.Item
+              label="Treinamento / Workshop"
+              value="Treinamento / Workshop"
+            />
             <Picker.Item label="Outro" value="Outro" />
           </Picker>
         </View>
@@ -104,9 +141,11 @@ export default function AvaliarScreen() {
         <View style={styles.switchContainer}>
           <Text>Não</Text>
           <Switch
-            trackColor={{ false: "#767577", true: Cores.primaryPurple }}
-            thumbColor={"#f4f3f4"}
-            onValueChange={() => setHadProblem(previousState => !previousState)}
+            trackColor={{ false: '#767577', true: Cores.primaryPurple }}
+            thumbColor={'#f4f3f4'}
+            onValueChange={() =>
+              setHadProblem((previousState) => !previousState)
+            }
             value={hadProblem}
           />
           <Text>Sim</Text>
@@ -114,7 +153,9 @@ export default function AvaliarScreen() {
 
         {hadProblem && (
           <View style={styles.problemDetailsContainer}>
-            <Text style={styles.formLabel}>Por favor, descreva o problema:</Text>
+            <Text style={styles.formLabel}>
+              Por favor, descreva o problema:
+            </Text>
             <TextInput
               style={styles.textArea}
               placeholder="Ex: O projetor não estava conectando..."
@@ -137,11 +178,15 @@ export default function AvaliarScreen() {
         />
 
         <View style={styles.switchContainer}>
-          <Text style={styles.checkboxLabel}>Enviar esta avaliação anonimamente</Text>
+          <Text style={styles.checkboxLabel}>
+            Enviar esta avaliação anonimamente
+          </Text>
           <Switch
-            trackColor={{ false: "#767577", true: Cores.primaryPurple }}
-            thumbColor={"#f4f3f4"}
-            onValueChange={() => setIsAnonymous(previousState => !previousState)}
+            trackColor={{ false: '#767577', true: Cores.primaryPurple }}
+            thumbColor={'#f4f3f4'}
+            onValueChange={() =>
+              setIsAnonymous((previousState) => !previousState)
+            }
             value={isAnonymous}
           />
         </View>
@@ -152,7 +197,7 @@ export default function AvaliarScreen() {
           disabled={isSubmitting}
         >
           <Text style={styles.actionButtonText}>
-            {isSubmitting ? "ENVIANDO..." : "ENVIAR AVALIAÇÃO"}
+            {isSubmitting ? 'ENVIANDO...' : 'ENVIAR AVALIAÇÃO'}
           </Text>
         </TouchableOpacity>
       </View>

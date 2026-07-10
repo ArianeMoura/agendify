@@ -32,7 +32,11 @@ export function TimeSlotPicker({
   if (timeSlots.length === 0) {
     return (
       <View style={styles.emptyContainer}>
-        <Ionicons name="calendar-outline" size={48} color={colors.textSecondary} />
+        <Ionicons
+          name="calendar-outline"
+          size={48}
+          color={colors.textSecondary}
+        />
         <Text style={styles.emptyText}>
           {isAllDayBooking
             ? 'Este espaço não possui horários configurados para reservas de dia inteiro.'
@@ -53,7 +57,7 @@ export function TimeSlotPicker({
           <Ionicons name="calendar" size={20} color={colors.primary} />
           <Text style={styles.allDayTitle}>Reserva de Dia Inteiro</Text>
         </View>
-        
+
         <Text style={styles.allDayInfo}>
           Disponível de {allDayStartTime} até {allDayEndTime}
         </Text>
@@ -87,7 +91,7 @@ export function TimeSlotPicker({
                 <Text style={styles.allDaySlotSubtext}>Dia inteiro</Text>
               </View>
             </View>
-            
+
             {isDisabled && (
               <View
                 style={[
@@ -111,8 +115,9 @@ export function TimeSlotPicker({
         <View style={styles.tipContainer}>
           <Ionicons name="information-circle" size={16} color={colors.accent} />
           <Text style={styles.tipText}>
-            Este espaço é reservado por dia inteiro. Você pode fazer a reserva mesmo se o horário
-            de início já passou, desde que o horário de término ainda não tenha chegado.
+            Este espaço é reservado por dia inteiro. Você pode fazer a reserva
+            mesmo se o horário de início já passou, desde que o horário de
+            término ainda não tenha chegado.
           </Text>
         </View>
       </View>
@@ -159,7 +164,11 @@ export function TimeSlotPicker({
                     ]}
                   >
                     {isSelected && (
-                      <Ionicons name="checkmark" size={18} color={colors.white} />
+                      <Ionicons
+                        name="checkmark"
+                        size={18}
+                        color={colors.white}
+                      />
                     )}
                   </View>
                   <View>
@@ -174,7 +183,7 @@ export function TimeSlotPicker({
                     <Text style={styles.slotDuration}>1 hora</Text>
                   </View>
                 </View>
-                
+
                 {isDisabled && (
                   <View
                     style={[
@@ -185,7 +194,9 @@ export function TimeSlotPicker({
                     <Text
                       style={[
                         styles.badgeText,
-                        slot.isPast ? styles.badgeTextPast : styles.badgeTextBooked,
+                        slot.isPast
+                          ? styles.badgeTextPast
+                          : styles.badgeTextBooked,
                       ]}
                     >
                       {slot.isPast ? 'Indisponível' : 'Reservado'}
@@ -375,4 +386,3 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs,
   },
 });
-

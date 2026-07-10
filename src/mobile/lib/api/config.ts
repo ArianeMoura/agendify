@@ -39,8 +39,13 @@ async function refreshAccessToken(): Promise<string | null> {
   const refreshToken = await tokenStore.getRefreshToken();
   if (!refreshToken) return null;
   try {
-    const res = await axios.post(`${API_BASE_URL}/auth/refresh`, { refreshToken });
-    const { token, refreshToken: newRefresh } = res.data as { token: string; refreshToken: string };
+    const res = await axios.post(`${API_BASE_URL}/auth/refresh`, {
+      refreshToken,
+    });
+    const { token, refreshToken: newRefresh } = res.data as {
+      token: string;
+      refreshToken: string;
+    };
     await tokenStore.setTokens(token, newRefresh);
     return token;
   } catch {
@@ -52,10 +57,16 @@ async function refreshAccessToken(): Promise<string | null> {
 api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
-    const original = error.config as (InternalAxiosRequestConfig & { _retry?: boolean }) | undefined;
+    const original = error.config as
+      (InternalAxiosRequestConfig & { _retry?: boolean }) | undefined;
     const isRefreshCall = original?.url?.includes('/auth/refresh');
 
-    if (error.response?.status === 401 && original && !original._retry && !isRefreshCall) {
+    if (
+      error.response?.status === 401 &&
+      original &&
+      !original._retry &&
+      !isRefreshCall
+    ) {
       original._retry = true;
       refreshing = refreshing ?? refreshAccessToken();
       const newToken = await refreshing;
@@ -72,5 +83,5 @@ api.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );

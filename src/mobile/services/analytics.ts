@@ -2,8 +2,8 @@
 import { api } from '../lib/api/config';
 
 export type PeakHourDto = {
-  startTime: string;        // "08:00"
-  endTime: string;          // "09:00"
+  startTime: string; // "08:00"
+  endTime: string; // "09:00"
   reservationsCount: number;
 };
 

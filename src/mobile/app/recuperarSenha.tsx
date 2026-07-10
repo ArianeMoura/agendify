@@ -1,4 +1,12 @@
-import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, StatusBar, Linking } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  SafeAreaView,
+  StatusBar,
+  Linking,
+} from 'react-native';
 import { Link } from 'expo-router';
 
 const Cores = {
@@ -11,19 +19,23 @@ const Cores = {
 
 export default function RecuperarSenhaScreen() {
   const handleAbrirEmail = () => {
-    Linking.openURL('mailto:admagendify@email.com?subject=Recuperação de Senha - AgendifyApp');
+    Linking.openURL(
+      'mailto:admagendify@email.com?subject=Recuperação de Senha - AgendifyApp',
+    );
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor={Cores.headerPurple} />
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor={Cores.headerPurple}
+      />
       <View style={styles.topBar}></View>
 
       <View style={styles.loginContainer}>
-
         <View style={styles.logo}>
           <View style={styles.logoIconWrapper}>
-            <View style={{width: 50, height: 50}} />
+            <View style={{ width: 50, height: 50 }} />
           </View>
           <Text style={styles.logoText}>
             <Text style={styles.logoPart1}>Agendify</Text>
@@ -34,20 +46,25 @@ export default function RecuperarSenhaScreen() {
         <View style={styles.recoveryContent}>
           <Text style={styles.recoveryTitle}>Recuperar Senha</Text>
           <Text style={styles.recoveryText}>
-            Para iniciar o processo de redefinição, envie um e-mail para o nosso suporte e nossa equipe irá ajudá-lo.
+            Para iniciar o processo de redefinição, envie um e-mail para o nosso
+            suporte e nossa equipe irá ajudá-lo.
           </Text>
           <Text style={styles.emailAddress}>admagendify@email.com</Text>
-          <TouchableOpacity style={styles.actionButton} onPress={handleAbrirEmail}>
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={handleAbrirEmail}
+          >
             <Text style={styles.actionButtonText}>ABRIR E-MAIL</Text>
           </TouchableOpacity>
         </View>
 
         <Text style={styles.forgotPassword}>
           <Link href="/">
-            <Text style={styles.forgotPasswordLink}>Lembrou sua senha? Voltar para o Login</Text>
+            <Text style={styles.forgotPasswordLink}>
+              Lembrou sua senha? Voltar para o Login
+            </Text>
           </Link>
         </Text>
-
       </View>
     </SafeAreaView>
   );
@@ -102,24 +119,24 @@ const styles = StyleSheet.create({
   recoveryTitle: {
     color: Cores.logoDark,
     fontWeight: '700',
-    fontSize: 24, 
+    fontSize: 24,
     marginBottom: 16,
   },
   recoveryText: {
     color: Cores.textColor,
-    fontSize: 16, 
-    lineHeight: 24, 
+    fontSize: 16,
+    lineHeight: 24,
     marginBottom: 16,
     textAlign: 'center',
   },
   emailAddress: {
-    fontSize: 18, 
+    fontSize: 18,
     fontWeight: '700',
     color: Cores.primaryPurple,
-    marginBottom: 32, 
+    marginBottom: 32,
   },
   actionButton: {
-    width: '100%', 
+    width: '100%',
     backgroundColor: Cores.primaryPurple,
     borderRadius: 8,
     paddingVertical: 18,
@@ -133,11 +150,11 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   forgotPassword: {
-    marginTop: 24, 
+    marginTop: 24,
     color: Cores.textColor,
-    fontSize: 14, 
+    fontSize: 14,
     textAlign: 'center',
-    maxWidth: 350, 
+    maxWidth: 350,
   },
   forgotPasswordLink: {
     color: Cores.textColor,

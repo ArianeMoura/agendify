@@ -36,14 +36,15 @@ export default function EditBookingScreen() {
   const [showDatePopover, setShowDatePopover] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedTimeSlots, setSelectedTimeSlots] = useState<string[]>([]);
-  const [availability, setAvailability] = useState<SpaceAvailability | null>(null);
+  const [availability, setAvailability] = useState<SpaceAvailability | null>(
+    null,
+  );
   const [isLoadingAvailability, setIsLoadingAvailability] = useState(false);
 
   const { data: booking, isLoading: bookingLoading } = useQuery({
     queryKey: ['bookings', id],
     queryFn: async () => {
       const booking = await bookingsApi.getById(id as string);
-
 
       const startDate = new Date(booking.startDateTime);
       const endDate = new Date(booking.endDateTime);
@@ -64,14 +65,15 @@ export default function EditBookingScreen() {
     enabled: !!id,
   });
 
-
   const { data: spaces, isLoading: spacesLoading } = useQuery({
     queryKey: ['spaces'],
     queryFn: spacesApi.getAll,
   });
 
-  const selectedSpace = useMemo(() =>
-    spaces?.find((s) => s.id === booking?.spaceId), [spaces, booking?.spaceId]);
+  const selectedSpace = useMemo(
+    () => spaces?.find((s) => s.id === booking?.spaceId),
+    [spaces, booking?.spaceId],
+  );
 
   const fetchAvailability = useCallback(async () => {
     if (!booking?.spaceId || !selectedDate) return;
@@ -85,13 +87,20 @@ export default function EditBookingScreen() {
       const availabilityData = await spacesApi.getAvailability(
         booking.spaceId,
         dateStr,
-        timezone
+        timezone,
       );
-      setAvailability({ ...availabilityData, timeSlots: availabilityData.timeSlots.map((slot: TimeSlot) => ({ ...slot, isBooked: id === booking.id ? false : slot.isAvailable })) });
+      setAvailability({
+        ...availabilityData,
+        timeSlots: availabilityData.timeSlots.map((slot: TimeSlot) => ({
+          ...slot,
+          isBooked: id === booking.id ? false : slot.isAvailable,
+        })),
+      });
     } catch (error: any) {
       Alert.alert(
         'Erro',
-        error.response?.data?.message || 'Não foi possível carregar os horários disponíveis.'
+        error.response?.data?.message ||
+          'Não foi possível carregar os horários disponíveis.',
       );
     } finally {
       setIsLoadingAvailability(false);
@@ -119,7 +128,8 @@ export default function EditBookingScreen() {
     onError: (error: any) => {
       Alert.alert(
         'Erro',
-        error.response?.data?.message || 'Não foi possível atualizar a reserva.'
+        error.response?.data?.message ||
+          'Não foi possível atualizar a reserva.',
       );
     },
   });
@@ -226,12 +236,20 @@ export default function EditBookingScreen() {
                 />
               )}
               <View style={styles.spacePreviewContent}>
-                <Text style={styles.spacePreviewTitle}>{selectedSpace.name}</Text>
+                <Text style={styles.spacePreviewTitle}>
+                  {selectedSpace.name}
+                </Text>
                 {selectedSpace.description && (
-                  <Text style={styles.spacePreviewDesc}>{selectedSpace.description}</Text>
+                  <Text style={styles.spacePreviewDesc}>
+                    {selectedSpace.description}
+                  </Text>
                 )}
                 <View style={styles.spacePreviewRow}>
-                  <Ionicons name="people-outline" size={16} color={colors.textSecondary} />
+                  <Ionicons
+                    name="people-outline"
+                    size={16}
+                    color={colors.textSecondary}
+                  />
                   <Text style={styles.spacePreviewText}>
                     Capacidade: {selectedSpace.capacity} pessoas
                   </Text>
@@ -239,7 +257,9 @@ export default function EditBookingScreen() {
                 {selectedSpace.isAllDayBooking && (
                   <View style={styles.allDayBadge}>
                     <Ionicons name="calendar" size={14} color={colors.accent} />
-                    <Text style={styles.allDayBadgeText}>Reserva de dia inteiro</Text>
+                    <Text style={styles.allDayBadgeText}>
+                      Reserva de dia inteiro
+                    </Text>
                   </View>
                 )}
               </View>
@@ -258,7 +278,11 @@ export default function EditBookingScreen() {
               >
                 <View style={styles.dateButtonContent}>
                   <View style={styles.dateIconContainer}>
-                    <Ionicons name="calendar" size={24} color={colors.primary} />
+                    <Ionicons
+                      name="calendar"
+                      size={24}
+                      color={colors.primary}
+                    />
                   </View>
                   <View style={styles.dateTextContainer}>
                     <Text style={styles.dateLabel}>Data selecionada</Text>
@@ -268,7 +292,11 @@ export default function EditBookingScreen() {
                       })}
                     </Text>
                   </View>
-                  <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+                  <Ionicons
+                    name="chevron-forward"
+                    size={20}
+                    color={colors.textSecondary}
+                  />
                 </View>
               </Pressable>
             </View>
@@ -467,4 +495,3 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
-

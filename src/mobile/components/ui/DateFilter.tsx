@@ -38,25 +38,31 @@ export const DateFilter: React.FC<DateFilterProps> = ({
     });
   }, []);
 
-  const handleStartDateChange = useCallback((event: any, selectedDate?: Date) => {
-    setShowStartPicker(Platform.OS === 'ios');
-    if (selectedDate) {
-      setStartDate(selectedDate);
-      if (Platform.OS !== 'ios') {
-        onFilterChange(selectedDate, endDate);
+  const handleStartDateChange = useCallback(
+    (event: any, selectedDate?: Date) => {
+      setShowStartPicker(Platform.OS === 'ios');
+      if (selectedDate) {
+        setStartDate(selectedDate);
+        if (Platform.OS !== 'ios') {
+          onFilterChange(selectedDate, endDate);
+        }
       }
-    }
-  }, [endDate, onFilterChange]);
+    },
+    [endDate, onFilterChange],
+  );
 
-  const handleEndDateChange = useCallback((event: any, selectedDate?: Date) => {
-    setShowEndPicker(Platform.OS === 'ios');
-    if (selectedDate) {
-      setEndDate(selectedDate);
-      if (Platform.OS !== 'ios') {
-        onFilterChange(startDate, selectedDate);
+  const handleEndDateChange = useCallback(
+    (event: any, selectedDate?: Date) => {
+      setShowEndPicker(Platform.OS === 'ios');
+      if (selectedDate) {
+        setEndDate(selectedDate);
+        if (Platform.OS !== 'ios') {
+          onFilterChange(startDate, selectedDate);
+        }
       }
-    }
-  }, [onFilterChange, startDate]);
+    },
+    [onFilterChange, startDate],
+  );
 
   const handleApplyFilter = useCallback(() => {
     onFilterChange(startDate, endDate);
@@ -86,7 +92,12 @@ export const DateFilter: React.FC<DateFilterProps> = ({
             size={20}
             color={hasActiveFilter ? colors.primary : colors.textSecondary}
           />
-          <Text style={[styles.headerText, hasActiveFilter && styles.headerTextActive]}>
+          <Text
+            style={[
+              styles.headerText,
+              hasActiveFilter && styles.headerTextActive,
+            ]}
+          >
             Filtrar por Data
           </Text>
           {hasActiveFilter && (
@@ -111,7 +122,11 @@ export const DateFilter: React.FC<DateFilterProps> = ({
                 style={styles.dateButton}
                 onPress={() => setShowStartPicker(true)}
               >
-                <Ionicons name="calendar-outline" size={16} color={colors.textSecondary} />
+                <Ionicons
+                  name="calendar-outline"
+                  size={16}
+                  color={colors.textSecondary}
+                />
                 <Text style={styles.dateText}>{formatDate(startDate)}</Text>
               </TouchableOpacity>
             </View>
@@ -122,7 +137,11 @@ export const DateFilter: React.FC<DateFilterProps> = ({
                 style={styles.dateButton}
                 onPress={() => setShowEndPicker(true)}
               >
-                <Ionicons name="calendar-outline" size={16} color={colors.textSecondary} />
+                <Ionicons
+                  name="calendar-outline"
+                  size={16}
+                  color={colors.textSecondary}
+                />
                 <Text style={styles.dateText}>{formatDate(endDate)}</Text>
               </TouchableOpacity>
             </View>
@@ -158,7 +177,9 @@ export const DateFilter: React.FC<DateFilterProps> = ({
               <View style={styles.modalOverlay}>
                 <View style={styles.modalContent}>
                   <View style={styles.modalHeader}>
-                    <Text style={styles.modalTitle}>Selecionar Data Início</Text>
+                    <Text style={styles.modalTitle}>
+                      Selecionar Data Início
+                    </Text>
                     <TouchableOpacity onPress={() => setShowStartPicker(false)}>
                       <Text style={styles.modalDone}>Fechar</Text>
                     </TouchableOpacity>
@@ -332,4 +353,3 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
-

@@ -20,4 +20,3 @@ export const usersApi = {
     await api.delete(`/users/${id}`);
   },
 };
-

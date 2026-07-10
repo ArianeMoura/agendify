@@ -49,12 +49,16 @@ export function TimePickerPopover({
   }, [visible, startTime, endTime]);
 
   const handleConfirm = () => {
-    onConfirm(roundToNearestHour(tempStartTime), roundToNearestHour(tempEndTime));
+    onConfirm(
+      roundToNearestHour(tempStartTime),
+      roundToNearestHour(tempEndTime),
+    );
     onDismiss();
   };
 
   const currentTime = activeTab === 'start' ? tempStartTime : tempEndTime;
-  const setCurrentTime = activeTab === 'start' ? setTempStartTime : setTempEndTime;
+  const setCurrentTime =
+    activeTab === 'start' ? setTempStartTime : setTempEndTime;
 
   if (!visible) return null;
 
@@ -62,134 +66,144 @@ export function TimePickerPopover({
     <Portal hostName="root">
       <Pressable style={styles.backdrop} onPress={onDismiss}>
         <View style={styles.container} onStartShouldSetResponder={() => true}>
-            <View style={styles.header}>
-              <Text style={styles.title}>Selecionar Horário</Text>
-              <TouchableOpacity onPress={onDismiss} style={styles.closeButton}>
-                <Ionicons name="close" size={24} color={colors.text} />
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.tabContainer}>
-              <TouchableOpacity
-                style={[styles.tab, activeTab === 'start' && styles.activeTab]}
-                onPress={() => setActiveTab('start')}
-              >
-                <Ionicons
-                  name="time-outline"
-                  size={20}
-                  color={activeTab === 'start' ? colors.primary : colors.textSecondary}
-                />
-                <Text
-                  style={[
-                    styles.tabText,
-                    activeTab === 'start' && styles.activeTabText,
-                  ]}
-                >
-                  Início
-                </Text>
-                <Text
-                  style={[
-                    styles.tabTime,
-                    activeTab === 'start' && styles.activeTabTime,
-                  ]}
-                >
-                  {format(tempStartTime, 'HH:mm')}
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[styles.tab, activeTab === 'end' && styles.activeTab]}
-                onPress={() => setActiveTab('end')}
-              >
-                <Ionicons
-                  name="time-outline"
-                  size={20}
-                  color={activeTab === 'end' ? colors.primary : colors.textSecondary}
-                />
-                <Text
-                  style={[
-                    styles.tabText,
-                    activeTab === 'end' && styles.activeTabText,
-                  ]}
-                >
-                  Término
-                </Text>
-                <Text
-                  style={[
-                    styles.tabTime,
-                    activeTab === 'end' && styles.activeTabTime,
-                  ]}
-                >
-                  {format(tempEndTime, 'HH:mm')}
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.pickerContainer}>
-              {Platform.OS === 'ios' ? (
-                <DateTimePicker
-                  value={currentTime}
-                  mode="time"
-                  display="spinner"
-                  is24Hour={true}
-                  minuteInterval={15}
-                  onChange={(event, selectedDate) => {
-                    if (selectedDate) {
-                      setCurrentTime(roundToNearestHour(selectedDate));
-                    }
-                  }}
-                  style={styles.picker}
-                />
-              ) : (
-                <DateTimePicker
-                  value={currentTime}
-                  mode="time"
-                  display="default"
-                  is24Hour={true}
-                  onChange={(event, selectedDate) => {
-                    if (event.type === 'set' && selectedDate) {
-                      setCurrentTime(roundToNearestHour(selectedDate));
-                    }
-                  }}
-                />
-              )}
-            </View>
-
-            <View style={styles.durationCard}>
-              <Ionicons name="hourglass-outline" size={18} color={colors.textSecondary} />
-              <Text style={styles.durationText}>
-                Duração: {' '}
-                {(() => {
-                  const hours = Math.abs(tempEndTime.getTime() - tempStartTime.getTime()) / (1000 * 60 * 60);
-                  const fullHours = Math.floor(hours);
-                  const minutes = Math.round((hours - fullHours) * 60);
-                  
-                  if (fullHours === 0) {
-                    return `${minutes} minutos`;
-                  } else if (minutes === 0) {
-                    return `${fullHours} ${fullHours === 1 ? 'hora' : 'horas'}`;
-                  } else {
-                    return `${fullHours}h ${minutes}min`;
-                  }
-                })()}
-              </Text>
-            </View>
-
-            <View style={styles.buttonRow}>
-              <Button
-                title="Cancelar"
-                variant="outline"
-                onPress={onDismiss}
-                style={styles.button}
-              />
-              <Button
-                title="Confirmar"
-                onPress={handleConfirm}
-                style={styles.button}
-              />
-            </View>
+          <View style={styles.header}>
+            <Text style={styles.title}>Selecionar Horário</Text>
+            <TouchableOpacity onPress={onDismiss} style={styles.closeButton}>
+              <Ionicons name="close" size={24} color={colors.text} />
+            </TouchableOpacity>
           </View>
-        </Pressable>
+
+          <View style={styles.tabContainer}>
+            <TouchableOpacity
+              style={[styles.tab, activeTab === 'start' && styles.activeTab]}
+              onPress={() => setActiveTab('start')}
+            >
+              <Ionicons
+                name="time-outline"
+                size={20}
+                color={
+                  activeTab === 'start' ? colors.primary : colors.textSecondary
+                }
+              />
+              <Text
+                style={[
+                  styles.tabText,
+                  activeTab === 'start' && styles.activeTabText,
+                ]}
+              >
+                Início
+              </Text>
+              <Text
+                style={[
+                  styles.tabTime,
+                  activeTab === 'start' && styles.activeTabTime,
+                ]}
+              >
+                {format(tempStartTime, 'HH:mm')}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.tab, activeTab === 'end' && styles.activeTab]}
+              onPress={() => setActiveTab('end')}
+            >
+              <Ionicons
+                name="time-outline"
+                size={20}
+                color={
+                  activeTab === 'end' ? colors.primary : colors.textSecondary
+                }
+              />
+              <Text
+                style={[
+                  styles.tabText,
+                  activeTab === 'end' && styles.activeTabText,
+                ]}
+              >
+                Término
+              </Text>
+              <Text
+                style={[
+                  styles.tabTime,
+                  activeTab === 'end' && styles.activeTabTime,
+                ]}
+              >
+                {format(tempEndTime, 'HH:mm')}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.pickerContainer}>
+            {Platform.OS === 'ios' ? (
+              <DateTimePicker
+                value={currentTime}
+                mode="time"
+                display="spinner"
+                is24Hour={true}
+                minuteInterval={15}
+                onChange={(event, selectedDate) => {
+                  if (selectedDate) {
+                    setCurrentTime(roundToNearestHour(selectedDate));
+                  }
+                }}
+                style={styles.picker}
+              />
+            ) : (
+              <DateTimePicker
+                value={currentTime}
+                mode="time"
+                display="default"
+                is24Hour={true}
+                onChange={(event, selectedDate) => {
+                  if (event.type === 'set' && selectedDate) {
+                    setCurrentTime(roundToNearestHour(selectedDate));
+                  }
+                }}
+              />
+            )}
+          </View>
+
+          <View style={styles.durationCard}>
+            <Ionicons
+              name="hourglass-outline"
+              size={18}
+              color={colors.textSecondary}
+            />
+            <Text style={styles.durationText}>
+              Duração:{' '}
+              {(() => {
+                const hours =
+                  Math.abs(tempEndTime.getTime() - tempStartTime.getTime()) /
+                  (1000 * 60 * 60);
+                const fullHours = Math.floor(hours);
+                const minutes = Math.round((hours - fullHours) * 60);
+
+                if (fullHours === 0) {
+                  return `${minutes} minutos`;
+                } else if (minutes === 0) {
+                  return `${fullHours} ${fullHours === 1 ? 'hora' : 'horas'}`;
+                } else {
+                  return `${fullHours}h ${minutes}min`;
+                }
+              })()}
+            </Text>
+          </View>
+
+          <View style={styles.buttonRow}>
+            <Button
+              title="Cancelar"
+              variant="outline"
+              onPress={onDismiss}
+              style={styles.button}
+            />
+            <Button
+              title="Confirmar"
+              onPress={handleConfirm}
+              style={styles.button}
+            />
+          </View>
+        </View>
+      </Pressable>
     </Portal>
   );
 }
@@ -302,4 +316,3 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
-

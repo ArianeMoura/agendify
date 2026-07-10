@@ -13,7 +13,9 @@ export const bookingsApi = {
   },
 
   getByUserId: async (userId: string): Promise<BookingWithDetails[]> => {
-    const response = await api.get<BookingWithDetails[]>(`/bookings/user/${userId}`);
+    const response = await api.get<BookingWithDetails[]>(
+      `/bookings/user/${userId}`,
+    );
     return response.data;
   },
 
@@ -22,8 +24,14 @@ export const bookingsApi = {
     return response.data;
   },
 
-  update: async (id: string, data: Partial<Booking>): Promise<BookingWithDetails> => {
-    const response = await api.put<BookingWithDetails>('/bookings', { ...data, id });
+  update: async (
+    id: string,
+    data: Partial<Booking>,
+  ): Promise<BookingWithDetails> => {
+    const response = await api.put<BookingWithDetails>('/bookings', {
+      ...data,
+      id,
+    });
     return response.data;
   },
 
@@ -31,4 +39,3 @@ export const bookingsApi = {
     await api.delete(`/bookings/${id}`);
   },
 };
-

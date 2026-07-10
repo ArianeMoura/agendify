@@ -15,8 +15,8 @@ npx expo start     # press a (Android), i (iOS), or scan the QR with Expo Go
 
 ## Environment
 
-| Variable | Purpose |
-| :--- | :--- |
+| Variable              | Purpose                                                                                      |
+| :-------------------- | :------------------------------------------------------------------------------------------- |
 | `EXPO_PUBLIC_API_URL` | API base URL (default `http://localhost:5089`); per-profile values in [`eas.json`](eas.json) |
 
 ## Scripts

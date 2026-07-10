@@ -1,5 +1,14 @@
 import { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, StatusBar, ScrollView, ActivityIndicator } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  SafeAreaView,
+  StatusBar,
+  ScrollView,
+  ActivityIndicator,
+} from 'react-native';
 import { useRouter } from 'expo-router';
 
 const Cores = {
@@ -13,17 +22,22 @@ const Cores = {
 
 function getSpaceName(spaceID: string) {
   switch (spaceID) {
-    case 'sala_a': return 'Sala de Reunião A';
-    case 'cabine_b': return 'Cabine Foco B';
-    case 'auditorio': return 'Auditório';
-    case 'espaco_cafe': return 'Espaço Café';
-    default: return spaceID;
+    case 'sala_a':
+      return 'Sala de Reunião A';
+    case 'cabine_b':
+      return 'Cabine Foco B';
+    case 'auditorio':
+      return 'Auditório';
+    case 'espaco_cafe':
+      return 'Espaço Café';
+    default:
+      return spaceID;
   }
 }
 
 function parseCSV(text: string): string[][] {
-  const rows = text.split('\n').map(row => row.trim());
-  return rows.map(row => row.split(','));
+  const rows = text.split('\n').map((row) => row.trim());
+  return rows.map((row) => row.split(','));
 }
 
 type Review = {
@@ -36,15 +50,16 @@ type Review = {
 
 export default function VerAvaliacoesScreen() {
   const router = useRouter();
-  
+
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
 
   useEffect(() => {
     const fetchReviews = async () => {
-      const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT-w0r2V7VBPQr3L-6IahMta9GdAXiapgaJNpBoMIsPfz9xoRVSRP0CjdDyOxAQioSWck2NNnV5HcQP/pub?output=csv';
-      
+      const GOOGLE_SHEET_CSV_URL =
+        'https://docs.google.com/spreadsheets/d/e/2PACX-1vT-w0r2V7VBPQr3L-6IahMta9GdAXiapgaJNpBoMIsPfz9xoRVSRP0CjdDyOxAQioSWck2NNnV5HcQP/pub?output=csv';
+
       try {
         const response = await fetch(GOOGLE_SHEET_CSV_URL);
         if (!response.ok) {
@@ -58,7 +73,7 @@ export default function VerAvaliacoesScreen() {
         for (let i = 1; i < data.length; i++) {
           const row = data[i];
           // Validação básica para pular linhas vazias
-          if (row && row.length > 6) { 
+          if (row && row.length > 6) {
             const newReview: Review = {
               id: `${i}-${row[0]}`,
               timestamp: row[0],
@@ -69,9 +84,9 @@ export default function VerAvaliacoesScreen() {
             loadedReviews.push(newReview);
           }
         }
-        
+
         // Mostra os mais novos primeiro
-        setReviews(loadedReviews.reverse()); 
+        setReviews(loadedReviews.reverse());
         setError(null);
       } catch (err) {
         console.error('Falha ao carregar avaliações:', err);
@@ -107,20 +122,22 @@ export default function VerAvaliacoesScreen() {
         </View>
       );
     }
-    
+
     return (
       <View style={styles.reviewsListContainer}>
         {reviews.map((review) => (
           <View key={review.id} style={styles.reviewCard}>
             <View style={styles.reviewCardHeader}>
-              <Text style={styles.reviewSpaceName}>{getSpaceName(review.spaceID)}</Text>
+              <Text style={styles.reviewSpaceName}>
+                {getSpaceName(review.spaceID)}
+              </Text>
               <View style={styles.reviewRating}>
                 <Text style={styles.reviewRatingText}>{review.rating}</Text>
                 <Text style={styles.reviewRatingStar}>★</Text>
               </View>
             </View>
             <Text style={styles.reviewFeedback}>
-              {review.feedback || "(Nenhum comentário de melhoria foi deixado)"}
+              {review.feedback || '(Nenhum comentário de melhoria foi deixado)'}
             </Text>
             <Text style={styles.reviewDate}>
               {review.timestamp ? review.timestamp.split(' ')[0] : ''}
@@ -133,19 +150,28 @@ export default function VerAvaliacoesScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor={Cores.headerPurple} />
-      
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor={Cores.headerPurple}
+      />
+
       <View style={styles.topBar}>
         <View style={styles.topBarContent}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-            <Text style={styles.backButtonText}>{"< Voltar"}</Text>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={styles.backButton}
+          >
+            <Text style={styles.backButtonText}>{'< Voltar'}</Text>
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Avaliações Recebidas</Text>
-          <View style={styles.headerPlaceholder} /> 
+          <View style={styles.headerPlaceholder} />
         </View>
       </View>
 
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.container}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.container}
+      >
         {renderContent()}
       </ScrollView>
     </SafeAreaView>
@@ -219,7 +245,7 @@ const styles = StyleSheet.create({
     padding: 24,
     borderWidth: 1,
     borderColor: Cores.inputBg,
-    marginBottom: 16, 
+    marginBottom: 16,
     // fallback para 'gap'
   },
   reviewCardHeader: {
@@ -235,7 +261,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     color: Cores.logoDark,
-    flex: 1, 
+    flex: 1,
   },
   reviewRating: {
     flexDirection: 'row',
@@ -256,7 +282,7 @@ const styles = StyleSheet.create({
     color: Cores.textColor,
     lineHeight: 24,
     marginBottom: 16,
-    fontStyle: 'italic', 
+    fontStyle: 'italic',
   },
   reviewDate: {
     fontSize: 14,

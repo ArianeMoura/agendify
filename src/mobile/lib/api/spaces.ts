@@ -32,20 +32,20 @@ export const spacesApi = {
   getAvailability: async (
     spaceId: string,
     date: string,
-    timezone: string
+    timezone: string,
   ): Promise<SpaceAvailability> => {
     const response = await api.get<SpaceAvailability>(
       `/spaces/${spaceId}/availability`,
       {
         params: { date, timezone },
-      }
+      },
     );
     return response.data;
   },
 
   create: async (data: CreateSpaceData): Promise<Space> => {
     const formData = new FormData();
-    
+
     const spaceData = {
       name: data.name,
       description: data.description,
@@ -59,19 +59,19 @@ export const spacesApi = {
     };
 
     formData.append('spaceData', JSON.stringify(spaceData));
-    
+
     if (data.imageUri) {
       const filename = data.imageUri.split('/').pop() || 'image.jpg';
       const match = /\.(\w+)$/.exec(filename);
       const type = match ? `image/${match[1]}` : 'image/jpeg';
-      
+
       formData.append('image', {
         uri: data.imageUri,
         name: filename,
         type,
       } as any);
     }
-    
+
     const response = await api.post<Space>('/spaces', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -81,9 +81,12 @@ export const spacesApi = {
     return response.data;
   },
 
-  update: async (id: string, data: Partial<UpdateSpaceData>): Promise<Space> => {
+  update: async (
+    id: string,
+    data: Partial<UpdateSpaceData>,
+  ): Promise<Space> => {
     const formData = new FormData();
-    
+
     const spaceData = {
       id,
       name: data.name,
@@ -98,19 +101,19 @@ export const spacesApi = {
     };
 
     formData.append('spaceData', JSON.stringify(spaceData));
-    
+
     if (data.imageUri) {
       const filename = data.imageUri.split('/').pop() || 'image.jpg';
       const match = /\.(\w+)$/.exec(filename);
       const type = match ? `image/${match[1]}` : 'image/jpeg';
-      
+
       formData.append('image', {
         uri: data.imageUri,
         name: filename,
         type,
       } as any);
     }
-    
+
     const response = await api.put<Space>('/spaces', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -123,4 +126,3 @@ export const spacesApi = {
     await api.delete(`/spaces/${id}`);
   },
 };
-

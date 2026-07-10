@@ -47,14 +47,18 @@ export default function LoginScreen() {
     onError: (error: any) => {
       Alert.alert(
         'Erro ao fazer login',
-        error.response?.data?.message || 'Verifique suas credenciais e tente novamente.'
+        error.response?.data?.message ||
+          'Verifique suas credenciais e tente novamente.',
       );
     },
   });
 
-  const onSubmit = useCallback(async (data: LoginFormData) => {
-    await login(data);
-  }, [login]);
+  const onSubmit = useCallback(
+    async (data: LoginFormData) => {
+      await login(data);
+    },
+    [login],
+  );
 
   return (
     <KeyboardAvoidingView
@@ -84,7 +88,13 @@ export default function LoginScreen() {
                 error={errors.email?.message}
                 keyboardType="email-address"
                 autoCapitalize="none"
-                leftIcon={<Ionicons name="mail-outline" size={20} color={colors.textSecondary} />}
+                leftIcon={
+                  <Ionicons
+                    name="mail-outline"
+                    size={20}
+                    color={colors.textSecondary}
+                  />
+                }
               />
             )}
           />
@@ -101,9 +111,17 @@ export default function LoginScreen() {
                 onBlur={onBlur}
                 error={errors.password?.message}
                 secureTextEntry={!showPassword}
-                leftIcon={<Ionicons name="lock-closed-outline" size={20} color={colors.textSecondary} />}
+                leftIcon={
+                  <Ionicons
+                    name="lock-closed-outline"
+                    size={20}
+                    color={colors.textSecondary}
+                  />
+                }
                 rightIcon={
-                  <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                  <TouchableOpacity
+                    onPress={() => setShowPassword(!showPassword)}
+                  >
                     <Ionicons
                       name={showPassword ? 'eye-outline' : 'eye-off-outline'}
                       size={20}
@@ -128,10 +146,10 @@ export default function LoginScreen() {
             onPress={() => router.push('/(auth)/accept-invite')}
           >
             <Text style={styles.registerText}>
-              Recebeu um convite? <Text style={styles.registerTextBold}>Aceitar</Text>
+              Recebeu um convite?{' '}
+              <Text style={styles.registerTextBold}>Aceitar</Text>
             </Text>
           </TouchableOpacity>
-
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -184,4 +202,3 @@ const styles = StyleSheet.create({
     color: colors.primary,
   },
 });
-
