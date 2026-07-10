@@ -1,16 +1,15 @@
-import React, { useCallback, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Platform,
-  Pressable,
-} from 'react-native';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { View, Text, StyleSheet, Pressable, Platform } from 'react-native';
 import { Portal } from '@gorhom/portal';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, typography, borderRadius } from '@/constants/theme';
+import {
+  spacing,
+  typography,
+  borderRadius,
+  type ThemeColors,
+} from '@/constants/theme';
+import { useTheme } from '@/lib/theme/ThemeProvider';
 import { Button } from './Button';
 
 interface DatePickerPopoverProps {
@@ -34,7 +33,9 @@ export function DatePickerPopover({
   onConfirm,
   onDismiss,
 }: DatePickerPopoverProps) {
-  const [tempDate, setTempDate] = React.useState(value);
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+  const [tempDate, setTempDate] = useState(value);
 
   useEffect(() => {
     if (visible) {
@@ -51,13 +52,30 @@ export function DatePickerPopover({
 
   return (
     <Portal hostName="root">
-      <Pressable style={styles.backdrop} onPress={onDismiss}>
-        <View style={styles.container} onStartShouldSetResponder={() => true}>
+      <Pressable
+        style={styles.backdrop}
+        onPress={onDismiss}
+        accessibilityRole="button"
+        accessibilityLabel="Fechar seletor"
+      >
+        <View
+          style={styles.container}
+          onStartShouldSetResponder={() => true}
+          accessibilityViewIsModal
+        >
           <View style={styles.header}>
-            <Text style={styles.title}>{title}</Text>
-            <TouchableOpacity onPress={onDismiss} style={styles.closeButton}>
+            <Text style={styles.title} accessibilityRole="header">
+              {title}
+            </Text>
+            <Pressable
+              onPress={onDismiss}
+              style={styles.closeButton}
+              hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel="Fechar"
+            >
               <Ionicons name="close" size={24} color={colors.text} />
-            </TouchableOpacity>
+            </Pressable>
           </View>
 
           <View style={styles.pickerContainer}>
@@ -68,7 +86,7 @@ export function DatePickerPopover({
                 display="spinner"
                 minimumDate={minimumDate}
                 is24Hour={is24Hour}
-                onChange={(event, selectedDate) => {
+                onChange={(_event, selectedDate) => {
                   if (selectedDate) {
                     setTempDate(selectedDate);
                   }
@@ -113,58 +131,59 @@ export function DatePickerPopover({
   );
 }
 
-const styles = StyleSheet.create({
-  backdrop: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing.lg,
-    zIndex: 9999,
-  },
-  container: {
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.xl,
-    padding: spacing.xl,
-    width: '100%',
-    maxWidth: 400,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: spacing.lg,
-  },
-  title: {
-    ...typography.h4,
-    color: colors.text,
-    fontWeight: '600',
-  },
-  closeButton: {
-    padding: spacing.xs,
-  },
-  pickerContainer: {
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  picker: {
-    width: '100%',
-    height: 200,
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    gap: spacing.md,
-  },
-  button: {
-    flex: 1,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    backdrop: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: spacing.lg,
+      zIndex: 9999,
+    },
+    container: {
+      backgroundColor: colors.surface,
+      borderRadius: borderRadius.xl,
+      padding: spacing.xl,
+      width: '100%',
+      maxWidth: 400,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 8,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: spacing.lg,
+    },
+    title: {
+      ...typography.h4,
+      color: colors.text,
+      fontWeight: '600',
+    },
+    closeButton: {
+      padding: spacing.xs,
+    },
+    pickerContainer: {
+      alignItems: 'center',
+      marginBottom: spacing.md,
+    },
+    picker: {
+      width: '100%',
+      height: 200,
+    },
+    buttonRow: {
+      flexDirection: 'row',
+      gap: spacing.md,
+    },
+    button: {
+      flex: 1,
+    },
+  });

@@ -1,16 +1,23 @@
-import React, { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
+  Pressable,
   Platform,
   Modal,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, typography, borderRadius } from '@/constants/theme';
+import {
+  spacing,
+  typography,
+  borderRadius,
+  type ThemeColors,
+} from '@/constants/theme';
+import { useTheme } from '@/lib/theme/ThemeProvider';
 import { Button } from './Button';
+import { Badge } from './Badge';
 
 interface DateFilterProps {
   onFilterChange: (startDate: Date | null, endDate: Date | null) => void;
@@ -18,11 +25,13 @@ interface DateFilterProps {
   endDate?: Date | null;
 }
 
-export const DateFilter: React.FC<DateFilterProps> = ({
+export function DateFilter({
   onFilterChange,
   startDate: initialStartDate = null,
   endDate: initialEndDate = null,
-}) => {
+}: DateFilterProps) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
   const [startDate, setStartDate] = useState<Date | null>(initialStartDate);
@@ -39,7 +48,7 @@ export const DateFilter: React.FC<DateFilterProps> = ({
   }, []);
 
   const handleStartDateChange = useCallback(
-    (event: any, selectedDate?: Date) => {
+    (_event: unknown, selectedDate?: Date) => {
       setShowStartPicker(Platform.OS === 'ios');
       if (selectedDate) {
         setStartDate(selectedDate);
@@ -52,7 +61,7 @@ export const DateFilter: React.FC<DateFilterProps> = ({
   );
 
   const handleEndDateChange = useCallback(
-    (event: any, selectedDate?: Date) => {
+    (_event: unknown, selectedDate?: Date) => {
       setShowEndPicker(Platform.OS === 'ios');
       if (selectedDate) {
         setEndDate(selectedDate);
@@ -82,15 +91,23 @@ export const DateFilter: React.FC<DateFilterProps> = ({
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity
+      <Pressable
         style={styles.header}
-        onPress={() => setIsExpanded(!isExpanded)}
+        onPress={() => setIsExpanded((prev) => !prev)}
+        accessibilityRole="button"
+        accessibilityState={{ expanded: isExpanded }}
+        accessibilityLabel="Filtrar por data"
+        accessibilityHint={
+          isExpanded ? 'Recolher filtros' : 'Expandir filtros de data'
+        }
       >
         <View style={styles.headerLeft}>
           <Ionicons
             name="filter"
             size={20}
-            color={hasActiveFilter ? colors.primary : colors.textSecondary}
+            color={hasActiveFilter ? colors.brandFg : colors.inkMuted}
+            accessibilityElementsHidden
+            importantForAccessibility="no"
           />
           <Text
             style={[
@@ -100,50 +117,56 @@ export const DateFilter: React.FC<DateFilterProps> = ({
           >
             Filtrar por Data
           </Text>
-          {hasActiveFilter && (
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>Ativo</Text>
-            </View>
-          )}
+          {hasActiveFilter ? <Badge label="Ativo" tone="brand" /> : null}
         </View>
         <Ionicons
           name={isExpanded ? 'chevron-up' : 'chevron-down'}
           size={20}
-          color={colors.textSecondary}
+          color={colors.inkMuted}
+          accessibilityElementsHidden
+          importantForAccessibility="no"
         />
-      </TouchableOpacity>
+      </Pressable>
 
       {isExpanded && (
         <View style={styles.content}>
           <View style={styles.dateRow}>
             <View style={styles.dateField}>
               <Text style={styles.label}>Data Início</Text>
-              <TouchableOpacity
+              <Pressable
                 style={styles.dateButton}
                 onPress={() => setShowStartPicker(true)}
+                accessibilityRole="button"
+                accessibilityLabel={`Data início: ${formatDate(startDate)}`}
               >
                 <Ionicons
                   name="calendar-outline"
                   size={16}
-                  color={colors.textSecondary}
+                  color={colors.inkMuted}
+                  accessibilityElementsHidden
+                  importantForAccessibility="no"
                 />
                 <Text style={styles.dateText}>{formatDate(startDate)}</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
 
             <View style={styles.dateField}>
               <Text style={styles.label}>Data Fim</Text>
-              <TouchableOpacity
+              <Pressable
                 style={styles.dateButton}
                 onPress={() => setShowEndPicker(true)}
+                accessibilityRole="button"
+                accessibilityLabel={`Data fim: ${formatDate(endDate)}`}
               >
                 <Ionicons
                   name="calendar-outline"
                   size={16}
-                  color={colors.textSecondary}
+                  color={colors.inkMuted}
+                  accessibilityElementsHidden
+                  importantForAccessibility="no"
                 />
                 <Text style={styles.dateText}>{formatDate(endDate)}</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </View>
 
@@ -168,60 +191,24 @@ export const DateFilter: React.FC<DateFilterProps> = ({
           </View>
 
           {Platform.OS === 'ios' && showStartPicker && (
-            <Modal
-              transparent
-              animationType="slide"
-              visible={showStartPicker}
-              onRequestClose={() => setShowStartPicker(false)}
-            >
-              <View style={styles.modalOverlay}>
-                <View style={styles.modalContent}>
-                  <View style={styles.modalHeader}>
-                    <Text style={styles.modalTitle}>
-                      Selecionar Data Início
-                    </Text>
-                    <TouchableOpacity onPress={() => setShowStartPicker(false)}>
-                      <Text style={styles.modalDone}>Fechar</Text>
-                    </TouchableOpacity>
-                  </View>
-                  <DateTimePicker
-                    value={startDate || new Date()}
-                    mode="date"
-                    display="spinner"
-                    onChange={handleStartDateChange}
-                    locale="pt-BR"
-                  />
-                </View>
-              </View>
-            </Modal>
+            <IosDateModal
+              styles={styles}
+              title="Selecionar Data Início"
+              value={startDate || new Date()}
+              onChange={handleStartDateChange}
+              onClose={() => setShowStartPicker(false)}
+            />
           )}
 
           {Platform.OS === 'ios' && showEndPicker && (
-            <Modal
-              transparent
-              animationType="slide"
-              visible={showEndPicker}
-              onRequestClose={() => setShowEndPicker(false)}
-            >
-              <View style={styles.modalOverlay}>
-                <View style={styles.modalContent}>
-                  <View style={styles.modalHeader}>
-                    <Text style={styles.modalTitle}>Selecionar Data Fim</Text>
-                    <TouchableOpacity onPress={() => setShowEndPicker(false)}>
-                      <Text style={styles.modalDone}>Fechar</Text>
-                    </TouchableOpacity>
-                  </View>
-                  <DateTimePicker
-                    value={endDate || new Date()}
-                    mode="date"
-                    display="spinner"
-                    onChange={handleEndDateChange}
-                    locale="pt-BR"
-                    minimumDate={startDate || undefined}
-                  />
-                </View>
-              </View>
-            </Modal>
+            <IosDateModal
+              styles={styles}
+              title="Selecionar Data Fim"
+              value={endDate || new Date()}
+              minimumDate={startDate || undefined}
+              onChange={handleEndDateChange}
+              onClose={() => setShowEndPicker(false)}
+            />
           )}
 
           {Platform.OS === 'android' && showStartPicker && (
@@ -246,110 +233,148 @@ export const DateFilter: React.FC<DateFilterProps> = ({
       )}
     </View>
   );
-};
+}
 
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: colors.white,
-    marginBottom: spacing.md,
-    borderRadius: borderRadius.md,
-    overflow: 'hidden',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: spacing.md,
-  },
-  headerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  headerText: {
-    ...typography.body,
-    color: colors.text,
-    fontWeight: '600',
-  },
-  headerTextActive: {
-    color: colors.primary,
-  },
-  badge: {
-    backgroundColor: colors.primary + '20',
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-    borderRadius: borderRadius.sm,
-  },
-  badgeText: {
-    ...typography.caption,
-    color: colors.primary,
-    fontWeight: '600',
-  },
-  content: {
-    padding: spacing.md,
-    paddingTop: 0,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-  },
-  dateRow: {
-    flexDirection: 'row',
-    gap: spacing.md,
-    marginBottom: spacing.md,
-  },
-  dateField: {
-    flex: 1,
-  },
-  label: {
-    ...typography.bodySmall,
-    color: colors.textSecondary,
-    marginBottom: spacing.xs,
-    fontWeight: '600',
-  },
-  dateButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    backgroundColor: colors.lightGray,
-    padding: spacing.md,
-    borderRadius: borderRadius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  dateText: {
-    ...typography.body,
-    color: colors.text,
-  },
-  actions: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
-  actionButton: {
-    flex: 1,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
-  },
-  modalContent: {
-    backgroundColor: colors.white,
-    borderTopLeftRadius: borderRadius.xl,
-    borderTopRightRadius: borderRadius.xl,
-    padding: spacing.lg,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  modalTitle: {
-    ...typography.h4,
-    color: colors.text,
-  },
-  modalDone: {
-    ...typography.body,
-    color: colors.primary,
-    fontWeight: '600',
-  },
-});
+function IosDateModal({
+  styles,
+  title,
+  value,
+  minimumDate,
+  onChange,
+  onClose,
+}: {
+  styles: ReturnType<typeof createStyles>;
+  title: string;
+  value: Date;
+  minimumDate?: Date;
+  onChange: (event: unknown, date?: Date) => void;
+  onClose: () => void;
+}) {
+  return (
+    <Modal transparent animationType="slide" visible onRequestClose={onClose}>
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContent} accessibilityViewIsModal>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle} accessibilityRole="header">
+              {title}
+            </Text>
+            <Pressable
+              onPress={onClose}
+              hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel="Fechar"
+            >
+              <Text style={styles.modalDone}>Fechar</Text>
+            </Pressable>
+          </View>
+          <DateTimePicker
+            value={value}
+            mode="date"
+            display="spinner"
+            onChange={onChange}
+            locale="pt-BR"
+            minimumDate={minimumDate}
+          />
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      backgroundColor: colors.surface,
+      marginBottom: spacing.md,
+      borderRadius: borderRadius.md,
+      overflow: 'hidden',
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      padding: spacing.md,
+      minHeight: 44,
+    },
+    headerLeft: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+    },
+    headerText: {
+      ...typography.body,
+      color: colors.text,
+      fontWeight: '600',
+    },
+    headerTextActive: {
+      color: colors.brandFg,
+    },
+    content: {
+      padding: spacing.md,
+      paddingTop: 0,
+      borderTopWidth: 1,
+      borderTopColor: colors.line,
+    },
+    dateRow: {
+      flexDirection: 'row',
+      gap: spacing.md,
+      marginBottom: spacing.md,
+    },
+    dateField: {
+      flex: 1,
+    },
+    label: {
+      ...typography.bodySmall,
+      color: colors.textMuted,
+      marginBottom: spacing.xs,
+      fontWeight: '600',
+    },
+    dateButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+      backgroundColor: colors.surfaceMuted,
+      padding: spacing.md,
+      borderRadius: borderRadius.sm,
+      borderWidth: 1,
+      borderColor: colors.line,
+      minHeight: 44,
+    },
+    dateText: {
+      ...typography.body,
+      color: colors.text,
+    },
+    actions: {
+      flexDirection: 'row',
+      gap: spacing.sm,
+    },
+    actionButton: {
+      flex: 1,
+    },
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      justifyContent: 'flex-end',
+    },
+    modalContent: {
+      backgroundColor: colors.surface,
+      borderTopLeftRadius: borderRadius.xl,
+      borderTopRightRadius: borderRadius.xl,
+      padding: spacing.lg,
+    },
+    modalHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: spacing.md,
+    },
+    modalTitle: {
+      ...typography.h4,
+      color: colors.text,
+    },
+    modalDone: {
+      ...typography.body,
+      color: colors.brandFg,
+      fontWeight: '600',
+    },
+  });

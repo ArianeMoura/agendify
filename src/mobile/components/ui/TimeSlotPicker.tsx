@@ -1,14 +1,15 @@
-import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-} from 'react-native';
+import { useMemo } from 'react';
+import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, typography, borderRadius } from '@/constants/theme';
-import { TimeSlot } from '@/lib/types';
+import {
+  spacing,
+  typography,
+  borderRadius,
+  type ThemeColors,
+} from '@/constants/theme';
+import { useTheme } from '@/lib/theme/ThemeProvider';
+import type { TimeSlot } from '@/lib/types';
+import { Badge } from './Badge';
 
 interface TimeSlotPickerProps {
   timeSlots: TimeSlot[];
@@ -29,13 +30,18 @@ export function TimeSlotPicker({
   allDayEndTime,
   isUser = true,
 }: TimeSlotPickerProps) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   if (timeSlots.length === 0) {
     return (
       <View style={styles.emptyContainer}>
         <Ionicons
           name="calendar-outline"
           size={48}
-          color={colors.textSecondary}
+          color={colors.inkMuted}
+          accessibilityElementsHidden
+          importantForAccessibility="no"
         />
         <Text style={styles.emptyText}>
           {isAllDayBooking
@@ -54,7 +60,13 @@ export function TimeSlotPicker({
     return (
       <View style={styles.container}>
         <View style={styles.allDayHeader}>
-          <Ionicons name="calendar" size={20} color={colors.primary} />
+          <Ionicons
+            name="calendar"
+            size={20}
+            color={colors.brandFg}
+            accessibilityElementsHidden
+            importantForAccessibility="no"
+          />
           <Text style={styles.allDayTitle}>Reserva de Dia Inteiro</Text>
         </View>
 
@@ -62,58 +74,24 @@ export function TimeSlotPicker({
           Disponível de {allDayStartTime} até {allDayEndTime}
         </Text>
 
-        <TouchableOpacity
-          style={[
-            styles.allDaySlot,
-            isSelected && styles.slotSelected,
-            isDisabled && styles.slotDisabled,
-          ]}
+        <SlotRow
+          styles={styles}
+          colors={colors}
+          slot={slot}
+          isSelected={isSelected}
+          isDisabled={isDisabled}
+          subtitle="Dia inteiro"
           onPress={() => onSelectSlot(slot.startTime)}
-          activeOpacity={0.7}
-        >
-          <View style={styles.allDaySlotContent}>
-            <View style={styles.allDaySlotLeft}>
-              <View
-                style={[
-                  styles.checkbox,
-                  isSelected && styles.checkboxSelected,
-                  isDisabled && styles.checkboxDisabled,
-                ]}
-              >
-                {isSelected && (
-                  <Ionicons name="checkmark" size={18} color={colors.white} />
-                )}
-              </View>
-              <View>
-                <Text style={styles.allDaySlotTime}>
-                  {slot.startTime} - {slot.endTime}
-                </Text>
-                <Text style={styles.allDaySlotSubtext}>Dia inteiro</Text>
-              </View>
-            </View>
-
-            {isDisabled && (
-              <View
-                style={[
-                  styles.badge,
-                  slot.isPast ? styles.badgePast : styles.badgeBooked,
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.badgeText,
-                    slot.isPast ? styles.badgeTextPast : styles.badgeTextBooked,
-                  ]}
-                >
-                  {slot.isPast ? 'Indisponível' : 'Reservado'}
-                </Text>
-              </View>
-            )}
-          </View>
-        </TouchableOpacity>
+        />
 
         <View style={styles.tipContainer}>
-          <Ionicons name="information-circle" size={16} color={colors.accent} />
+          <Ionicons
+            name="information-circle"
+            size={16}
+            color={colors.action}
+            accessibilityElementsHidden
+            importantForAccessibility="no"
+          />
           <Text style={styles.tipText}>
             Este espaço é reservado por dia inteiro. Você pode fazer a reserva
             mesmo se o horário de início já passou, desde que o horário de
@@ -127,7 +105,9 @@ export function TimeSlotPicker({
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Horários Disponíveis</Text>
+        <Text style={styles.headerTitle} accessibilityRole="header">
+          Horários Disponíveis
+        </Text>
         <Text style={styles.headerSubtitle}>
           Selecione os horários que deseja reservar
         </Text>
@@ -141,70 +121,17 @@ export function TimeSlotPicker({
         {timeSlots.map((slot) => {
           const isSelected = selectedSlots.includes(slot.startTime);
           const isDisabled = (slot.isPast || slot.isBooked) && !isUser;
-
           return (
-            <TouchableOpacity
+            <SlotRow
               key={slot.startTime}
-              style={[
-                styles.slot,
-                isSelected && styles.slotSelected,
-                isDisabled && styles.slotDisabled,
-              ]}
+              styles={styles}
+              colors={colors}
+              slot={slot}
+              isSelected={isSelected}
+              isDisabled={isDisabled}
+              subtitle="1 hora"
               onPress={() => !isDisabled && onSelectSlot(slot.startTime)}
-              disabled={isDisabled}
-              activeOpacity={0.7}
-            >
-              <View style={styles.slotContent}>
-                <View style={styles.slotLeft}>
-                  <View
-                    style={[
-                      styles.checkbox,
-                      isSelected && styles.checkboxSelected,
-                      isDisabled && styles.checkboxDisabled,
-                    ]}
-                  >
-                    {isSelected && (
-                      <Ionicons
-                        name="checkmark"
-                        size={18}
-                        color={colors.white}
-                      />
-                    )}
-                  </View>
-                  <View>
-                    <Text
-                      style={[
-                        styles.slotTime,
-                        isDisabled && styles.slotTimeDisabled,
-                      ]}
-                    >
-                      {slot.startTime} - {slot.endTime}
-                    </Text>
-                    <Text style={styles.slotDuration}>1 hora</Text>
-                  </View>
-                </View>
-
-                {isDisabled && (
-                  <View
-                    style={[
-                      styles.badge,
-                      slot.isPast ? styles.badgePast : styles.badgeBooked,
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.badgeText,
-                        slot.isPast
-                          ? styles.badgeTextPast
-                          : styles.badgeTextBooked,
-                      ]}
-                    >
-                      {slot.isPast ? 'Indisponível' : 'Reservado'}
-                    </Text>
-                  </View>
-                )}
-              </View>
-            </TouchableOpacity>
+            />
           );
         })}
       </ScrollView>
@@ -212,177 +139,199 @@ export function TimeSlotPicker({
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    marginVertical: spacing.md,
-  },
-  header: {
-    marginBottom: spacing.md,
-  },
-  headerTitle: {
-    ...typography.h5,
-    color: colors.text,
-    marginBottom: spacing.xs,
-  },
-  headerSubtitle: {
-    ...typography.bodySmall,
-    color: colors.textSecondary,
-  },
-  slotsList: {
-    maxHeight: 400,
-  },
-  slotsListContent: {
-    gap: spacing.sm,
-  },
-  slot: {
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.md,
-    borderWidth: 2,
-    borderColor: colors.border,
-    padding: spacing.md,
-  },
-  slotSelected: {
-    borderColor: colors.primary,
-    backgroundColor: colors.primary + '10',
-  },
-  slotDisabled: {
-    backgroundColor: colors.lightGray,
-    opacity: 0.6,
-  },
-  slotContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  slotLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    flex: 1,
-  },
-  checkbox: {
-    width: 24,
-    height: 24,
-    borderRadius: borderRadius.sm,
-    borderWidth: 2,
-    borderColor: colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.white,
-  },
-  checkboxSelected: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
-  checkboxDisabled: {
-    backgroundColor: colors.lightGray,
-    borderColor: colors.textSecondary,
-  },
-  slotTime: {
-    ...typography.body,
-    fontWeight: '600',
-    color: colors.text,
-  },
-  slotTimeDisabled: {
-    color: colors.textSecondary,
-  },
-  slotDuration: {
-    ...typography.caption,
-    color: colors.textSecondary,
-  },
-  badge: {
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    borderRadius: borderRadius.sm,
-  },
-  badgeBooked: {
-    backgroundColor: colors.danger + '15',
-  },
-  badgePast: {
-    backgroundColor: colors.textSecondary + '15',
-  },
-  badgeText: {
-    ...typography.caption,
-    fontWeight: '600',
-    fontSize: 11,
-  },
-  badgeTextBooked: {
-    color: colors.danger,
-  },
-  badgeTextPast: {
-    color: colors.textSecondary,
-  },
-  tipContainer: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-    backgroundColor: colors.accent + '10',
-    padding: spacing.md,
-    borderRadius: borderRadius.md,
-    marginTop: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.accent + '30',
-  },
-  tipText: {
-    ...typography.bodySmall,
-    color: colors.text,
-    flex: 1,
-  },
-  emptyContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: spacing.xl,
-    backgroundColor: colors.lightGray,
-    borderRadius: borderRadius.lg,
-    marginVertical: spacing.md,
-  },
-  emptyText: {
-    ...typography.body,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    marginTop: spacing.md,
-  },
-  allDayHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    marginBottom: spacing.sm,
-  },
-  allDayTitle: {
-    ...typography.h5,
-    color: colors.text,
-    fontWeight: '600',
-  },
-  allDayInfo: {
-    ...typography.body,
-    color: colors.textSecondary,
-    marginBottom: spacing.md,
-  },
-  allDaySlot: {
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.lg,
-    borderWidth: 2,
-    borderColor: colors.border,
-    padding: spacing.lg,
-  },
-  allDaySlotContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  allDaySlotLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    flex: 1,
-  },
-  allDaySlotTime: {
-    ...typography.h5,
-    color: colors.text,
-    fontWeight: '600',
-  },
-  allDaySlotSubtext: {
-    ...typography.bodySmall,
-    color: colors.textSecondary,
-    marginTop: spacing.xs,
-  },
-});
+function SlotRow({
+  styles,
+  colors,
+  slot,
+  isSelected,
+  isDisabled,
+  subtitle,
+  onPress,
+}: {
+  styles: ReturnType<typeof createStyles>;
+  colors: ThemeColors;
+  slot: TimeSlot;
+  isSelected: boolean;
+  isDisabled: boolean;
+  subtitle: string;
+  onPress: () => void;
+}) {
+  const statusLabel = slot.isPast
+    ? 'Indisponível'
+    : slot.isBooked
+      ? 'Reservado'
+      : undefined;
+  const range = `${slot.startTime} às ${slot.endTime}`;
+
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={isDisabled}
+      accessibilityRole="checkbox"
+      accessibilityState={{ checked: isSelected, disabled: isDisabled }}
+      accessibilityLabel={statusLabel ? `${range}, ${statusLabel}` : range}
+      style={[
+        styles.slot,
+        isSelected && styles.slotSelected,
+        isDisabled && styles.slotDisabled,
+      ]}
+    >
+      <View style={styles.slotContent}>
+        <View style={styles.slotLeft}>
+          <View
+            style={[
+              styles.checkbox,
+              isSelected && styles.checkboxSelected,
+              isDisabled && styles.checkboxDisabled,
+            ]}
+          >
+            {isSelected ? (
+              <Ionicons name="checkmark" size={18} color={colors.onPrimary} />
+            ) : null}
+          </View>
+          <View>
+            <Text
+              style={[styles.slotTime, isDisabled && styles.slotTimeDisabled]}
+            >
+              {range}
+            </Text>
+            <Text style={styles.slotDuration}>{subtitle}</Text>
+          </View>
+        </View>
+        {statusLabel ? (
+          <Badge
+            label={statusLabel}
+            tone={slot.isBooked ? 'danger' : 'neutral'}
+          />
+        ) : null}
+      </View>
+    </Pressable>
+  );
+}
+
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      marginVertical: spacing.md,
+    },
+    header: {
+      marginBottom: spacing.md,
+    },
+    headerTitle: {
+      ...typography.h5,
+      color: colors.text,
+      marginBottom: spacing.xs,
+    },
+    headerSubtitle: {
+      ...typography.bodySmall,
+      color: colors.textMuted,
+    },
+    slotsList: {
+      maxHeight: 400,
+    },
+    slotsListContent: {
+      gap: spacing.sm,
+    },
+    slot: {
+      backgroundColor: colors.surface,
+      borderRadius: borderRadius.md,
+      borderWidth: 2,
+      borderColor: colors.line,
+      padding: spacing.md,
+      minHeight: 44,
+    },
+    slotSelected: {
+      borderColor: colors.primary,
+      backgroundColor: colors.surfaceMuted,
+    },
+    slotDisabled: {
+      backgroundColor: colors.surfaceMuted,
+      opacity: 0.6,
+    },
+    slotContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    slotLeft: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.md,
+      flex: 1,
+    },
+    checkbox: {
+      width: 24,
+      height: 24,
+      borderRadius: borderRadius.sm,
+      borderWidth: 2,
+      borderColor: colors.line,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.surface,
+    },
+    checkboxSelected: {
+      backgroundColor: colors.primary,
+      borderColor: colors.primary,
+    },
+    checkboxDisabled: {
+      backgroundColor: colors.surfaceMuted,
+      borderColor: colors.inkMuted,
+    },
+    slotTime: {
+      ...typography.body,
+      fontWeight: '600',
+      color: colors.text,
+    },
+    slotTimeDisabled: {
+      color: colors.textMuted,
+    },
+    slotDuration: {
+      ...typography.caption,
+      color: colors.textMuted,
+    },
+    tipContainer: {
+      flexDirection: 'row',
+      gap: spacing.sm,
+      backgroundColor: colors.surfaceMuted,
+      padding: spacing.md,
+      borderRadius: borderRadius.md,
+      marginTop: spacing.md,
+      borderWidth: 1,
+      borderColor: colors.line,
+    },
+    tipText: {
+      ...typography.bodySmall,
+      color: colors.text,
+      flex: 1,
+    },
+    emptyContainer: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: spacing.xl,
+      backgroundColor: colors.surfaceMuted,
+      borderRadius: borderRadius.lg,
+      marginVertical: spacing.md,
+    },
+    emptyText: {
+      ...typography.body,
+      color: colors.textMuted,
+      textAlign: 'center',
+      marginTop: spacing.md,
+    },
+    allDayHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+      marginBottom: spacing.sm,
+    },
+    allDayTitle: {
+      ...typography.h5,
+      color: colors.text,
+      fontWeight: '600',
+    },
+    allDayInfo: {
+      ...typography.body,
+      color: colors.textMuted,
+      marginBottom: spacing.md,
+    },
+  });

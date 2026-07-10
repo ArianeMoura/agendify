@@ -1,141 +1,154 @@
-import React from 'react';
+import { useMemo } from 'react';
 import {
-  TouchableOpacity,
+  Pressable,
   Text,
   ActivityIndicator,
-  TouchableOpacityProps,
-  ViewStyle,
-  TextStyle,
+  StyleSheet,
+  type PressableProps,
+  type ViewStyle,
+  type TextStyle,
 } from 'react-native';
-import { colors, spacing, borderRadius } from '@/constants/theme';
+import {
+  spacing,
+  borderRadius,
+  fontFamily,
+  type ThemeColors,
+} from '@/constants/theme';
+import { useTheme } from '@/lib/theme/ThemeProvider';
 
-interface ButtonProps extends TouchableOpacityProps {
+type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'danger' | 'success';
+type ButtonSize = 'small' | 'medium' | 'large';
+
+interface ButtonProps extends Omit<PressableProps, 'style' | 'children'> {
   title: string;
-  variant?: 'primary' | 'secondary' | 'outline' | 'danger' | 'success';
-  size?: 'small' | 'medium' | 'large';
+  variant?: ButtonVariant;
+  size?: ButtonSize;
   isLoading?: boolean;
   fullWidth?: boolean;
+  disabled?: boolean;
+  style?: ViewStyle;
 }
 
-export const Button: React.FC<ButtonProps> = ({
+// Alvo de toque mínimo acessível (WCAG 2.5.5 / HIG). O tamanho `small` reduz o
+// padding vertical, então garantimos o mínimo por `minHeight`.
+const MIN_TOUCH_TARGET = 44;
+
+const SIZE_PADDING: Record<ButtonSize, ViewStyle> = {
+  small: { paddingHorizontal: spacing.md, paddingVertical: spacing.sm },
+  medium: { paddingHorizontal: spacing.lg, paddingVertical: spacing.md },
+  large: { paddingHorizontal: spacing.xl, paddingVertical: spacing.lg },
+};
+
+const SIZE_FONT: Record<ButtonSize, number> = {
+  small: 14,
+  medium: 16,
+  large: 18,
+};
+
+export function Button({
   title,
   variant = 'primary',
   size = 'medium',
   isLoading = false,
   fullWidth = false,
-  disabled,
+  disabled = false,
   style,
+  accessibilityLabel,
+  accessibilityHint,
   ...rest
-}) => {
-  const getButtonStyle = (): ViewStyle => {
-    const baseStyle: ViewStyle = {
-      alignItems: 'center',
-      justifyContent: 'center',
-      borderRadius: borderRadius.md,
-      flexDirection: 'row',
-    };
+}: ButtonProps) {
+  const { colors } = useTheme();
 
-    const sizeStyles: Record<string, ViewStyle> = {
-      small: {
-        paddingHorizontal: spacing.md,
-        paddingVertical: spacing.sm,
-      },
-      medium: {
-        paddingHorizontal: spacing.lg,
-        paddingVertical: spacing.md,
-      },
-      large: {
-        paddingHorizontal: spacing.xl,
-        paddingVertical: spacing.lg,
-      },
-    };
+  const { backgroundColor, borderColor, textColor } = useMemo(
+    () => variantColors(variant, colors),
+    [variant, colors],
+  );
 
-    const variantStyles: Record<string, ViewStyle> = {
-      primary: {
-        backgroundColor: colors.primary,
-      },
-      secondary: {
-        backgroundColor: colors.secondary,
-      },
-      outline: {
-        backgroundColor: 'transparent',
-        borderWidth: 2,
-        borderColor: colors.primary,
-      },
-      danger: {
-        backgroundColor: colors.danger,
-      },
-      success: {
-        backgroundColor: colors.success,
-      },
-    };
+  const isDisabled = disabled || isLoading;
 
-    return {
-      ...baseStyle,
-      ...sizeStyles[size],
-      ...variantStyles[variant],
-      ...(fullWidth && { width: '100%' }),
-      ...(disabled && { opacity: 0.5 }),
-    };
+  const containerStyle: ViewStyle = {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    gap: spacing.sm,
+    minHeight: MIN_TOUCH_TARGET,
+    borderRadius: borderRadius.sm,
+    backgroundColor,
+    ...(borderColor ? { borderWidth: 2, borderColor } : null),
+    ...SIZE_PADDING[size],
+    ...(fullWidth ? { width: '100%' } : null),
   };
 
-  const getTextStyle = (): TextStyle => {
-    const baseStyle: TextStyle = {
-      fontWeight: '600',
-      textAlign: 'center',
-    };
-
-    const sizeStyles: Record<string, TextStyle> = {
-      small: {
-        fontSize: 14,
-      },
-      medium: {
-        fontSize: 16,
-      },
-      large: {
-        fontSize: 18,
-      },
-    };
-
-    const variantStyles: Record<string, TextStyle> = {
-      primary: {
-        color: colors.white,
-      },
-      secondary: {
-        color: colors.white,
-      },
-      outline: {
-        color: colors.primary,
-      },
-      danger: {
-        color: colors.white,
-      },
-      success: {
-        color: colors.white,
-      },
-    };
-
-    return {
-      ...baseStyle,
-      ...sizeStyles[size],
-      ...variantStyles[variant],
-    };
+  const labelStyle: TextStyle = {
+    fontFamily: fontFamily.bodySemibold,
+    fontWeight: '600',
+    textAlign: 'center',
+    fontSize: SIZE_FONT[size],
+    color: textColor,
   };
 
   return (
-    <TouchableOpacity
-      style={[getButtonStyle(), style]}
-      disabled={disabled || isLoading}
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel ?? title}
+      accessibilityHint={accessibilityHint}
+      accessibilityState={{ disabled: isDisabled, busy: isLoading }}
+      disabled={isDisabled}
+      style={({ pressed }) => [
+        containerStyle,
+        (pressed || isDisabled) && styles.dimmed,
+        style,
+      ]}
       {...rest}
     >
       {isLoading ? (
-        <ActivityIndicator
-          color={variant === 'outline' ? colors.primary : colors.white}
-          size="small"
-        />
+        <ActivityIndicator color={textColor} size="small" />
       ) : (
-        <Text style={getTextStyle()}>{title}</Text>
+        <Text style={labelStyle} numberOfLines={1}>
+          {title}
+        </Text>
       )}
-    </TouchableOpacity>
+    </Pressable>
   );
-};
+}
+
+function variantColors(variant: ButtonVariant, colors: ThemeColors) {
+  switch (variant) {
+    case 'secondary':
+      // Âmbar da marca: texto sempre teal (onAction), nunca branco.
+      return {
+        backgroundColor: colors.action,
+        borderColor: undefined,
+        textColor: colors.onAction,
+      };
+    case 'outline':
+      return {
+        backgroundColor: 'transparent',
+        borderColor: colors.primary,
+        textColor: colors.brandFg,
+      };
+    case 'danger':
+      return {
+        backgroundColor: colors.danger,
+        borderColor: undefined,
+        textColor: '#ffffff',
+      };
+    case 'success':
+      return {
+        backgroundColor: colors.success,
+        borderColor: undefined,
+        textColor: '#ffffff',
+      };
+    case 'primary':
+    default:
+      return {
+        backgroundColor: colors.primary,
+        borderColor: undefined,
+        textColor: colors.onPrimary,
+      };
+  }
+}
+
+const styles = StyleSheet.create({
+  dimmed: { opacity: 0.6 },
+});

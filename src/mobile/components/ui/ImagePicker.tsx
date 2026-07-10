@@ -1,16 +1,22 @@
-import React, { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
-  Image,
+  Pressable,
   Alert,
   Platform,
 } from 'react-native';
+import { Image } from 'expo-image';
 import * as ExpoImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, typography, borderRadius } from '@/constants/theme';
+import {
+  spacing,
+  typography,
+  borderRadius,
+  type ThemeColors,
+} from '@/constants/theme';
+import { useTheme } from '@/lib/theme/ThemeProvider';
 
 interface ImagePickerProps {
   imageUri?: string;
@@ -25,6 +31,9 @@ export function ImagePicker({
   label,
   error,
 }: ImagePickerProps) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   const requestPermission = useCallback(async () => {
     if (Platform.OS !== 'web') {
       const { status } =
@@ -93,18 +102,9 @@ export function ImagePicker({
       'Selecionar Imagem',
       'Escolha uma opção',
       [
-        {
-          text: 'Câmera',
-          onPress: takePhoto,
-        },
-        {
-          text: 'Galeria',
-          onPress: pickImage,
-        },
-        {
-          text: 'Cancelar',
-          style: 'cancel',
-        },
+        { text: 'Câmera', onPress: takePhoto },
+        { text: 'Galeria', onPress: pickImage },
+        { text: 'Cancelar', style: 'cancel' },
       ],
       { cancelable: true },
     );
@@ -112,10 +112,7 @@ export function ImagePicker({
 
   const removeImage = useCallback(() => {
     Alert.alert('Remover Imagem', 'Tem certeza que deseja remover a imagem?', [
-      {
-        text: 'Cancelar',
-        style: 'cancel',
-      },
+      { text: 'Cancelar', style: 'cancel' },
       {
         text: 'Remover',
         style: 'destructive',
@@ -126,36 +123,50 @@ export function ImagePicker({
 
   return (
     <View style={styles.container}>
-      {label && <Text style={styles.label}>{label}</Text>}
+      {label ? <Text style={styles.label}>{label}</Text> : null}
 
       {imageUri ? (
         <View style={styles.imageContainer}>
           <Image
             source={{ uri: imageUri }}
             style={styles.image}
-            resizeMode="cover"
+            contentFit="cover"
+            transition={200}
+            accessibilityLabel={label ? `Imagem de ${label}` : 'Imagem'}
           />
           <View style={styles.imageOverlay}>
-            <TouchableOpacity
+            <Pressable
               style={styles.overlayButton}
               onPress={showOptions}
+              accessibilityRole="button"
+              accessibilityLabel="Trocar imagem"
             >
-              <Ionicons name="pencil" size={20} color={colors.white} />
-            </TouchableOpacity>
-            <TouchableOpacity
+              <Ionicons name="pencil" size={20} color="#ffffff" />
+            </Pressable>
+            <Pressable
               style={styles.overlayButton}
               onPress={removeImage}
+              accessibilityRole="button"
+              accessibilityLabel="Remover imagem"
             >
-              <Ionicons name="trash" size={20} color={colors.white} />
-            </TouchableOpacity>
+              <Ionicons name="trash" size={20} color="#ffffff" />
+            </Pressable>
           </View>
         </View>
       ) : (
-        <TouchableOpacity style={styles.placeholder} onPress={showOptions}>
+        <Pressable
+          style={styles.placeholder}
+          onPress={showOptions}
+          accessibilityRole="button"
+          accessibilityLabel="Adicionar imagem"
+          accessibilityHint="Abre opções de câmera ou galeria"
+        >
           <Ionicons
             name="image-outline"
             size={48}
-            color={colors.textSecondary}
+            color={colors.inkMuted}
+            accessibilityElementsHidden
+            importantForAccessibility="no"
           />
           <Text style={styles.placeholderText}>
             Toque para adicionar uma imagem
@@ -163,77 +174,86 @@ export function ImagePicker({
           <Text style={styles.placeholderSubtext}>
             Formatos: JPG, PNG, GIF (máximo 5MB)
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       )}
 
-      {error && <Text style={styles.errorText}>{error}</Text>}
+      {error ? (
+        <Text
+          style={styles.errorText}
+          accessibilityLiveRegion="polite"
+          accessibilityRole="alert"
+        >
+          {error}
+        </Text>
+      ) : null}
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    marginBottom: spacing.md,
-  },
-  label: {
-    ...typography.bodySmall,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: spacing.sm,
-  },
-  imageContainer: {
-    position: 'relative',
-    borderRadius: borderRadius.lg,
-    overflow: 'hidden',
-  },
-  image: {
-    width: '100%',
-    height: 200,
-    backgroundColor: colors.lightGray,
-  },
-  imageOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: spacing.md,
-  },
-  overlayButton: {
-    width: 48,
-    height: 48,
-    borderRadius: borderRadius.round,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  placeholder: {
-    height: 200,
-    borderRadius: borderRadius.lg,
-    borderWidth: 2,
-    borderColor: colors.border,
-    borderStyle: 'dashed',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: colors.lightGray,
-  },
-  placeholderText: {
-    ...typography.body,
-    color: colors.textSecondary,
-    marginTop: spacing.sm,
-  },
-  placeholderSubtext: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    marginTop: spacing.xs,
-  },
-  errorText: {
-    ...typography.caption,
-    color: colors.danger,
-    marginTop: spacing.xs,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      marginBottom: spacing.md,
+    },
+    label: {
+      ...typography.bodySmall,
+      fontWeight: '600',
+      color: colors.text,
+      marginBottom: spacing.sm,
+    },
+    imageContainer: {
+      position: 'relative',
+      borderRadius: borderRadius.lg,
+      overflow: 'hidden',
+    },
+    image: {
+      width: '100%',
+      aspectRatio: 16 / 9,
+      backgroundColor: colors.surfaceMuted,
+    },
+    imageOverlay: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.4)',
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: spacing.md,
+    },
+    overlayButton: {
+      width: 48,
+      height: 48,
+      borderRadius: borderRadius.round,
+      backgroundColor: 'rgba(255, 255, 255, 0.2)',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    placeholder: {
+      aspectRatio: 16 / 9,
+      borderRadius: borderRadius.lg,
+      borderWidth: 2,
+      borderColor: colors.line,
+      borderStyle: 'dashed',
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: colors.surfaceMuted,
+    },
+    placeholderText: {
+      ...typography.body,
+      color: colors.textMuted,
+      marginTop: spacing.sm,
+    },
+    placeholderSubtext: {
+      ...typography.caption,
+      color: colors.textMuted,
+      marginTop: spacing.xs,
+    },
+    errorText: {
+      ...typography.caption,
+      color: colors.danger,
+      marginTop: spacing.xs,
+    },
+  });

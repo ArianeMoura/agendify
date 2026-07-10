@@ -1,39 +1,38 @@
-import React, { ReactNode } from 'react';
-import { View, ViewStyle } from 'react-native';
-import { colors, spacing, borderRadius, shadows } from '@/constants/theme';
+import type { ReactNode } from 'react';
+import { View, type ViewProps, type ViewStyle } from 'react-native';
+import { spacing, borderRadius, shadows } from '@/constants/theme';
+import { useTheme } from '@/lib/theme/ThemeProvider';
 
-interface CardProps {
+interface CardProps extends ViewProps {
   children: ReactNode;
   style?: ViewStyle;
   variant?: 'default' | 'elevated' | 'outlined';
 }
 
-export const Card: React.FC<CardProps> = ({
+export function Card({
   children,
   style,
   variant = 'elevated',
-}) => {
-  const getCardStyle = (): ViewStyle => {
-    const baseStyle: ViewStyle = {
-      backgroundColor: colors.white,
-      borderRadius: borderRadius.lg,
-      padding: spacing.lg,
-    };
+  ...rest
+}: CardProps) {
+  const { colors } = useTheme();
 
-    const variantStyles: Record<string, ViewStyle> = {
-      default: {},
-      elevated: shadows.md,
-      outlined: {
-        borderWidth: 1,
-        borderColor: colors.border,
-      },
-    };
-
-    return {
-      ...baseStyle,
-      ...variantStyles[variant],
-    };
+  const baseStyle: ViewStyle = {
+    backgroundColor: colors.surface,
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
   };
 
-  return <View style={[getCardStyle(), style]}>{children}</View>;
-};
+  const variantStyle: ViewStyle =
+    variant === 'elevated'
+      ? { ...shadows.md, shadowColor: '#3e2380' }
+      : variant === 'outlined'
+        ? { borderWidth: 1, borderColor: colors.line }
+        : {};
+
+  return (
+    <View style={[baseStyle, variantStyle, style]} {...rest}>
+      {children}
+    </View>
+  );
+}
