@@ -7,10 +7,21 @@ jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
-// Silencia o aviso de nativo ausente do reanimated no ambiente de teste.
-// (As animações não são exercidas nos testes de unidade dos componentes.)
+// Mock do reanimated para o ambiente de teste. O mock oficial não cobre alguns
+// símbolos usados aqui (useReducedMotion, layout animations), então os
+// complementamos — as animações em si não são exercidas nos testes de unidade.
 jest.mock('react-native-reanimated', () => {
   const Reanimated = require('react-native-reanimated/mock');
-  Reanimated.default.call = () => {};
+  // Em testes, tratamos como "reduzir movimento" ativo: desliga entering/exiting
+  // (que, no mock, poderiam manter nós montados) e mantém asserções determinísticas.
+  Reanimated.useReducedMotion = () => true;
+  const passthroughLayout = {
+    duration: () => passthroughLayout,
+    delay: () => passthroughLayout,
+    springify: () => passthroughLayout,
+    build: () => ({}),
+  };
+  Reanimated.FadeInDown = passthroughLayout;
+  Reanimated.FadeOutDown = passthroughLayout;
   return Reanimated;
 });
