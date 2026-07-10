@@ -9,8 +9,8 @@ on:
     paths: ['src/mobile/**', '.github/workflows/mobile.yml']
 
 jobs:
-  lint:
-    name: Lint (Expo)
+  checks:
+    name: Lint · Typecheck · Format · Test
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -24,7 +24,30 @@ jobs:
           cache-dependency-path: src/mobile/package-lock.json
       - name: Install
         run: npm ci
-      # expo lint é o gate do mobile. O typecheck completo (tsc) ainda tem erros
-      # pré-existentes em telas legadas (sem `import React`); tratar em separado.
+
+      # Os tipos de rota do expo-router (typedRoutes) são gerados ao subir o
+      # Metro. `.expo/types/router.d.ts` é gitignorado, então geramos aqui antes
+      # do typecheck: sobe o servidor em background só até o arquivo aparecer.
+      - name: Generate expo-router types
+        run: |
+          CI=1 npx expo start --no-dev > /tmp/expo-start.log 2>&1 &
+          EXPO_PID=$!
+          for i in $(seq 1 60); do
+            [ -f .expo/types/router.d.ts ] && break
+            sleep 1
+          done
+          kill "$EXPO_PID" 2>/dev/null || true
+          if [ ! -f .expo/types/router.d.ts ]; then
+            echo "::error::expo-router types were not generated"
+            tail -20 /tmp/expo-start.log
+            exit 1
+          fi
+
       - name: Lint
         run: npx expo lint
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Format check
+        run: npm run format:check
+      - name: Test
+        run: npm test -- --ci
