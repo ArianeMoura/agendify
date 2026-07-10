@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -15,11 +15,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation } from '@tanstack/react-query';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, typography } from '@/constants/theme';
+import { spacing, typography, type ThemeColors } from '@/constants/theme';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
 import { useAuth } from '@/lib/contexts/AuthContext';
+import { useTheme } from '@/lib/theme/ThemeProvider';
 import { usersApi } from '@/lib/api/users';
 
 const changePasswordSchema = z
@@ -40,6 +41,8 @@ type ChangePasswordFormData = z.infer<typeof changePasswordSchema>;
 export default function ChangePasswordScreen() {
   const router = useRouter();
   const { user } = useAuth();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -177,25 +180,26 @@ export default function ChangePasswordScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scrollContent: {
-    padding: spacing.lg,
-  },
-  title: {
-    ...typography.h2,
-    color: colors.text,
-    marginBottom: spacing.xl,
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    gap: spacing.md,
-    marginTop: spacing.lg,
-  },
-  button: {
-    flex: 1,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scrollContent: {
+      padding: spacing.lg,
+    },
+    title: {
+      ...typography.h2,
+      color: colors.text,
+      marginBottom: spacing.xl,
+    },
+    buttonRow: {
+      flexDirection: 'row',
+      gap: spacing.md,
+      marginTop: spacing.lg,
+    },
+    button: {
+      flex: 1,
+    },
+  });

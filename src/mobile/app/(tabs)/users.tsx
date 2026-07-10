@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -10,7 +10,13 @@ import {
 } from 'react-native';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, typography, borderRadius } from '@/constants/theme';
+import {
+  spacing,
+  typography,
+  borderRadius,
+  type ThemeColors,
+} from '@/constants/theme';
+import { useTheme } from '@/lib/theme/ThemeProvider';
 import { Card } from '@/components/ui/Card';
 import { Loading } from '@/components/ui/Loading';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -19,6 +25,8 @@ import { User, Role } from '@/lib/types';
 
 export default function UsersScreen() {
   const queryClient = useQueryClient();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
   const {
     data: users,
@@ -156,71 +164,72 @@ export default function UsersScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  listContent: {
-    padding: spacing.lg,
-    flexGrow: 1,
-  },
-  userCard: {
-    marginBottom: spacing.md,
-  },
-  userHeader: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
-  avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: borderRadius.round,
-    backgroundColor: colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: spacing.md,
-  },
-  avatarText: {
-    ...typography.h4,
-    color: colors.white,
-  },
-  userInfo: {
-    flex: 1,
-  },
-  userName: {
-    ...typography.h5,
-    color: colors.text,
-    marginBottom: spacing.xs,
-  },
-  userEmail: {
-    ...typography.bodySmall,
-    color: colors.textSecondary,
-    marginBottom: spacing.sm,
-  },
-  badgeContainer: {
-    marginBottom: spacing.sm,
-  },
-  roleBadge: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    borderRadius: borderRadius.sm,
-  },
-  roleText: {
-    ...typography.caption,
-    fontWeight: '600',
-  },
-  dateContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  dateText: {
-    ...typography.caption,
-    color: colors.textLight,
-    marginLeft: spacing.xs,
-  },
-  deleteButton: {
-    padding: spacing.xs,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    listContent: {
+      padding: spacing.lg,
+      flexGrow: 1,
+    },
+    userCard: {
+      marginBottom: spacing.md,
+    },
+    userHeader: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+    },
+    avatar: {
+      width: 50,
+      height: 50,
+      borderRadius: borderRadius.round,
+      backgroundColor: colors.primary,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: spacing.md,
+    },
+    avatarText: {
+      ...typography.h4,
+      color: colors.white,
+    },
+    userInfo: {
+      flex: 1,
+    },
+    userName: {
+      ...typography.h5,
+      color: colors.text,
+      marginBottom: spacing.xs,
+    },
+    userEmail: {
+      ...typography.bodySmall,
+      color: colors.textSecondary,
+      marginBottom: spacing.sm,
+    },
+    badgeContainer: {
+      marginBottom: spacing.sm,
+    },
+    roleBadge: {
+      alignSelf: 'flex-start',
+      paddingHorizontal: spacing.sm,
+      paddingVertical: spacing.xs,
+      borderRadius: borderRadius.sm,
+    },
+    roleText: {
+      ...typography.caption,
+      fontWeight: '600',
+    },
+    dateContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    dateText: {
+      ...typography.caption,
+      color: colors.textLight,
+      marginLeft: spacing.xs,
+    },
+    deleteButton: {
+      padding: spacing.xs,
+    },
+  });

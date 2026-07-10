@@ -11,7 +11,8 @@ import {
 import { useRouter } from 'expo-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, typography } from '@/constants/theme';
+import { spacing, typography, type ThemeColors } from '@/constants/theme';
+import { useTheme } from '@/lib/theme/ThemeProvider';
 import { Card } from '@/components/ui/Card';
 import { Loading } from '@/components/ui/Loading';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -24,6 +25,9 @@ export default function BookingsScreen() {
   const router = useRouter();
 
   const { user } = useAuth();
+
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
   const queryClient = useQueryClient();
 
@@ -267,73 +271,74 @@ export default function BookingsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  listContent: {
-    padding: spacing.lg,
-    flexGrow: 1,
-  },
-  bookingCard: {
-    marginBottom: spacing.md,
-  },
-  bookingHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  bookingInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  spaceName: {
-    ...typography.h5,
-    color: colors.text,
-    marginLeft: spacing.sm,
-    flex: 1,
-  },
-  bookingActions: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
-  iconButton: {
-    padding: spacing.xs,
-  },
-  userInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.sm,
-  },
-  userName: {
-    ...typography.bodySmall,
-    color: colors.textSecondary,
-    marginLeft: spacing.xs,
-  },
-  dateTimeContainer: {
-    marginBottom: spacing.sm,
-  },
-  dateTimeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.xs,
-  },
-  dateText: {
-    ...typography.body,
-    color: colors.text,
-    marginLeft: spacing.sm,
-  },
-  timeText: {
-    ...typography.body,
-    color: colors.text,
-    marginLeft: spacing.sm,
-  },
-  description: {
-    ...typography.bodySmall,
-    color: colors.textSecondary,
-    marginTop: spacing.sm,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    listContent: {
+      padding: spacing.lg,
+      flexGrow: 1,
+    },
+    bookingCard: {
+      marginBottom: spacing.md,
+    },
+    bookingHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: spacing.md,
+    },
+    bookingInfo: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flex: 1,
+    },
+    spaceName: {
+      ...typography.h5,
+      color: colors.text,
+      marginLeft: spacing.sm,
+      flex: 1,
+    },
+    bookingActions: {
+      flexDirection: 'row',
+      gap: spacing.sm,
+    },
+    iconButton: {
+      padding: spacing.xs,
+    },
+    userInfo: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: spacing.sm,
+    },
+    userName: {
+      ...typography.bodySmall,
+      color: colors.textSecondary,
+      marginLeft: spacing.xs,
+    },
+    dateTimeContainer: {
+      marginBottom: spacing.sm,
+    },
+    dateTimeRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: spacing.xs,
+    },
+    dateText: {
+      ...typography.body,
+      color: colors.text,
+      marginLeft: spacing.sm,
+    },
+    timeText: {
+      ...typography.body,
+      color: colors.text,
+      marginLeft: spacing.sm,
+    },
+    description: {
+      ...typography.bodySmall,
+      color: colors.textSecondary,
+      marginTop: spacing.sm,
+    },
+  });

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -14,11 +14,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation } from '@tanstack/react-query';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, typography } from '@/constants/theme';
+import { spacing, typography, type ThemeColors } from '@/constants/theme';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
 import { useAuth } from '@/lib/contexts/AuthContext';
+import { useTheme } from '@/lib/theme/ThemeProvider';
 import { usersApi } from '@/lib/api/users';
 
 const editProfileSchema = z.object({
@@ -34,6 +35,8 @@ type EditProfileFormData = z.infer<typeof editProfileSchema>;
 export default function EditProfileScreen() {
   const router = useRouter();
   const { user, updateUser } = useAuth();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
   const {
     control,
@@ -148,25 +151,26 @@ export default function EditProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scrollContent: {
-    padding: spacing.lg,
-  },
-  title: {
-    ...typography.h2,
-    color: colors.text,
-    marginBottom: spacing.xl,
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    gap: spacing.md,
-    marginTop: spacing.lg,
-  },
-  button: {
-    flex: 1,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scrollContent: {
+      padding: spacing.lg,
+    },
+    title: {
+      ...typography.h2,
+      color: colors.text,
+      marginBottom: spacing.xl,
+    },
+    buttonRow: {
+      flexDirection: 'row',
+      gap: spacing.md,
+      marginTop: spacing.lg,
+    },
+    button: {
+      flex: 1,
+    },
+  });

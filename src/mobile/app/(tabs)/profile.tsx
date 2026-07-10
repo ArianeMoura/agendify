@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -9,7 +9,13 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, typography, borderRadius } from '@/constants/theme';
+import {
+  spacing,
+  typography,
+  borderRadius,
+  type ThemeColors,
+} from '@/constants/theme';
+import { useTheme } from '@/lib/theme/ThemeProvider';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/lib/contexts/AuthContext';
@@ -25,23 +31,34 @@ export const MenuItem = ({
   title: string;
   onPress: () => void;
   showChevron?: boolean;
-}) => (
-  <TouchableOpacity style={styles.menuItem} onPress={onPress}>
-    <View style={styles.menuItemLeft}>
-      <View style={styles.iconContainer}>
-        <Ionicons name={icon} size={20} color={colors.primary} />
+}) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
+  return (
+    <TouchableOpacity style={styles.menuItem} onPress={onPress}>
+      <View style={styles.menuItemLeft}>
+        <View style={styles.iconContainer}>
+          <Ionicons name={icon} size={20} color={colors.primary} />
+        </View>
+        <Text style={styles.menuItemText}>{title}</Text>
       </View>
-      <Text style={styles.menuItemText}>{title}</Text>
-    </View>
-    {showChevron && (
-      <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
-    )}
-  </TouchableOpacity>
-);
+      {showChevron && (
+        <Ionicons
+          name="chevron-forward"
+          size={20}
+          color={colors.textSecondary}
+        />
+      )}
+    </TouchableOpacity>
+  );
+};
 
 export default function ProfileScreen() {
   const router = useRouter();
   const { user, logout } = useAuth();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const isAdmin =
     user?.role === Role.OrgAdmin || user?.role === Role.PlatformOwner;
 
@@ -110,96 +127,97 @@ export default function ProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scrollContent: {
-    padding: spacing.lg,
-  },
-  profileCard: {
-    alignItems: 'center',
-    marginBottom: spacing.lg,
-  },
-  avatarContainer: {
-    marginBottom: spacing.md,
-  },
-  avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: borderRadius.round,
-    backgroundColor: colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  avatarText: {
-    ...typography.h1,
-    color: colors.white,
-  },
-  userName: {
-    ...typography.h3,
-    color: colors.text,
-    marginBottom: spacing.xs,
-  },
-  userEmail: {
-    ...typography.body,
-    color: colors.textSecondary,
-    marginBottom: spacing.md,
-  },
-  roleBadge: {
-    backgroundColor: colors.primary + '20',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: borderRadius.md,
-  },
-  roleText: {
-    ...typography.bodySmall,
-    color: colors.primary,
-    fontWeight: '600',
-  },
-  menuCard: {
-    marginBottom: spacing.lg,
-  },
-  sectionTitle: {
-    ...typography.h5,
-    color: colors.text,
-    marginBottom: spacing.md,
-  },
-  menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  menuItemLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  iconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: borderRadius.md,
-    backgroundColor: colors.primary + '10',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: spacing.md,
-  },
-  menuItemText: {
-    ...typography.body,
-    color: colors.text,
-  },
-  logoutButton: {
-    marginTop: spacing.lg,
-    marginBottom: spacing.md,
-  },
-  version: {
-    ...typography.caption,
-    color: colors.textLight,
-    textAlign: 'center',
-    marginBottom: spacing.lg,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scrollContent: {
+      padding: spacing.lg,
+    },
+    profileCard: {
+      alignItems: 'center',
+      marginBottom: spacing.lg,
+    },
+    avatarContainer: {
+      marginBottom: spacing.md,
+    },
+    avatar: {
+      width: 80,
+      height: 80,
+      borderRadius: borderRadius.round,
+      backgroundColor: colors.primary,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    avatarText: {
+      ...typography.h1,
+      color: colors.white,
+    },
+    userName: {
+      ...typography.h3,
+      color: colors.text,
+      marginBottom: spacing.xs,
+    },
+    userEmail: {
+      ...typography.body,
+      color: colors.textSecondary,
+      marginBottom: spacing.md,
+    },
+    roleBadge: {
+      backgroundColor: colors.primary + '20',
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      borderRadius: borderRadius.md,
+    },
+    roleText: {
+      ...typography.bodySmall,
+      color: colors.primary,
+      fontWeight: '600',
+    },
+    menuCard: {
+      marginBottom: spacing.lg,
+    },
+    sectionTitle: {
+      ...typography.h5,
+      color: colors.text,
+      marginBottom: spacing.md,
+    },
+    menuItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingVertical: spacing.md,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    menuItemLeft: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flex: 1,
+    },
+    iconContainer: {
+      width: 40,
+      height: 40,
+      borderRadius: borderRadius.md,
+      backgroundColor: colors.primary + '10',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: spacing.md,
+    },
+    menuItemText: {
+      ...typography.body,
+      color: colors.text,
+    },
+    logoutButton: {
+      marginTop: spacing.lg,
+      marginBottom: spacing.md,
+    },
+    version: {
+      ...typography.caption,
+      color: colors.textLight,
+      textAlign: 'center',
+      marginBottom: spacing.lg,
+    },
+  });

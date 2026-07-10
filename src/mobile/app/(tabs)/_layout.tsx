@@ -1,12 +1,12 @@
-import React from 'react';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '@/constants/theme';
 import { useAuth } from '@/lib/contexts/AuthContext';
+import { useTheme } from '@/lib/theme/ThemeProvider';
 import { Role } from '@/lib/types';
 
 export default function TabLayout() {
   const { user } = useAuth();
+  const { colors } = useTheme();
   const isAdmin =
     user?.role === Role.OrgAdmin || user?.role === Role.PlatformOwner;
 
@@ -14,11 +14,11 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.textSecondary,
+        tabBarInactiveTintColor: colors.inkMuted,
         tabBarShowLabel: false,
         tabBarStyle: {
-          backgroundColor: colors.white,
-          borderTopColor: colors.border,
+          backgroundColor: colors.surface,
+          borderTopColor: colors.line,
           height: 60,
           paddingBottom: 8,
           paddingTop: 8,
@@ -26,7 +26,7 @@ export default function TabLayout() {
         headerStyle: {
           backgroundColor: colors.primary,
         },
-        headerTintColor: colors.white,
+        headerTintColor: colors.onPrimary,
         headerTitleStyle: {
           fontWeight: '600',
         },

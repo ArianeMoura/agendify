@@ -13,7 +13,13 @@ import {
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, typography, borderRadius } from '@/constants/theme';
+import {
+  spacing,
+  typography,
+  borderRadius,
+  type ThemeColors,
+} from '@/constants/theme';
+import { useTheme } from '@/lib/theme/ThemeProvider';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Loading } from '@/components/ui/Loading';
@@ -32,6 +38,8 @@ export default function CreateBookingScreen() {
   const params = useLocalSearchParams();
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
   const [showDatePopover, setShowDatePopover] = useState(false);
   const [selectedSpaceId] = useState<string>((params.spaceId as string) || '');
@@ -363,191 +371,192 @@ export default function CreateBookingScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scrollContent: {
-    padding: spacing.lg,
-  },
-  title: {
-    ...typography.h2,
-    color: colors.text,
-    marginBottom: spacing.xl,
-  },
-  errorText: {
-    ...typography.body,
-    color: colors.danger,
-    textAlign: 'center',
-    marginBottom: spacing.md,
-  },
-  formGroup: {
-    marginBottom: spacing.lg,
-  },
-  label: {
-    ...typography.bodySmall,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: spacing.sm,
-  },
-  spacesScroll: {
-    paddingVertical: spacing.xs,
-    gap: spacing.sm,
-  },
-  spaceCard: {
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.md,
-    borderWidth: 2,
-    borderColor: colors.border,
-    padding: spacing.md,
-    marginRight: spacing.sm,
-    minWidth: 140,
-  },
-  spaceCardSelected: {
-    borderColor: colors.primary,
-    backgroundColor: colors.primary + '10',
-  },
-  spaceCardName: {
-    ...typography.body,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: spacing.xs,
-  },
-  spaceCardCapacity: {
-    ...typography.caption,
-    color: colors.textSecondary,
-  },
-  spacePreview: {
-    marginBottom: spacing.lg,
-    overflow: 'hidden',
-    padding: 0,
-  },
-  spaceImage: {
-    width: '100%',
-    height: 180,
-    backgroundColor: colors.lightGray,
-  },
-  spacePreviewContent: {
-    padding: spacing.md,
-  },
-  spacePreviewTitle: {
-    ...typography.h5,
-    color: colors.text,
-    marginBottom: spacing.xs,
-  },
-  spacePreviewDesc: {
-    ...typography.bodySmall,
-    color: colors.textSecondary,
-    marginBottom: spacing.sm,
-  },
-  spacePreviewRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.xs,
-  },
-  spacePreviewText: {
-    ...typography.bodySmall,
-    color: colors.text,
-    marginLeft: spacing.sm,
-  },
-  allDayBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-    backgroundColor: colors.accent + '15',
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    borderRadius: borderRadius.sm,
-    alignSelf: 'flex-start',
-    marginTop: spacing.xs,
-  },
-  allDayBadgeText: {
-    ...typography.caption,
-    color: colors.accent,
-    fontWeight: '600',
-  },
-  dateSection: {
-    marginBottom: spacing.lg,
-  },
-  sectionTitle: {
-    ...typography.h5,
-    color: colors.text,
-    marginBottom: spacing.md,
-    fontWeight: '600',
-  },
-  dateButton: {
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.md,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  dateButtonPressed: {
-    backgroundColor: colors.lightGray,
-    borderColor: colors.primary,
-  },
-  dateButtonContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-  },
-  dateIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: borderRadius.md,
-    backgroundColor: colors.primary + '10',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  dateTextContainer: {
-    flex: 1,
-  },
-  dateLabel: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    marginBottom: 2,
-    fontWeight: '500',
-  },
-  dateValue: {
-    ...typography.body,
-    color: colors.text,
-    fontWeight: '600',
-    fontSize: 16,
-  },
-  loadingContainer: {
-    paddingVertical: spacing.xl,
-  },
-  tipsCard: {
-    backgroundColor: colors.accent + '10',
-    borderColor: colors.accent + '30',
-    marginBottom: spacing.lg,
-  },
-  tipsTitle: {
-    ...typography.h5,
-    color: colors.text,
-    marginBottom: spacing.sm,
-  },
-  tipsText: {
-    ...typography.bodySmall,
-    color: colors.textSecondary,
-    marginBottom: spacing.xs,
-    lineHeight: 18,
-  },
-  tipsBold: {
-    fontWeight: '600',
-    color: colors.text,
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    gap: spacing.md,
-  },
-  button: {
-    flex: 1,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scrollContent: {
+      padding: spacing.lg,
+    },
+    title: {
+      ...typography.h2,
+      color: colors.text,
+      marginBottom: spacing.xl,
+    },
+    errorText: {
+      ...typography.body,
+      color: colors.danger,
+      textAlign: 'center',
+      marginBottom: spacing.md,
+    },
+    formGroup: {
+      marginBottom: spacing.lg,
+    },
+    label: {
+      ...typography.bodySmall,
+      fontWeight: '600',
+      color: colors.text,
+      marginBottom: spacing.sm,
+    },
+    spacesScroll: {
+      paddingVertical: spacing.xs,
+      gap: spacing.sm,
+    },
+    spaceCard: {
+      backgroundColor: colors.white,
+      borderRadius: borderRadius.md,
+      borderWidth: 2,
+      borderColor: colors.border,
+      padding: spacing.md,
+      marginRight: spacing.sm,
+      minWidth: 140,
+    },
+    spaceCardSelected: {
+      borderColor: colors.primary,
+      backgroundColor: colors.primary + '10',
+    },
+    spaceCardName: {
+      ...typography.body,
+      fontWeight: '600',
+      color: colors.text,
+      marginBottom: spacing.xs,
+    },
+    spaceCardCapacity: {
+      ...typography.caption,
+      color: colors.textSecondary,
+    },
+    spacePreview: {
+      marginBottom: spacing.lg,
+      overflow: 'hidden',
+      padding: 0,
+    },
+    spaceImage: {
+      width: '100%',
+      height: 180,
+      backgroundColor: colors.lightGray,
+    },
+    spacePreviewContent: {
+      padding: spacing.md,
+    },
+    spacePreviewTitle: {
+      ...typography.h5,
+      color: colors.text,
+      marginBottom: spacing.xs,
+    },
+    spacePreviewDesc: {
+      ...typography.bodySmall,
+      color: colors.textSecondary,
+      marginBottom: spacing.sm,
+    },
+    spacePreviewRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: spacing.xs,
+    },
+    spacePreviewText: {
+      ...typography.bodySmall,
+      color: colors.text,
+      marginLeft: spacing.sm,
+    },
+    allDayBadge: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.xs,
+      backgroundColor: colors.accent + '15',
+      paddingHorizontal: spacing.sm,
+      paddingVertical: spacing.xs,
+      borderRadius: borderRadius.sm,
+      alignSelf: 'flex-start',
+      marginTop: spacing.xs,
+    },
+    allDayBadgeText: {
+      ...typography.caption,
+      color: colors.accent,
+      fontWeight: '600',
+    },
+    dateSection: {
+      marginBottom: spacing.lg,
+    },
+    sectionTitle: {
+      ...typography.h5,
+      color: colors.text,
+      marginBottom: spacing.md,
+      fontWeight: '600',
+    },
+    dateButton: {
+      backgroundColor: colors.white,
+      borderRadius: borderRadius.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: spacing.md,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.05,
+      shadowRadius: 2,
+      elevation: 1,
+    },
+    dateButtonPressed: {
+      backgroundColor: colors.lightGray,
+      borderColor: colors.primary,
+    },
+    dateButtonContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.md,
+    },
+    dateIconContainer: {
+      width: 48,
+      height: 48,
+      borderRadius: borderRadius.md,
+      backgroundColor: colors.primary + '10',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    dateTextContainer: {
+      flex: 1,
+    },
+    dateLabel: {
+      ...typography.caption,
+      color: colors.textSecondary,
+      marginBottom: 2,
+      fontWeight: '500',
+    },
+    dateValue: {
+      ...typography.body,
+      color: colors.text,
+      fontWeight: '600',
+      fontSize: 16,
+    },
+    loadingContainer: {
+      paddingVertical: spacing.xl,
+    },
+    tipsCard: {
+      backgroundColor: colors.accent + '10',
+      borderColor: colors.accent + '30',
+      marginBottom: spacing.lg,
+    },
+    tipsTitle: {
+      ...typography.h5,
+      color: colors.text,
+      marginBottom: spacing.sm,
+    },
+    tipsText: {
+      ...typography.bodySmall,
+      color: colors.textSecondary,
+      marginBottom: spacing.xs,
+      lineHeight: 18,
+    },
+    tipsBold: {
+      fontWeight: '600',
+      color: colors.text,
+    },
+    buttonRow: {
+      flexDirection: 'row',
+      gap: spacing.md,
+    },
+    button: {
+      flex: 1,
+    },
+  });

@@ -100,6 +100,19 @@ export function makeColors(scheme: ColorSchemeName) {
     background: semantic.canvas,
     border: semantic.line,
     // `surface` e `surfaceMuted` já vêm do spread de `semantic`
+
+    // Aliases de compatibilidade para as telas em migração (nomes antigos da
+    // paleta plana → tokens semânticos do tema). Preferir os nomes semânticos
+    // em código novo.
+    white: semantic.surface,
+    lightGray: semantic.surfaceMuted,
+    gray: semantic.inkMuted,
+    textSecondary: semantic.inkMuted,
+    textLight: semantic.inkMuted,
+    accent: status.action,
+    accentOrange: status.alert,
+    secondary: brand.soft,
+    dark: semantic.ink,
   };
 }
 

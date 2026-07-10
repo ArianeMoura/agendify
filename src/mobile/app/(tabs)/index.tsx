@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,13 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, typography, borderRadius } from '@/constants/theme';
+import {
+  spacing,
+  typography,
+  borderRadius,
+  type ThemeColors,
+} from '@/constants/theme';
+import { useTheme } from '@/lib/theme/ThemeProvider';
 import { Card } from '@/components/ui/Card';
 import { useAuth } from '@/lib/contexts/AuthContext';
 import { Role } from '@/lib/types';
@@ -25,21 +31,28 @@ export const DashboardCard = ({
   description: string;
   onPress: () => void;
   color: string;
-}) => (
-  <TouchableOpacity onPress={onPress} style={styles.cardContainer}>
-    <Card style={styles.card}>
-      <View style={[styles.iconContainer, { backgroundColor: color + '20' }]}>
-        <Ionicons name={icon} size={32} color={color} />
-      </View>
-      <Text style={styles.cardTitle}>{title}</Text>
-      <Text style={styles.cardDescription}>{description}</Text>
-    </Card>
-  </TouchableOpacity>
-);
+}) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
+  return (
+    <TouchableOpacity onPress={onPress} style={styles.cardContainer}>
+      <Card style={styles.card}>
+        <View style={[styles.iconContainer, { backgroundColor: color + '20' }]}>
+          <Ionicons name={icon} size={32} color={color} />
+        </View>
+        <Text style={styles.cardTitle}>{title}</Text>
+        <Text style={styles.cardDescription}>{description}</Text>
+      </Card>
+    </TouchableOpacity>
+  );
+};
 
 export default function DashboardScreen() {
   const router = useRouter();
   const { user } = useAuth();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const isAdmin =
     user?.role === Role.OrgAdmin || user?.role === Role.PlatformOwner;
 
@@ -134,81 +147,82 @@ export default function DashboardScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scrollContent: {
-    padding: spacing.lg,
-  },
-  header: {
-    marginBottom: spacing.xl,
-  },
-  greeting: {
-    ...typography.h4,
-    color: colors.textSecondary,
-  },
-  userName: {
-    ...typography.h1,
-    color: colors.text,
-  },
-  sectionTitle: {
-    ...typography.h3,
-    color: colors.text,
-    marginBottom: spacing.lg,
-  },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginHorizontal: -spacing.sm,
-    marginBottom: spacing.xl,
-  },
-  cardContainer: {
-    width: '50%',
-    padding: spacing.sm,
-  },
-  card: {
-    alignItems: 'center',
-    minHeight: 160,
-    justifyContent: 'flex-start',
-    flex: 1,
-  },
-  iconContainer: {
-    width: 64,
-    height: 64,
-    borderRadius: borderRadius.round,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.md,
-  },
-  cardTitle: {
-    ...typography.h5,
-    color: colors.text,
-    textAlign: 'center',
-    marginBottom: spacing.xs,
-  },
-  cardDescription: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    textAlign: 'center',
-  },
-  infoCard: {
-    marginBottom: spacing.lg,
-  },
-  infoTitle: {
-    ...typography.h4,
-    color: colors.text,
-    marginBottom: spacing.md,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.sm,
-  },
-  infoText: {
-    ...typography.body,
-    color: colors.text,
-    marginLeft: spacing.md,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scrollContent: {
+      padding: spacing.lg,
+    },
+    header: {
+      marginBottom: spacing.xl,
+    },
+    greeting: {
+      ...typography.h4,
+      color: colors.textSecondary,
+    },
+    userName: {
+      ...typography.h1,
+      color: colors.text,
+    },
+    sectionTitle: {
+      ...typography.h3,
+      color: colors.text,
+      marginBottom: spacing.lg,
+    },
+    grid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      marginHorizontal: -spacing.sm,
+      marginBottom: spacing.xl,
+    },
+    cardContainer: {
+      width: '50%',
+      padding: spacing.sm,
+    },
+    card: {
+      alignItems: 'center',
+      minHeight: 160,
+      justifyContent: 'flex-start',
+      flex: 1,
+    },
+    iconContainer: {
+      width: 64,
+      height: 64,
+      borderRadius: borderRadius.round,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: spacing.md,
+    },
+    cardTitle: {
+      ...typography.h5,
+      color: colors.text,
+      textAlign: 'center',
+      marginBottom: spacing.xs,
+    },
+    cardDescription: {
+      ...typography.caption,
+      color: colors.textSecondary,
+      textAlign: 'center',
+    },
+    infoCard: {
+      marginBottom: spacing.lg,
+    },
+    infoTitle: {
+      ...typography.h4,
+      color: colors.text,
+      marginBottom: spacing.md,
+    },
+    infoRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: spacing.sm,
+    },
+    infoText: {
+      ...typography.body,
+      color: colors.text,
+      marginLeft: spacing.md,
+    },
+  });

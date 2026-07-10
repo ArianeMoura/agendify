@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -15,7 +15,13 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, typography, borderRadius } from '@/constants/theme';
+import {
+  spacing,
+  typography,
+  borderRadius,
+  type ThemeColors,
+} from '@/constants/theme';
+import { useTheme } from '@/lib/theme/ThemeProvider';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
@@ -26,6 +32,8 @@ import { spaceSchema, SpaceFormData } from '@/lib/schemas/space';
 export default function CreateSpaceScreen() {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [imageUri, setImageUri] = useState<string>('');
   const [selectedHours, setSelectedHours] = useState<string[]>([]);
 
@@ -387,126 +395,127 @@ export default function CreateSpaceScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scrollContent: {
-    padding: spacing.lg,
-  },
-  title: {
-    ...typography.h2,
-    color: colors.text,
-    marginBottom: spacing.xl,
-  },
-  switchContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.lg,
-    paddingVertical: spacing.sm,
-  },
-  switchLabel: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    flex: 1,
-  },
-  label: {
-    ...typography.body,
-    fontWeight: '600',
-    color: colors.text,
-  },
-  sublabel: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  sectionTitle: {
-    ...typography.h5,
-    color: colors.text,
-    marginBottom: spacing.md,
-    fontWeight: '600',
-  },
-  sectionSubtitle: {
-    ...typography.bodySmall,
-    color: colors.textSecondary,
-    marginBottom: spacing.md,
-  },
-  allDayTimesContainer: {
-    marginBottom: spacing.lg,
-  },
-  hourlyBookingContainer: {
-    marginBottom: spacing.lg,
-  },
-  hoursGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.sm,
-    marginBottom: spacing.md,
-  },
-  hourCheckbox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.white,
-    borderWidth: 2,
-    borderColor: colors.border,
-    borderRadius: borderRadius.md,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    gap: spacing.sm,
-    minWidth: 100,
-  },
-  hourCheckboxSelected: {
-    borderColor: colors.primary,
-    backgroundColor: colors.primary + '10',
-  },
-  checkbox: {
-    width: 20,
-    height: 20,
-    borderRadius: borderRadius.sm,
-    borderWidth: 2,
-    borderColor: colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.white,
-  },
-  checkboxSelected: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
-  hourText: {
-    ...typography.body,
-    color: colors.text,
-    fontWeight: '500',
-  },
-  hourTextSelected: {
-    color: colors.primary,
-    fontWeight: '600',
-  },
-  infoBox: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-    backgroundColor: colors.accent + '10',
-    padding: spacing.md,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: colors.accent + '30',
-    marginTop: spacing.sm,
-  },
-  infoText: {
-    ...typography.bodySmall,
-    color: colors.text,
-    flex: 1,
-    lineHeight: 18,
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    gap: spacing.md,
-    marginTop: spacing.lg,
-  },
-  button: {
-    flex: 1,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scrollContent: {
+      padding: spacing.lg,
+    },
+    title: {
+      ...typography.h2,
+      color: colors.text,
+      marginBottom: spacing.xl,
+    },
+    switchContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: spacing.lg,
+      paddingVertical: spacing.sm,
+    },
+    switchLabel: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.sm,
+      flex: 1,
+    },
+    label: {
+      ...typography.body,
+      fontWeight: '600',
+      color: colors.text,
+    },
+    sublabel: {
+      ...typography.caption,
+      color: colors.textSecondary,
+      marginTop: 2,
+    },
+    sectionTitle: {
+      ...typography.h5,
+      color: colors.text,
+      marginBottom: spacing.md,
+      fontWeight: '600',
+    },
+    sectionSubtitle: {
+      ...typography.bodySmall,
+      color: colors.textSecondary,
+      marginBottom: spacing.md,
+    },
+    allDayTimesContainer: {
+      marginBottom: spacing.lg,
+    },
+    hourlyBookingContainer: {
+      marginBottom: spacing.lg,
+    },
+    hoursGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: spacing.sm,
+      marginBottom: spacing.md,
+    },
+    hourCheckbox: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.white,
+      borderWidth: 2,
+      borderColor: colors.border,
+      borderRadius: borderRadius.md,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      gap: spacing.sm,
+      minWidth: 100,
+    },
+    hourCheckboxSelected: {
+      borderColor: colors.primary,
+      backgroundColor: colors.primary + '10',
+    },
+    checkbox: {
+      width: 20,
+      height: 20,
+      borderRadius: borderRadius.sm,
+      borderWidth: 2,
+      borderColor: colors.border,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.white,
+    },
+    checkboxSelected: {
+      backgroundColor: colors.primary,
+      borderColor: colors.primary,
+    },
+    hourText: {
+      ...typography.body,
+      color: colors.text,
+      fontWeight: '500',
+    },
+    hourTextSelected: {
+      color: colors.primary,
+      fontWeight: '600',
+    },
+    infoBox: {
+      flexDirection: 'row',
+      gap: spacing.sm,
+      backgroundColor: colors.accent + '10',
+      padding: spacing.md,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: colors.accent + '30',
+      marginTop: spacing.sm,
+    },
+    infoText: {
+      ...typography.bodySmall,
+      color: colors.text,
+      flex: 1,
+      lineHeight: 18,
+    },
+    buttonRow: {
+      flexDirection: 'row',
+      gap: spacing.md,
+      marginTop: spacing.lg,
+    },
+    button: {
+      flex: 1,
+    },
+  });

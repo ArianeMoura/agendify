@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -14,16 +14,24 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, typography, borderRadius } from '@/constants/theme';
+import {
+  spacing,
+  typography,
+  borderRadius,
+  type ThemeColors,
+} from '@/constants/theme';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { useAuth } from '@/lib/contexts/AuthContext';
+import { useTheme } from '@/lib/theme/ThemeProvider';
 import { authApi } from '@/lib/api/auth';
 import { acceptInviteSchema, AcceptInviteFormData } from '@/lib/schemas/auth';
 
 export default function AcceptInviteScreen() {
   const router = useRouter();
   const { setAuthData } = useAuth();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [showPassword, setShowPassword] = useState(false);
 
   // O token pode vir de um deep link (agendify://accept-invite?token=...) ou ser colado.
@@ -185,49 +193,50 @@ export default function AcceptInviteScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.primary,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    padding: spacing.xl,
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: spacing.xxl,
-  },
-  brandTitle: {
-    color: colors.white,
-    fontSize: 48,
-    fontWeight: '700',
-    marginBottom: spacing.sm,
-  },
-  subtitle: {
-    ...typography.body,
-    color: colors.white,
-    opacity: 0.9,
-  },
-  form: {
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.xl,
-    padding: spacing.xl,
-  },
-  submitButton: {
-    marginTop: spacing.md,
-  },
-  loginLink: {
-    marginTop: spacing.lg,
-    alignItems: 'center',
-  },
-  loginText: {
-    ...typography.body,
-    color: colors.textSecondary,
-  },
-  loginTextBold: {
-    fontWeight: '600',
-    color: colors.primary,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.primary,
+    },
+    scrollContent: {
+      flexGrow: 1,
+      justifyContent: 'center',
+      padding: spacing.xl,
+    },
+    header: {
+      alignItems: 'center',
+      marginBottom: spacing.xxl,
+    },
+    brandTitle: {
+      color: colors.white,
+      fontSize: 48,
+      fontWeight: '700',
+      marginBottom: spacing.sm,
+    },
+    subtitle: {
+      ...typography.body,
+      color: colors.white,
+      opacity: 0.9,
+    },
+    form: {
+      backgroundColor: colors.white,
+      borderRadius: borderRadius.xl,
+      padding: spacing.xl,
+    },
+    submitButton: {
+      marginTop: spacing.md,
+    },
+    loginLink: {
+      marginTop: spacing.lg,
+      alignItems: 'center',
+    },
+    loginText: {
+      ...typography.body,
+      color: colors.textSecondary,
+    },
+    loginTextBold: {
+      fontWeight: '600',
+      color: colors.primary,
+    },
+  });
