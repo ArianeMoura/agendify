@@ -5,7 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import 'react-native-reanimated';
-import { PortalProvider, PortalHost } from '@gorhom/portal';
+import { PortalProvider } from '@gorhom/portal';
 import {
   useFonts,
   Manrope_400Regular,
@@ -20,6 +20,7 @@ import {
 } from '@expo-google-fonts/sora';
 import { AuthProvider, useAuth } from '@/lib/contexts/AuthContext';
 import { ThemeProvider, useTheme } from '@/lib/theme/ThemeProvider';
+import { ToastProvider } from '@/components/ui/Toast';
 
 // Mantém o splash nativo até fontes da marca + sessão estarem prontas,
 // evitando um "flash" de fonte do sistema antes do Sora/Manrope carregar.
@@ -130,9 +131,11 @@ export default function RootLayout() {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <ThemeProvider>
+            {/* PortalProvider já provê um host "root" (usado por Toast e popovers). */}
             <PortalProvider>
-              <RootLayoutNav />
-              <PortalHost name="root" />
+              <ToastProvider>
+                <RootLayoutNav />
+              </ToastProvider>
             </PortalProvider>
           </ThemeProvider>
         </AuthProvider>
