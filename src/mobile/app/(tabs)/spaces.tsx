@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -13,12 +13,13 @@ import { useRouter } from 'expo-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Ionicons } from '@expo/vector-icons';
 import {
-  colors,
   spacing,
   typography,
   borderRadius,
   shadows,
+  type ThemeColors,
 } from '@/constants/theme';
+import { useTheme } from '@/lib/theme/ThemeProvider';
 import { Card } from '@/components/ui/Card';
 import { Loading } from '@/components/ui/Loading';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -31,6 +32,8 @@ export default function SpacesScreen() {
   const router = useRouter();
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const isAdmin =
     user?.role === Role.OrgAdmin || user?.role === Role.PlatformOwner;
 
@@ -165,6 +168,21 @@ export default function SpacesScreen() {
           )}
         </View>
 
+        <TouchableOpacity
+          style={styles.reviewsLink}
+          onPress={() =>
+            router.push({
+              pathname: '/spaces/[id]/reviews',
+              params: { id: item.id, name: item.name },
+            })
+          }
+          accessibilityRole="button"
+          accessibilityLabel={`Ver avaliações de ${item.name}`}
+        >
+          <Ionicons name="star-outline" size={16} color={colors.brandFg} />
+          <Text style={styles.reviewsLinkText}>Avaliações</Text>
+        </TouchableOpacity>
+
         {!isAdmin && (
           <TouchableOpacity
             style={styles.bookButton}
@@ -223,101 +241,115 @@ export default function SpacesScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  listContent: {
-    padding: spacing.lg,
-    flexGrow: 1,
-  },
-  spaceCard: {
-    marginBottom: spacing.md,
-    overflow: 'hidden',
-    padding: 0,
-  },
-  spaceImage: {
-    width: '100%',
-    height: 180,
-    backgroundColor: colors.lightGray,
-  },
-  spaceContent: {
-    padding: spacing.md,
-  },
-  spaceHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: spacing.md,
-  },
-  spaceInfo: {
-    flex: 1,
-  },
-  spaceName: {
-    ...typography.h5,
-    color: colors.text,
-    marginBottom: spacing.xs,
-  },
-  statusBadge: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    borderRadius: borderRadius.sm,
-    marginTop: spacing.xs,
-  },
-  statusText: {
-    ...typography.caption,
-    fontWeight: '600',
-  },
-  spaceActions: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
-  iconButton: {
-    padding: spacing.xs,
-  },
-  description: {
-    ...typography.body,
-    color: colors.textSecondary,
-    marginBottom: spacing.md,
-  },
-  detailsContainer: {
-    gap: spacing.sm,
-  },
-  detailRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  detailText: {
-    ...typography.bodySmall,
-    color: colors.text,
-    marginLeft: spacing.sm,
-  },
-  bookButton: {
-    marginTop: spacing.md,
-    backgroundColor: colors.primary,
-    paddingVertical: spacing.md,
-    borderRadius: borderRadius.md,
-    alignItems: 'center',
-  },
-  bookButtonText: {
-    ...typography.body,
-    color: colors.white,
-    fontWeight: '600',
-  },
-  fabContainer: {
-    position: 'absolute',
-    bottom: spacing.xl,
-    right: spacing.xl,
-  },
-  fab: {
-    width: 56,
-    height: 56,
-    borderRadius: borderRadius.round,
-    backgroundColor: colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-    ...shadows.lg,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    listContent: {
+      padding: spacing.lg,
+      flexGrow: 1,
+    },
+    spaceCard: {
+      marginBottom: spacing.md,
+      overflow: 'hidden',
+      padding: 0,
+    },
+    spaceImage: {
+      width: '100%',
+      height: 180,
+      backgroundColor: colors.lightGray,
+    },
+    spaceContent: {
+      padding: spacing.md,
+    },
+    spaceHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+      marginBottom: spacing.md,
+    },
+    spaceInfo: {
+      flex: 1,
+    },
+    spaceName: {
+      ...typography.h5,
+      color: colors.text,
+      marginBottom: spacing.xs,
+    },
+    statusBadge: {
+      alignSelf: 'flex-start',
+      paddingHorizontal: spacing.sm,
+      paddingVertical: spacing.xs,
+      borderRadius: borderRadius.sm,
+      marginTop: spacing.xs,
+    },
+    statusText: {
+      ...typography.caption,
+      fontWeight: '600',
+    },
+    spaceActions: {
+      flexDirection: 'row',
+      gap: spacing.sm,
+    },
+    iconButton: {
+      padding: spacing.xs,
+    },
+    description: {
+      ...typography.body,
+      color: colors.textSecondary,
+      marginBottom: spacing.md,
+    },
+    detailsContainer: {
+      gap: spacing.sm,
+    },
+    detailRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    detailText: {
+      ...typography.bodySmall,
+      color: colors.text,
+      marginLeft: spacing.sm,
+    },
+    reviewsLink: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.xs,
+      alignSelf: 'flex-start',
+      marginTop: spacing.md,
+      paddingVertical: spacing.xs,
+    },
+    reviewsLinkText: {
+      ...typography.bodySmall,
+      color: colors.brandFg,
+      fontWeight: '600',
+    },
+    bookButton: {
+      marginTop: spacing.md,
+      backgroundColor: colors.primary,
+      paddingVertical: spacing.md,
+      borderRadius: borderRadius.md,
+      alignItems: 'center',
+    },
+    bookButtonText: {
+      ...typography.body,
+      color: colors.white,
+      fontWeight: '600',
+    },
+    fabContainer: {
+      position: 'absolute',
+      bottom: spacing.xl,
+      right: spacing.xl,
+    },
+    fab: {
+      width: 56,
+      height: 56,
+      borderRadius: borderRadius.round,
+      backgroundColor: colors.primary,
+      justifyContent: 'center',
+      alignItems: 'center',
+      ...shadows.lg,
+    },
+  });

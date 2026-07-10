@@ -113,6 +113,10 @@ function RootLayoutNav() {
           name="spaces/edit/[id]"
           options={{ title: 'Editar Espaço' }}
         />
+        <Stack.Screen
+          name="spaces/[id]/reviews"
+          options={{ title: 'Avaliações' }}
+        />
         <Stack.Screen name="profile/edit" options={{ title: 'Perfil' }} />
         <Stack.Screen
           name="profile/change-password"
