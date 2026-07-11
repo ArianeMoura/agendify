@@ -20,6 +20,7 @@ import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
 import { useAuth } from '@/lib/contexts/AuthContext';
 import { useTheme } from '@/lib/theme/ThemeProvider';
+import { CONTENT_MAX_WIDTH } from '@/lib/theme/useResponsive';
 import { usersApi } from '@/lib/api/users';
 
 const editProfileSchema = z.object({
@@ -159,6 +160,9 @@ const createStyles = (colors: ThemeColors) =>
     },
     scrollContent: {
       padding: spacing.lg,
+      maxWidth: CONTENT_MAX_WIDTH,
+      width: '100%',
+      alignSelf: 'center',
     },
     title: {
       ...typography.h2,

@@ -25,6 +25,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { useAuth } from '@/lib/contexts/AuthContext';
 import { useTheme } from '@/lib/theme/ThemeProvider';
+import { CONTENT_MAX_WIDTH } from '@/lib/theme/useResponsive';
 import { authApi } from '@/lib/api/auth';
 import { loginSchema, LoginFormData } from '@/lib/schemas/auth';
 
@@ -184,6 +185,9 @@ const createStyles = (colors: ThemeColors) =>
       flexGrow: 1,
       justifyContent: 'center',
       padding: spacing.xl,
+      maxWidth: CONTENT_MAX_WIDTH,
+      width: '100%',
+      alignSelf: 'center',
     },
     header: {
       alignItems: 'center',

@@ -1,11 +1,16 @@
 import type { ReactNode } from 'react';
-import { View, type ViewProps, type ViewStyle } from 'react-native';
+import {
+  View,
+  type ViewProps,
+  type ViewStyle,
+  type StyleProp,
+} from 'react-native';
 import { spacing, borderRadius, shadows } from '@/constants/theme';
 import { useTheme } from '@/lib/theme/ThemeProvider';
 
 interface CardProps extends ViewProps {
   children: ReactNode;
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
   variant?: 'default' | 'elevated' | 'outlined';
 }
 

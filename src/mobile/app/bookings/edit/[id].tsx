@@ -8,8 +8,8 @@ import {
   Platform,
   Alert,
   Pressable,
-  Image,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Ionicons } from '@expo/vector-icons';
@@ -20,6 +20,7 @@ import {
   type ThemeColors,
 } from '@/constants/theme';
 import { useTheme } from '@/lib/theme/ThemeProvider';
+import { CONTENT_MAX_WIDTH } from '@/lib/theme/useResponsive';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Loading } from '@/components/ui/Loading';
@@ -240,7 +241,8 @@ export default function EditBookingScreen() {
                 <Image
                   source={{ uri: getImageUrl(selectedSpace.imageUrl) }}
                   style={styles.spaceImage}
-                  resizeMode="cover"
+                  contentFit="cover"
+                  transition={200}
                 />
               )}
               <View style={styles.spacePreviewContent}>
@@ -370,6 +372,9 @@ const createStyles = (colors: ThemeColors) =>
     },
     scrollContent: {
       padding: spacing.lg,
+      maxWidth: CONTENT_MAX_WIDTH,
+      width: '100%',
+      alignSelf: 'center',
     },
     title: {
       ...typography.h2,
@@ -398,7 +403,7 @@ const createStyles = (colors: ThemeColors) =>
     },
     spaceImage: {
       width: '100%',
-      height: 180,
+      aspectRatio: 16 / 9,
       backgroundColor: colors.lightGray,
     },
     spacePreviewContent: {

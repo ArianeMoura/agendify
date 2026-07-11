@@ -7,8 +7,8 @@ import {
   TouchableOpacity,
   RefreshControl,
   Alert,
-  Image,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Ionicons } from '@expo/vector-icons';
@@ -20,6 +20,7 @@ import {
   type ThemeColors,
 } from '@/constants/theme';
 import { useTheme } from '@/lib/theme/ThemeProvider';
+import { useResponsive } from '@/lib/theme/useResponsive';
 import { Card } from '@/components/ui/Card';
 import { Loading } from '@/components/ui/Loading';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -33,6 +34,7 @@ export default function SpacesScreen() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { colors } = useTheme();
+  const { columns } = useResponsive();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const isAdmin =
     user?.role === Role.OrgAdmin || user?.role === Role.PlatformOwner;
@@ -76,12 +78,13 @@ export default function SpacesScreen() {
   );
 
   const renderSpaceItem = ({ item }: { item: Space }) => (
-    <Card style={styles.spaceCard}>
+    <Card style={[styles.spaceCard, columns > 1 ? styles.spaceCardGrid : null]}>
       {item.imageUrl && (
         <Image
           source={{ uri: getImageUrl(item.imageUrl) }}
           style={styles.spaceImage}
-          resizeMode="cover"
+          contentFit="cover"
+          transition={200}
         />
       )}
 
@@ -115,6 +118,9 @@ export default function SpacesScreen() {
               <TouchableOpacity
                 onPress={() => router.push(`/spaces/edit/${item.id}`)}
                 style={styles.iconButton}
+                hitSlop={8}
+                accessibilityRole="button"
+                accessibilityLabel={`Editar ${item.name}`}
               >
                 <Ionicons
                   name="create-outline"
@@ -125,6 +131,9 @@ export default function SpacesScreen() {
               <TouchableOpacity
                 onPress={() => handleDelete(item.id)}
                 style={styles.iconButton}
+                hitSlop={8}
+                accessibilityRole="button"
+                accessibilityLabel={`Excluir ${item.name}`}
               >
                 <Ionicons
                   name="trash-outline"
@@ -188,6 +197,13 @@ export default function SpacesScreen() {
             style={styles.bookButton}
             onPress={() => router.push(`/bookings/create?spaceId=${item.id}`)}
             disabled={!item.availability}
+            accessibilityRole="button"
+            accessibilityState={{ disabled: !item.availability }}
+            accessibilityLabel={
+              item.availability
+                ? `Reservar ${item.name}`
+                : `${item.name} indisponível`
+            }
           >
             <Text style={styles.bookButtonText}>
               {item.availability ? 'Reservar' : 'Indisponível'}
@@ -208,6 +224,10 @@ export default function SpacesScreen() {
         data={spaces}
         renderItem={renderSpaceItem}
         keyExtractor={(item) => item.id}
+        // `key` força o FlatList a remontar quando o nº de colunas muda (rotação/tablet).
+        key={`cols-${columns}`}
+        numColumns={columns}
+        columnWrapperStyle={columns > 1 ? styles.columnWrapper : undefined}
         contentContainerStyle={styles.listContent}
         ListEmptyComponent={
           <EmptyState
@@ -232,6 +252,8 @@ export default function SpacesScreen() {
           <TouchableOpacity
             style={styles.fab}
             onPress={() => router.push('/spaces/create')}
+            accessibilityRole="button"
+            accessibilityLabel="Adicionar espaço"
           >
             <Ionicons name="add" size={32} color={colors.white} />
           </TouchableOpacity>
@@ -256,9 +278,15 @@ const createStyles = (colors: ThemeColors) =>
       overflow: 'hidden',
       padding: 0,
     },
+    spaceCardGrid: {
+      flex: 1,
+    },
+    columnWrapper: {
+      gap: spacing.md,
+    },
     spaceImage: {
       width: '100%',
-      height: 180,
+      aspectRatio: 16 / 9,
       backgroundColor: colors.lightGray,
     },
     spaceContent: {
