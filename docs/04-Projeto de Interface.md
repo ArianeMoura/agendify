@@ -94,3 +94,27 @@ Abaixo de `lg`, a barra lateral vira um **drawer** acessível, aberto por um bot
 <div align="center">
 <img width="300" alt="Navegação mobile do painel — drawer" src="img/admin/mobile-drawer.png" />
 </div>
+
+## Telas do App Mobile (implementadas)
+
+O aplicativo (Expo / React Native — perfil **Member** dentro de um *tenant*) segue o **mesmo design
+system** do painel: marca `#5E35B1`, fontes **Sora/Manrope** e os **mesmos tokens** que trocam de
+valor entre os temas **claro** e **escuro**. A experiência é acessível (papéis, rótulos e estados
+de acessibilidade, alvos de toque ≥ 44 px, *Dynamic Type*) e responsiva (safe area por *insets*,
+breakpoints para tablet/landscape, listas virtualizadas).
+
+- **Login / Aceite de convite** — autenticação por e-mail e senha; convites por *deep link*
+  (`agendify://accept-invite?token=…`), com formulários acessíveis e teclado tratado.
+- **Início (dashboard)** — visão inicial personalizada por papel (Member × admin do *tenant*).
+- **Espaços** — catálogo reservável com imagem, status e capacidade; grade adaptativa (1 coluna no
+  celular, 2 no tablet); ações de reservar e de ver **avaliações**.
+- **Reservas** — criação, edição e cancelamento, com seleção de horários que respeita a regra de
+  conflito (RN-01).
+- **Avaliações do espaço (RF-013)** — nota por estrelas + comentário, listagem e média, ligadas ao
+  endpoint `/reviews`.
+- **Perfil** — edição de dados, troca de senha e **alternância de tema** (claro / sistema / escuro).
+- **Usuários** — gestão de acessos, **visível apenas para administradores** do *tenant*.
+
+> Nota: a **recuperação de senha (RF-003)** ainda não está disponível no app — ver
+> [Especificação → Requisitos](02-Especificação%20do%20Projeto.md) e o [Roadmap](../ROADMAP.md).
+> As capturas de tela do mobile serão adicionadas quando publicadas.

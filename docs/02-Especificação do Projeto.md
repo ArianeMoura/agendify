@@ -151,6 +151,16 @@ O Agendify é uma solução mobile e web para gerenciar reservas, uso e faturame
 |RF-014| O sistema deve permitir que os usuários editem seu perfil.| ALTA |
 |RF-015| O sistema deve exibir uma dashboard inicial personalizada, com conteúdos e funcionalidades diferentes para usuários e administradores. | ALTA |
 
+> **Status de implementação (nota).** A maioria dos RFs acima está entregue na API + web
+> (admin) e/ou no app mobile. Exceções conhecidas nesta data:
+> - **RF-003 (recuperação de senha): _planejado_ — ainda não implementado.** Não há endpoint
+>   de *forgot/reset* no backend nem fluxo real no cliente; a antiga tela mobile era apenas uma
+>   fachada (`mailto`) e foi removida. Rastreado no [Roadmap](../ROADMAP.md).
+> - **RF-010 (relatórios/dashboards):** entregue na **web (painel admin)**; é uma visão de
+>   gestão (admin/owner) e não faz parte do app mobile do Member.
+> - **RF-013 (avaliações):** entregue via API e **reconstruída no mobile** (tela de avaliações
+>   do espaço, ligada ao endpoint `/reviews`).
+
 #### Requisitos funcionais avançados
 
 Funcionalidades de plataforma moderna de reservas, priorizadas para a evolução do produto. O
