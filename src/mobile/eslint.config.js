@@ -8,6 +8,13 @@ module.exports = defineConfig([
   // Desliga regras de estilo que conflitam com o Prettier (formatação é do Prettier).
   eslintConfigPrettier,
   {
+    // Testes precisam declarar jest.mock() antes dos imports que dependem dele.
+    files: ['**/*.test.{ts,tsx}'],
+    rules: {
+      'import/first': 'off',
+    },
+  },
+  {
     ignores: ['dist/*', 'coverage/*'],
   },
 ]);
