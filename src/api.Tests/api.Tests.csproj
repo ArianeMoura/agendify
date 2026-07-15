@@ -14,6 +14,9 @@
     <PackageReference Include="Testcontainers.PostgreSql" Version="3.10.0" />
     <!-- Alinha a versão do EF Core Relational com a do projeto api (evita MSB3277). -->
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.9" />
+    <!-- Testes de endpoint: sobem a API in-process (WebApplicationFactory) e exercitam o
+         model binding, que os testes de service não atravessam. Mesma versão do stack. -->
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.9" />
     <PackageReference Include="NUnit" Version="4.2.2" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
     <PackageReference Include="NUnit.Analyzers" Version="4.3.0">

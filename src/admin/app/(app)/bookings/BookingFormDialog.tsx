@@ -14,56 +14,80 @@ function toUtcIso(local: string): string {
   return `${withSeconds}Z`;
 }
 
+// Inverso do toUtcIso: o ISO UTC da API volta ao formato que o datetime-local aceita
+// (YYYY-MM-DDTHH:mm). Sem isso o input abre vazio na edição.
+function toLocalInput(iso: string): string {
+  if (!iso) return "";
+  return iso.replace("Z", "").slice(0, 16);
+}
+
 interface BookingFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** Presente = edição; ausente = criação. */
+  booking?: Booking | null;
 }
 
-/** Modal de nova reserva. O corpo é filho do Dialog (monta limpo a cada abertura). */
-export function BookingFormDialog({ open, onOpenChange }: BookingFormDialogProps) {
+/** Modal de nova reserva / edição. O corpo é filho do Dialog (monta limpo a cada abertura). */
+export function BookingFormDialog({ open, onOpenChange, booking }: BookingFormDialogProps) {
+  const editing = Boolean(booking);
   return (
     <Dialog
       open={open}
       onOpenChange={onOpenChange}
-      title="Nova reserva"
-      description="Reserve um espaço em um intervalo de tempo."
+      title={editing ? "Editar reserva" : "Nova reserva"}
+      description={editing ? undefined : "Reserve um espaço em um intervalo de tempo."}
     >
-      <BookingForm onDone={() => onOpenChange(false)} />
+      <BookingForm booking={booking} onDone={() => onOpenChange(false)} />
     </Dialog>
   );
 }
 
-function BookingForm({ onDone }: { onDone: () => void }) {
+function BookingForm({ booking, onDone }: { booking?: Booking | null; onDone: () => void }) {
   const qc = useQueryClient();
   const { user } = useAuth();
+  const editing = Boolean(booking);
   const spaces = useQuery({ queryKey: ["spaces"], queryFn: () => apiFetch<Space[]>("/spaces") });
 
-  const [spaceId, setSpaceId] = useState("");
-  const [start, setStart] = useState("");
-  const [end, setEnd] = useState("");
+  const [spaceId, setSpaceId] = useState(booking?.spaceId ?? "");
+  const [start, setStart] = useState(toLocalInput(booking?.startDateTime ?? ""));
+  const [end, setEnd] = useState(toLocalInput(booking?.endDateTime ?? ""));
   const [conflict, setConflict] = useState<string | null>(null);
 
-  const create = useMutation({
+  const mutation = useMutation({
     mutationFn: () =>
-      apiFetch<Booking>("/bookings", {
-        method: "POST",
-        body: {
-          userId: user?.id,
-          spaceId,
-          startDateTime: toUtcIso(start),
-          endDateTime: toUtcIso(end),
-        },
-      }),
+      editing
+        ? apiFetch<Booking>("/bookings", {
+            method: "PUT",
+            // Sem userId: a API preserva o dono da reserva de propósito.
+            body: {
+              id: booking!.id,
+              spaceId,
+              startDateTime: toUtcIso(start),
+              endDateTime: toUtcIso(end),
+            },
+          })
+        : apiFetch<Booking>("/bookings", {
+            method: "POST",
+            body: {
+              userId: user?.id,
+              spaceId,
+              startDateTime: toUtcIso(start),
+              endDateTime: toUtcIso(end),
+            },
+          }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["bookings"] });
-      toast.success("Reserva confirmada.");
+      toast.success(editing ? "Reserva atualizada." : "Reserva confirmada.");
       onDone();
     },
     onError: (err) => {
       if (err instanceof ApiError && err.status === 409) {
         setConflict(err.message);
       } else {
-        toast.error(err instanceof Error ? err.message : "Erro ao criar reserva.");
+        toast.error(
+          err instanceof Error ? err.message : `Erro ao ${editing ? "editar" : "criar"} reserva.`
+        );
       }
     },
   });
@@ -71,7 +95,7 @@ function BookingForm({ onDone }: { onDone: () => void }) {
   const submit = (e: FormEvent) => {
     e.preventDefault();
     setConflict(null);
-    create.mutate();
+    mutation.mutate();
   };
 
   return (
@@ -122,7 +146,11 @@ function BookingForm({ onDone }: { onDone: () => void }) {
         )}
       </Field>
 
-      <DialogFooter onCancel={onDone} loading={create.isPending} submitLabel="Criar reserva" />
+      <DialogFooter
+        onCancel={onDone}
+        loading={mutation.isPending}
+        submitLabel={editing ? "Salvar alterações" : "Criar reserva"}
+      />
     </form>
   );
 }

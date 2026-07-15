@@ -37,13 +37,13 @@ namespace api.Controllers
 
         [HttpPost]
         [Authorize(Policy = "OrgAdmin")]
-        public async Task<IActionResult> Post(Resource resource)
+        public async Task<IActionResult> Post(CreateResourceRequest request)
         {
             var newResource = new Resource
             {
                 Id = Guid.NewGuid().ToString(),
-                Name = resource.Name,
-                Description = resource.Description,
+                Name = request.Name,
+                Description = request.Description,
             };
 
             await _resourcesService.Create(newResource);
@@ -53,20 +53,20 @@ namespace api.Controllers
 
         [HttpPut()]
         [Authorize(Policy = "OrgAdmin")]
-        public async Task<IActionResult> Put(Resource resource)
+        public async Task<IActionResult> Put(UpdateResourceRequest request)
         {
-            var dbResource = await _resourcesService.GetById(resource.Id!);
+            var dbResource = await _resourcesService.GetById(request.Id);
 
             if (dbResource == null)
             {
                 return NotFound();
             }
 
-            dbResource.Name = resource.Name;
-            dbResource.Description = resource.Description;
+            dbResource.Name = request.Name;
+            dbResource.Description = request.Description;
             dbResource.UpdatedAt = DateTime.UtcNow;
 
-            await _resourcesService.Update(resource.Id!, dbResource);
+            await _resourcesService.Update(request.Id, dbResource);
 
             return Ok(dbResource);
         }

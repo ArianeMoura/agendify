@@ -229,3 +229,8 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+// Os top-level statements geram uma classe Program internal. Torná-la pública e parcial é
+// o que permite ao WebApplicationFactory<Program> dos testes de endpoint achar o entry
+// point. Não tem efeito em runtime.
+public partial class Program { }

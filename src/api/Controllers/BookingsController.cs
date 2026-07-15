@@ -2,6 +2,7 @@ using api.Services;
 using api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Options;
 using System.Security.Claims;
 using System.Text.Json;
 
@@ -14,11 +15,20 @@ namespace api.Controllers
     {
         private readonly BookingsService _bookingsService;
         private readonly IdempotencyService _idempotencyService;
+        // Opções de JSON do próprio pipeline MVC. O corpo guardado para o replay idempotente
+        // precisa sair idêntico ao da resposta original — com Serialize() sem opções ele saía
+        // em PascalCase, enquanto a resposta normal vai em camelCase, e o replay devolvia um
+        // shape diferente do original (quebrando clientes, que são case-sensitive).
+        private readonly JsonSerializerOptions _jsonOptions;
 
-        public BookingsController(BookingsService bookingsService, IdempotencyService idempotencyService)
+        public BookingsController(
+            BookingsService bookingsService,
+            IdempotencyService idempotencyService,
+            IOptions<JsonOptions> jsonOptions)
         {
             _bookingsService = bookingsService;
             _idempotencyService = idempotencyService;
+            _jsonOptions = jsonOptions.Value.JsonSerializerOptions;
         }
 
         private string? CurrentUserId => User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -72,9 +82,9 @@ namespace api.Controllers
 
         [HttpPost]
         [Authorize(Policy = "Member")]
-        public async Task<IActionResult> Post(Booking booking)
+        public async Task<IActionResult> Post(CreateBookingRequest request)
         {
-            var userId = CurrentUserId ?? booking.UserId ?? string.Empty;
+            var userId = CurrentUserId ?? request.UserId ?? string.Empty;
 
             // Idempotência (RNF-014): replay com a mesma chave devolve a resposta original.
             var idemKey = Request.Headers["Idempotency-Key"].FirstOrDefault();
@@ -93,15 +103,16 @@ namespace api.Controllers
             }
 
             // Member só reserva para si; admin pode reservar em nome de outro membro.
-            var ownerId = IsAdmin() ? (booking.UserId ?? userId) : userId;
+            var ownerId = IsAdmin() ? (request.UserId ?? userId) : userId;
 
             var newBooking = new Booking
             {
                 Id = Guid.NewGuid().ToString(),
                 UserId = ownerId,
-                SpaceId = booking.SpaceId,
-                StartDateTime = ToUtc(booking.StartDateTime),
-                EndDateTime = ToUtc(booking.EndDateTime),
+                SpaceId = request.SpaceId,
+                // !.Value: o [Required] do DTO já garantiu que as datas vieram.
+                StartDateTime = ToUtc(request.StartDateTime!.Value),
+                EndDateTime = ToUtc(request.EndDateTime!.Value),
             };
 
             try
@@ -126,7 +137,7 @@ namespace api.Controllers
 
             if (!string.IsNullOrWhiteSpace(idemKey))
             {
-                var body = JsonSerializer.Serialize(created);
+                var body = JsonSerializer.Serialize(created, _jsonOptions);
                 await _idempotencyService.SaveAsync(idemKey, userId, StatusCodes.Status201Created, body);
             }
 
@@ -135,9 +146,9 @@ namespace api.Controllers
 
         [HttpPut()]
         [Authorize(Policy = "Member")]
-        public async Task<IActionResult> Put(Booking booking)
+        public async Task<IActionResult> Put(UpdateBookingRequest request)
         {
-            var dbBooking = await _bookingsService.GetById(booking.Id!);
+            var dbBooking = await _bookingsService.GetById(request.Id);
 
             if (dbBooking == null)
             {
@@ -155,9 +166,9 @@ namespace api.Controllers
                 Id = dbBooking.Id,
                 // Dono preservado: o PUT não reatribui a reserva a outro usuário.
                 UserId = dbBooking.UserId,
-                SpaceId = booking.SpaceId,
-                StartDateTime = ToUtc(booking.StartDateTime),
-                EndDateTime = ToUtc(booking.EndDateTime),
+                SpaceId = request.SpaceId,
+                StartDateTime = ToUtc(request.StartDateTime!.Value),
+                EndDateTime = ToUtc(request.EndDateTime!.Value),
                 Status = dbBooking.Status,
                 CreatedAt = dbBooking.CreatedAt,
                 UpdatedAt = DateTime.UtcNow,

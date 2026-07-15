@@ -1,7 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { CalendarCheck2, Plus } from "lucide-react";
+import { CalendarCheck2, Pencil, Plus } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { Booking } from "@/lib/types";
 import { formatDateTime } from "@/lib/utils/date";
@@ -16,15 +17,26 @@ import {
   TableSkeleton,
   Td,
   Th,
+  Tooltip,
 } from "@/components/ui";
 import { BookingFormDialog } from "./BookingFormDialog";
 
 export default function BookingsPage() {
   const form = useDisclosure();
+  const [editing, setEditing] = useState<Booking | null>(null);
   const bookings = useQuery({
     queryKey: ["bookings"],
     queryFn: () => apiFetch<Booking[]>("/bookings"),
   });
+
+  const openCreate = () => {
+    setEditing(null);
+    form.onOpen();
+  };
+  const openEdit = (booking: Booking) => {
+    setEditing(booking);
+    form.onOpen();
+  };
 
   const rows = bookings.data ?? [];
 
@@ -50,7 +62,7 @@ export default function BookingsPage() {
             title="Nenhuma reserva"
             description="Crie a primeira reserva para um espaço."
             action={
-              <Button onClick={form.onOpen}>
+              <Button onClick={openCreate}>
                 <Plus className="size-4" aria-hidden />
                 Nova reserva
               </Button>
@@ -65,6 +77,7 @@ export default function BookingsPage() {
                 <Th>Início</Th>
                 <Th>Fim</Th>
                 <Th>Status</Th>
+                <Th className="text-right">Ações</Th>
               </tr>
             }
           >
@@ -76,13 +89,27 @@ export default function BookingsPage() {
                 <Td>
                   <Badge tone={b.status === "confirmed" ? "success" : "neutral"}>{b.status}</Badge>
                 </Td>
+                <Td>
+                  <div className="flex justify-end gap-1">
+                    <Tooltip content="Editar">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => openEdit(b)}
+                        aria-label={`Editar reserva de ${b.space?.name ?? b.spaceId}`}
+                      >
+                        <Pencil className="size-4" aria-hidden />
+                      </Button>
+                    </Tooltip>
+                  </div>
+                </Td>
               </tr>
             ))}
           </Table>
         )}
       </Card>
 
-      <BookingFormDialog open={form.open} onOpenChange={form.setOpen} />
+      <BookingFormDialog open={form.open} onOpenChange={form.setOpen} booking={editing} />
     </div>
   );
 }
