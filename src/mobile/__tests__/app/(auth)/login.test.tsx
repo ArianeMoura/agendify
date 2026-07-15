@@ -25,7 +25,7 @@ jest.mock('@/lib/contexts/AuthContext', () => ({
   useAuth: () => ({ setAuthData: mockSetAuthData }),
 }));
 
-import LoginScreen from './login';
+import LoginScreen from '@/app/(auth)/login';
 
 function renderScreen(ui: ReactElement) {
   const client = new QueryClient({

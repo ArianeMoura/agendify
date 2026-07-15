@@ -28,7 +28,7 @@ jest.mock('@/lib/contexts/AuthContext', () => ({
   useAuth: () => ({ user: mockUser }),
 }));
 
-import TabLayout from './_layout';
+import TabLayout from '@/app/(tabs)/_layout';
 
 function renderLayout() {
   for (const key of Object.keys(captured)) delete captured[key];

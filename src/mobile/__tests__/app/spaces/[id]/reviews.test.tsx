@@ -24,7 +24,7 @@ jest.mock('@/lib/api/reviews', () => ({
   },
 }));
 
-import SpaceReviewsScreen from './reviews';
+import SpaceReviewsScreen from '@/app/spaces/[id]/reviews';
 
 function renderScreen(ui: ReactElement) {
   const client = new QueryClient({
