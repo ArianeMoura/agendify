@@ -129,7 +129,8 @@ Saudação, atalhos para reservas e espaços e os dados da conta, personalizados
 
 ### Espaços
 Catálogo reservável com imagem, status e capacidade; grade adaptativa (1 coluna no celular,
-2 no tablet), com ações de reservar e de ver avaliações.
+2 no tablet), com ações de reservar e de ver avaliações. Administradores do *tenant* também
+criam e editam espaços por aqui.
 
 <div align="center">
 <img width="300" alt="Catálogo de espaços no app" src="img/mobile/spaces.png" />

@@ -94,8 +94,8 @@ Scripts: `dev`, `build`, `start`, `lint`, `typecheck`, `test`, `test:watch`, `fo
 
 ## Mobile (`src/mobile`) — Expo / React Native
 
-**Prerequisites:** Node.js ≥ 20.19.4 (React Native 0.81 requires it; `.nvmrc` pins 22 — run
-`nvm use`), and an Android emulator, iOS simulator (Xcode), or the **Expo Go** app.
+**Prerequisites:** Node.js ≥ 20.19.4 (React Native 0.81 requires it; `.nvmrc` pins the version —
+run `nvm use`), and an Android emulator, iOS simulator (Xcode), or the **Expo Go** app.
 
 ```bash
 cd src/mobile

@@ -95,6 +95,11 @@ Before opening to the public:
 
 - **Cold start:** the free Render instance sleeps after ~15 min idle; the first request then
   takes ~30–50 s. A paid/always-on tier removes this.
+- **Uploaded images are ephemeral.** `FileUploadService` writes space images to the container's
+  own filesystem (served at `/uploads`), and Render's disk does not survive a deploy or restart —
+  so those images are lost while the database keeps pointing at them. Fine for the current
+  walking skeleton; before real use, move to external storage (S3/R2) or a paid persistent disk.
+  Tracked in the [Roadmap](../ROADMAP.md).
 - **Secrets hygiene:** never commit secrets; if a credential appears in a log, rotate it
   (e.g. reset the Neon password and update the Render variable). See [SECURITY.md](../SECURITY.md).
 - **CORS:** stays empty until a browser client is deployed; then list the exact origins.

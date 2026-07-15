@@ -17,8 +17,8 @@ used instead.
 
 This inverts the classic "test pyramid" on purpose: risk is concentrated at the data layer,
 so that is where the tests are concentrated. The admin panel adds component/accessibility tests
-(Vitest + Testing Library + vitest-axe) and the mobile app adds screen tests with jest-expo +
-Testing Library (`src/mobile/__tests__/`); E2E remains planned (see below).
+(Vitest + Testing Library + vitest-axe) and the mobile app adds screen and component tests with
+jest-expo + Testing Library; E2E remains planned (see below).
 
 ## Test inventory — Implemented
 
@@ -58,7 +58,7 @@ automated proof of RN-01.
 | Gitleaks secret scanning (CI + opt-in local hook) | Implemented |
 | CodeQL SAST (C#, JS/TS) | Implemented |
 | Unit-test tier distinct from integration | Started (`ResendEmailSenderTests`); the data layer stays integration-first by design |
-| Frontend/component tests | Implemented — admin (Vitest + RTL + vitest-axe) and mobile (jest-expo + Testing Library, in `src/mobile/__tests__/`) |
+| Frontend/component tests | Implemented — admin (Vitest + RTL + vitest-axe, 2 files); mobile (jest-expo + Testing Library, 17 files / 45 cases: screens in `__tests__/`, components next to each component) |
 | E2E tests (Playwright/Cypress/Detox) | Planned (none today) |
 | Prettier (`format`/`format:check`); `.editorconfig`, .NET analyzers | Implemented (admin & mobile Prettier); Planned (rest) |
 | Enforced Git hooks (Husky/lint-staged) | Planned (only an opt-in gitleaks hook exists) |

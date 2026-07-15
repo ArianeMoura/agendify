@@ -1,9 +1,10 @@
 # Design System
 
 Brand foundations for Agendify — the source of truth for logo, colour, and typography across web and
-mobile. The **admin panel (`src/admin`) already implements this system**: tokens live in
-`src/admin/app/globals.css` (`@theme`), brand marks in `src/admin/components/brand/`, and generated
-icons in `src/admin/public/`.
+mobile. **Both clients implement this system:** the admin panel keeps its tokens in
+`src/admin/app/globals.css` (`@theme`), its brand marks in `src/admin/components/brand/` and generated
+icons in `src/admin/public/`; the mobile app mirrors the same tokens in `src/mobile/constants/theme.ts`
+and the same marks in `src/mobile/components/brand/` (built with `react-native-svg`).
 
 ## Brand concept
 
@@ -45,9 +46,13 @@ petrol = text. **Amber always pairs with petrol text (`#14333E`), never white.**
 
 ## Design tokens (as implemented)
 
-Single source of truth: `src/admin/app/globals.css` via Tailwind v4 `@theme inline`. Semantic tokens
+Reference implementation: `src/admin/app/globals.css` via Tailwind v4 `@theme inline`. Semantic tokens
 point to runtime CSS variables and **flip by theme**; the brand scale is static in both themes.
 Theme switching is class-based (`.dark`, driven by `next-themes`).
+
+The mobile app can't consume CSS, so it restates the same values in `src/mobile/constants/theme.ts`
+(covered by `theme.test.ts`) and flips them through `useTheme()` — the token *names* and *values* are
+the contract between the two; keep them in sync when either side changes.
 
 ### Brand scale (static)
 
@@ -104,16 +109,18 @@ admin (no external request, no layout shift).
 
 <img src="img/agendify-icon.png" alt="Agendify icon" width="146" height="146" />
 
-Brand marks are **React SVG components** in `src/admin/components/brand/` and static assets in
-`src/admin/public/` (generated reproducibly by `src/admin/scripts/generate-icons.mjs` with `sharp`):
+Brand marks are **SVG components** — `src/admin/components/brand/` (plain SVG) and
+`src/mobile/components/brand/` (same drawing via `react-native-svg`), with the same props and the same
+240×240 grid. Static assets live in `src/admin/public/`, generated reproducibly by
+`src/admin/scripts/generate-icons.mjs` with `sharp`.
 
 | Asset | Where | When |
 | :--- | :--- | :--- |
-| Icon — brand / dark / mono | `components/brand/AgendifyIcon.tsx`, `public/icon.svg` | App icon; dark for dark grounds; mono for 1-colour |
-| Favicon (simplified, no notch) | `public/favicon.svg`, `public/favicon.ico` (16/32/48) | Browser tab; use simplified below 32px |
-| Wordmark (`agendify` + amber dot) | `components/brand/Wordmark.tsx` | Sora ExtraBold, lowercase, tracking `-0.02em` |
-| Lockup (horizontal / vertical) | `components/brand/Logo.tsx` | Navbar / login & splash |
-| PWA icons | `public/icon-192.png`, `icon-512.png`, `icon-maskable-512.png`, `apple-touch-icon.png`, `site.webmanifest` | Install / home screen |
+| Icon — brand / dark / mono | `components/brand/AgendifyIcon.tsx` (admin & mobile), `src/admin/public/icon.svg` | App icon; dark for dark grounds; mono for 1-colour |
+| Favicon (simplified, no notch) | `src/admin/public/favicon.svg`, `favicon.ico` (16/32/48) | Browser tab; use simplified below 32px |
+| Wordmark (`agendify` + amber dot) | `components/brand/Wordmark.tsx` (admin & mobile) | Sora ExtraBold, lowercase, tracking `-0.02em` |
+| Lockup (horizontal / vertical) | `components/brand/Logo.tsx` (admin & mobile) | Navbar / login & splash |
+| PWA icons | `src/admin/public/icon-192.png`, `icon-512.png`, `icon-maskable-512.png`, `apple-touch-icon.png`, `site.webmanifest` | Install / home screen |
 
 **Clear space:** keep margin around the mark equal to the height of the amber seal. On dark grounds,
 use the dark icon variant (light-purple square). Do not distort, recolour, rotate, or add shadow.
@@ -122,3 +129,4 @@ use the dark icon variant (light-purple square). Do not distort, recolour, rotat
 
 - [Projeto de Interface](04-Projeto%20de%20Interface.md) — wireframes and flows that apply this system.
 - [`src/admin/README.md`](../src/admin/README.md) — how the admin implements this system.
+- [`src/mobile/README.md`](../src/mobile/README.md) — how the mobile app implements this system.

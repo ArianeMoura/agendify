@@ -29,6 +29,8 @@ Oferecer uma plataforma para gerenciamento e reserva de espaços compartilhados 
 - Cadastrar espaços (nome, capacidade, recursos, regras e horários);
 - Prover fluxo de reservas com verificação em tempo real e prevenção de conflitos;
 - Estabelecer sistema de perfis e permissões (administrador, gestor, usuário, prestador de serviços);
+- Atender várias organizações na mesma plataforma (*multi-tenant*), com cadastro da própria
+  organização, convite de membros por e-mail e isolamento dos dados entre elas;
 - Disponibilizar os CRUDs essenciais (espaços, reservas, usuários/prestadores);
 - Integrar notificações para confirmações, lembretes e alterações de reserva;
 - Disponibilizar relatórios e dashboards com métricas (taxa de ocupação, horários de pico, volume de reservas);

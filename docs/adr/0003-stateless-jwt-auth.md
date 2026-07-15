@@ -1,6 +1,7 @@
 # ADR-0003: Stateless authentication with JWT + refresh tokens
 
-**Status:** Accepted.
+**Status:** Accepted. The decision stands; the role names below were later superseded — see the
+update note at the end.
 
 ## Context
 
@@ -23,3 +24,11 @@ and an `AdminOnly` policy.
   revocable refresh tokens).
 - Trade-off: immediate revocation of an access token is harder — mitigated by short lifetimes.
 - `JwtSettings:Secret` must be ≥ 32 chars; the API fails fast at boot otherwise.
+
+## Update — multi-tenancy (roles renamed)
+
+The two roles above no longer exist. Making the product multi-tenant replaced them with three —
+`PlatformOwner`, `OrgAdmin` (the former `Administrator`) and `Member` (the former `Common`) — served
+by hierarchical policies of the same names; there is no `AdminOnly` policy. The access token also
+carries a `tenant_id` claim, which the API resolves into the request's tenant. The stateless
+decision itself is unchanged. See [Architecture §3](../ARCHITECTURE.md) and [SECURITY.md](../../SECURITY.md).

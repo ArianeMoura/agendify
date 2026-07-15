@@ -150,12 +150,22 @@ O Agendify é uma solução mobile e web para gerenciar reservas, uso e faturame
 |RF-013| O sistema deve permitir que usuários avaliem espaços e serviços, fornecendo feedback aos gestores.| MÉDIA |
 |RF-014| O sistema deve permitir que os usuários editem seu perfil.| ALTA |
 |RF-015| O sistema deve exibir uma dashboard inicial personalizada, com conteúdos e funcionalidades diferentes para usuários e administradores. | ALTA |
+|RF-016| O sistema deve permitir que uma organização se cadastre (*self-signup*), criando o primeiro administrador do próprio *tenant*. | ALTA |
+|RF-017| O sistema deve permitir que administradores convidem membros por e-mail, com link de aceite de uso único e prazo de validade. | ALTA |
+|RF-018| O sistema deve isolar os dados por organização, garantindo que nenhum usuário acesse dados de outro *tenant*. | ALTA |
 
 > **Status de implementação (nota).** A maioria dos RFs acima está entregue na API + web
-> (admin) e/ou no app mobile. Exceções conhecidas nesta data:
+> (admin) e/ou no app mobile. Exceções e esclarecimentos nesta data:
+> - **RF-001 (perfis):** os quatro perfis descritos são a visão de produto. O implementado hoje
+>   são três papéis — `PlatformOwner` (dona da plataforma), `OrgAdmin` (gestor da organização) e
+>   `Member` (usuário final) — que cobrem os casos de administrador, gestor e usuário. O perfil de
+>   *prestador de serviços* segue não implementado.
 > - **RF-003 (recuperação de senha): _planejado_ — ainda não implementado.** Não há endpoint
 >   de *forgot/reset* no backend nem fluxo real no cliente; a antiga tela mobile era apenas uma
 >   fachada (`mailto`) e foi removida. Rastreado no [Roadmap](../ROADMAP.md).
+> - **RF-016 a RF-018 (multi-tenancy):** entregues no backend e nos dois clientes. O isolamento
+>   é aplicado em duas camadas — filtros do EF Core e *Row-Level Security* no PostgreSQL — com
+>   testes de integração dedicados. Ver [Arquitetura](ARCHITECTURE.md) e [Segurança](../SECURITY.md).
 > - **RF-010 (relatórios/dashboards):** entregue na **web (painel admin)**; é uma visão de
 >   gestão (admin/owner) e não faz parte do app mobile do Member.
 > - **RF-013 (avaliações):** entregue via API e **reconstruída no mobile** (tela de avaliações
@@ -238,7 +248,7 @@ detalhada em [Arquitetura → Concorrência](ARCHITECTURE.md).
 |07| Web e Mobile **não acessam o banco diretamente**: toda a lógica de negócio trafega pela API, que é a única fonte de verdade. |
 |08| A configuração sensível (connection strings, segredos, URLs de ambiente) deve vir de variáveis de ambiente / *User Secrets* — **nunca *hardcoded*** no código ou versionada. |
 |09| O contrato da API deve ser **versionado** (`/api/v1`), com erros padronizados em `ProblemDetails` (RFC 7807) e códigos semânticos (ex.: `409` para conflito de reserva). |
-|10| A cobertura mínima de testes (RNF-008) e um **teste de concorrência de reservas** (N criações simultâneas → exatamente uma persiste) são *gates* obrigatórios de release no CI. |
+|10| Um **teste de concorrência de reservas** (N criações simultâneas → exatamente uma persiste) é *gate* obrigatório de release no CI. A cobertura mínima (RNF-008) é medida por script local; torná-la *gate* está no [Roadmap](../ROADMAP.md). |
 
 ## Diagrama de casos de uso
 

@@ -24,17 +24,20 @@ git config core.hooksPath .githooks   # habilita o gitleaks no pre-commit
 
 ## Fluxo de branches
 
-Adotamos uma versão simplificada do **Git Flow**:
+O projeto é *trunk-based*: a `main` é a única branch de longa duração e a fonte de verdade —
+é dela que o Render publica a API.
 
 | Branch | Papel |
 |--------|-------|
-| `main` | Versão estável, testada e pronta para produção. Protegida. |
-| `dev` | Integração e homologação. Reúne novas features e correções antes de ir para `main`. |
-| `testing` | Validação de versões candidatas antes de promover para `dev`/`main`. |
-| `feature/*`, `fix/*`, `docs/*` | Trabalho isolado por tarefa, criado a partir de `dev`. |
+| `main` | Versão estável e publicável. É onde a CI roda e de onde sai o deploy. |
+| `feature/*`, `fix/*`, `docs/*` | Trabalho isolado, criado a partir da `main`, quando a mudança merece revisão ou vida própria. |
 
-Fluxo típico: crie `feature/<descrição>` a partir de `dev` → abra PR para `dev` → após revisão
-e CI verdes, faça *merge* → `dev` é promovida a `main` quando uma versão estável está pronta.
+Fluxo típico: crie `feature/<descrição>` a partir da `main` → abra PR para a `main` → com a CI
+verde, faça *merge*. Mudanças pequenas e de baixo risco podem ir direto na `main` — a CI roda
+igual no push e o gate de concorrência (RN-01) barra o que quebrar a regra de negócio.
+
+Como a CI só dispara em `main` (push e PR), abrir PR contra qualquer outra branch **não roda
+verificação nenhuma**.
 
 ## Convenção de commits
 
@@ -78,7 +81,8 @@ Um PR deve ser pequeno, focado e conter contexto suficiente para revisão. **Che
 - [ ] A documentação relevante foi atualizada.
 - [ ] Mudanças de comportamento estão descritas no corpo do PR.
 
-Todo PR requer **pelo menos uma revisão aprovada** e CI verde antes do *merge*.
+Todo PR precisa da **CI verde** antes do *merge*. O projeto é mantido por uma pessoa só, então
+a revisão por pares é oportunidade, não obrigação — quando houver mais gente, ela passa a ser.
 
 ## Definition of Done
 
@@ -86,10 +90,9 @@ Uma tarefa está concluída quando:
 
 1. Atende aos critérios de aceite da Issue;
 2. Está coberta por testes automatizados adequados e a suíte passa;
-3. Passou por revisão de código e teve o PR aprovado;
-4. A CI (build, testes, lint, *secret scan*, SAST) está verde;
-5. A documentação afetada foi atualizada;
-6. Foi integrada à branch de destino sem regressões.
+3. A CI (build, testes, lint, *secret scan*, SAST) está verde na `main`;
+4. A documentação afetada foi atualizada;
+5. Foi integrada sem regressões.
 
 ## Comunicação
 
