@@ -33,7 +33,7 @@ public class AuthService
         var user = await _usersService.GetByEmailAsync(request.Email);
 
         // Conta anonimizada (LGPD) não autentica.
-        if (user is null || user.AnonymizedAt is not null || !BCrypt.Net.BCrypt.Verify(request.Password, user.Password))
+        if (user is null || user.AnonymizedAt is not null || !PasswordHasher.Verify(request.Password, user.Password))
             return null;
 
         return await IssueSessionAsync(user);

@@ -42,4 +42,16 @@ export const authApi = {
   logout: async (refreshToken: string): Promise<void> => {
     await api.post('/auth/logout', { refreshToken });
   },
+
+  // Pede o link de redefinição (anônimo). A API responde igual para e-mail cadastrado
+  // ou não — de propósito, para não revelar quem tem conta. Não trate como sucesso/falha
+  // de existência.
+  forgotPassword: async (email: string): Promise<void> => {
+    await api.post('/auth/forgot-password', { email });
+  },
+
+  // Troca a senha usando o token do e-mail. O token é de uso único e expira em 30 min.
+  resetPassword: async (token: string, password: string): Promise<void> => {
+    await api.post('/auth/reset-password', { token, password });
+  },
 };

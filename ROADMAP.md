@@ -48,9 +48,6 @@ Direções de evolução do **Agendify**. Intencionalmente **sem datas** — a p
 
 ## Segurança e conformidade
 
-- **Recuperação de senha (RF-003)** — *forgot/reset* de ponta a ponta (endpoint no backend +
-  e-mail transacional + telas). Ainda **não implementado**; a antiga tela mobile era só uma
-  fachada `mailto` e foi removida.
 - **MFA** para administradores; avaliar **Argon2id** para novas senhas.
 - Criptografia em nível de campo para PII sensível.
 - Fluxos de **LGPD self-service** (exportação e eliminação pelo titular).
@@ -63,7 +60,6 @@ Direções de evolução do **Agendify**. Intencionalmente **sem datas** — a p
 
 ## Arquitetura e desempenho
 
-- **Cache** de leituras frequentes (catálogo de espaços).
 - **Cache** de leituras frequentes (catálogo de espaços).
 - Versionamento explícito do contrato REST (`/api/v1`).
 - Escala do PostgreSQL: *read replicas* e *connection pooling* conforme a carga crescer.

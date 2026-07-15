@@ -44,7 +44,7 @@ namespace api.Services
                 TenantId = org.Id!,
                 Name = req.AdminName,
                 Email = req.AdminEmail,
-                Password = BCrypt.Net.BCrypt.HashPassword(req.AdminPassword),
+                Password = PasswordHasher.Hash(req.AdminPassword),
                 Role = Role.OrgAdmin,
                 CreatedAt = DateTime.UtcNow,
             };

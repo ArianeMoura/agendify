@@ -32,6 +32,11 @@ namespace api.Tests.Services
                 LastAcceptLink = acceptLink;
                 return Task.CompletedTask;
             }
+
+            // Fora do escopo destes testes; ver PasswordResetServiceTests.
+            public Task SendPasswordResetAsync(
+                string toEmail, string resetLink, DateTime expiresAt, CancellationToken ct = default) =>
+                Task.CompletedTask;
         }
 
         private static CreateOrganizationRequest Signup(string org, string email) => new()

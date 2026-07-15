@@ -160,9 +160,11 @@ O Agendify é uma solução mobile e web para gerenciar reservas, uso e faturame
 >   são três papéis — `PlatformOwner` (dona da plataforma), `OrgAdmin` (gestor da organização) e
 >   `Member` (usuário final) — que cobrem os casos de administrador, gestor e usuário. O perfil de
 >   *prestador de serviços* segue não implementado.
-> - **RF-003 (recuperação de senha): _planejado_ — ainda não implementado.** Não há endpoint
->   de *forgot/reset* no backend nem fluxo real no cliente; a antiga tela mobile era apenas uma
->   fachada (`mailto`) e foi removida. Rastreado no [Roadmap](../ROADMAP.md).
+> - **RF-003 (recuperação de senha): entregue.** `POST /api/auth/forgot-password` e
+>   `POST /api/auth/reset-password`, com token de uso único que expira em 30 minutos, mais as
+>   telas no painel e no app. O pedido responde sempre o mesmo 202, mesmo para e-mail não
+>   cadastrado, para não revelar quem tem conta. Sem `Email:ApiKey`, o link vai para os logs
+>   (`LoggingEmailSender`) em vez de ser enviado.
 > - **RF-016 a RF-018 (multi-tenancy):** entregues no backend e nos dois clientes. O isolamento
 >   é aplicado em duas camadas — filtros do EF Core e *Row-Level Security* no PostgreSQL — com
 >   testes de integração dedicados. Ver [Arquitetura](ARCHITECTURE.md) e [Segurança](../SECURITY.md).

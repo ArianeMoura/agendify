@@ -23,5 +23,15 @@ namespace api.Services
                 toEmail, acceptLink, expiresAt);
             return Task.CompletedTask;
         }
+
+        public Task SendPasswordResetAsync(
+            string toEmail, string resetLink, DateTime expiresAt, CancellationToken ct = default)
+        {
+            // Em dev é assim que se pega o link: ele não sai por e-mail nenhum.
+            _logger.LogInformation(
+                "[RESET DE SENHA] Para: {ToEmail} | Link: {ResetLink} | Expira: {ExpiresAt:u}",
+                toEmail, resetLink, expiresAt);
+            return Task.CompletedTask;
+        }
     }
 }

@@ -62,6 +62,15 @@ export default function LoginPage() {
             )}
           </Field>
 
+          <p className="text-right text-sm">
+            <Link
+              href="/forgot-password"
+              className="text-ink-muted font-medium underline underline-offset-4 hover:opacity-80"
+            >
+              Esqueci minha senha
+            </Link>
+          </p>
+
           {error && (
             <p className="text-danger text-sm" role="alert">
               {error}

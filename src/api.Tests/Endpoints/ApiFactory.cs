@@ -26,6 +26,9 @@ namespace api.Tests.Endpoints
                 "DatabaseSettings__ConnectionString", TestDatabaseFixture.ConnectionString);
             Environment.SetEnvironmentVariable("JwtSettings__Secret", JwtSecret);
 
+            // Fora de Development o boot exige a base do painel (link do e-mail de reset).
+            Environment.SetEnvironmentVariable("App__BaseUrl", "https://painel.test");
+
             // "Testing" (≠ "Development") impede o Migrate() do startup de rodar com o papel
             // agendify_app, que não tem CREATE no schema — a fixture já migrou como admin.
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Testing");

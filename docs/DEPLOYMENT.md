@@ -52,7 +52,8 @@ The container listens on port `8080`; Render terminates TLS at the edge.
 | `JwtSettings__Secret` | a fresh secret, `openssl rand -base64 48` (distinct from dev) |
 | `ApplyMigrationsOnStartup` | `true` — runs EF migrations on boot |
 | `CORS_ALLOWED_ORIGINS` | the admin origin(s), set once the admin is deployed |
-| `Email__ApiKey` | Resend API key for invitation e-mails; when unset the API logs the accept link instead of sending (`LoggingEmailSender`) |
+| `App__BaseUrl` | public URL of the admin panel — it is the base of the password-reset link sent by e-mail, so it must be openable in a browser. **Required outside Development**: the app fails to boot without it |
+| `Email__ApiKey` | Resend API key for invitation and password-reset e-mails; when unset the API logs the link instead of sending it (`LoggingEmailSender`) |
 | `Email__FromAddress` / `Email__FromName` | sender identity (defaults: `onboarding@resend.dev` / `Agendify`) |
 | `Storage__ServiceUrl` | `https://<account_id>.r2.cloudflarestorage.com` |
 | `Storage__Bucket` | the R2 bucket name — **this is the switch**: set it and images go to R2, leave it empty and they go to the container's ephemeral disk |

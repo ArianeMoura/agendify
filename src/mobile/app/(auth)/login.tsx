@@ -144,6 +144,17 @@ export default function LoginScreen() {
 
           <Pressable
             style={styles.registerLink}
+            onPress={() => router.push('/(auth)/forgot-password')}
+            accessibilityRole="button"
+            accessibilityLabel="Recuperar a senha"
+          >
+            <Text style={styles.registerText}>
+              <Text style={styles.registerTextBold}>Esqueci minha senha</Text>
+            </Text>
+          </Pressable>
+
+          <Pressable
+            style={styles.registerLink}
             onPress={() => router.push('/(auth)/accept-invite')}
             accessibilityRole="button"
             accessibilityLabel="Aceitar um convite"

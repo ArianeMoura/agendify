@@ -89,6 +89,22 @@ builder.Services.AddScoped<PrivacyService>();
 builder.Services.AddScoped<ReviewsService>();
 builder.Services.AddScoped<OrganizationsService>();
 builder.Services.AddScoped<InvitationsService>();
+builder.Services.AddScoped<PasswordResetService>();
+
+// Base pública do painel: é o que monta o link do e-mail de redefinição de senha.
+var appBaseUrl = builder.Configuration["App:BaseUrl"];
+if (string.IsNullOrWhiteSpace(appBaseUrl))
+{
+    if (!builder.Environment.IsDevelopment())
+        throw new InvalidOperationException(
+            "App:BaseUrl não configurado. Defina a URL pública do painel (App__BaseUrl) — é a base do link de redefinição de senha enviado por e-mail.");
+
+    // Default de dev, onde o painel Next.js sobe. Fica no código porque o
+    // appsettings.Development.json não é versionado: sem isto, um clone limpo montaria o
+    // link com BaseUrl nulo.
+    appBaseUrl = "http://localhost:3000";
+}
+builder.Services.Configure<AppSettings>(o => o.BaseUrl = appBaseUrl);
 // Envio de convite. Com Email:ApiKey configurado → Resend (HTTPS, envio real); sem key →
 // LoggingEmailSender (só registra o link nos logs — dev/testes/CI rodam sem infra).
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Email"));

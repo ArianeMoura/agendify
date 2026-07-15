@@ -14,6 +14,24 @@ namespace api.Models
         public string Version { get; set; } = string.Empty;
     }
 
+    public class ForgotPasswordRequest
+    {
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; } = string.Empty;
+    }
+
+    public class ResetPasswordRequest
+    {
+        [Required]
+        public string Token { get; set; } = string.Empty;
+
+        // Mesma política do aceite de convite (AcceptInvitationRequest).
+        [Required]
+        [MinLength(6)]
+        public string Password { get; set; } = string.Empty;
+    }
+
     public class CreateReviewRequest
     {
         [Required]

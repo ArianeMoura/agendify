@@ -93,7 +93,7 @@ namespace api.Services
                 TenantId = invitation.TenantId,
                 Name = req.Name,
                 Email = invitation.Email,
-                Password = BCrypt.Net.BCrypt.HashPassword(req.Password),
+                Password = PasswordHasher.Hash(req.Password),
                 Role = invitation.Role,
                 CreatedAt = DateTime.UtcNow,
             };

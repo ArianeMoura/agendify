@@ -37,6 +37,7 @@ namespace api.Data
         public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
         public DbSet<Review> Reviews => Set<Review>();
         public DbSet<Invitation> Invitations => Set<Invitation>();
+        public DbSet<PasswordResetToken> PasswordResetTokens => Set<PasswordResetToken>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -201,6 +202,21 @@ namespace api.Data
                 e.Property(x => x.CreatedAt).HasColumnName("created_at");
                 e.Ignore(x => x.IsPending);
                 e.HasIndex(x => x.TokenHash).IsUnique();
+            });
+
+            modelBuilder.Entity<PasswordResetToken>(e =>
+            {
+                e.ToTable("password_reset_tokens");
+                e.HasKey(x => x.Id);
+                e.Property(x => x.Id).HasColumnName("id");
+                e.Property(x => x.UserId).HasColumnName("user_id");
+                e.Property(x => x.TokenHash).HasColumnName("token_hash");
+                e.Property(x => x.ExpiresAt).HasColumnName("expires_at");
+                e.Property(x => x.UsedAt).HasColumnName("used_at");
+                e.Property(x => x.CreatedAt).HasColumnName("created_at");
+                e.Ignore(x => x.IsPending);
+                e.HasIndex(x => x.TokenHash).IsUnique();
+                e.HasIndex(x => x.UserId);
             });
 
             // Configuração comum de tenancy aplicada a TODA entidade ITenantScoped,

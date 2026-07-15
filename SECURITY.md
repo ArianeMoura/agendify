@@ -36,13 +36,18 @@ divulgue publicamente até que uma correção esteja disponível (*coordinated d
 ## Senhas e hashing
 
 - Senhas são armazenadas **exclusivamente como hash** — nunca em texto plano, nunca reversível.
-- Algoritmo atual: **BCrypt** com *salt* por usuário e *work factor* ≥ 12.
+- Algoritmo atual: **BCrypt** com *salt* por usuário e *work factor* 12, aplicado num ponto
+  único (`PasswordHasher`). Hashes gerados antes disso carregam o custo antigo no próprio
+  valor e seguem validando; só as senhas novas usam 12.
 - Para novas implementações, recomenda-se **Argon2id** (resistente a ataques de GPU/ASIC),
   com parâmetros de memória/tempo calibrados.
 - Aplicar **política de senha forte** no cadastro e verificação contra senhas vazadas
   conhecidas quando viável.
-- A recuperação de senha (RF-003) deve usar *tokens* de uso único, com expiração curta e
-  invalidação após o uso.
+- A recuperação de senha (RF-003) usa *token* aleatório de 256 bits, guardado apenas como hash
+  SHA-256, válido por 30 minutos e de uso único. Pedir um novo link invalida os anteriores, e
+  concluir a troca revoga as sessões abertas. O `POST /api/auth/forgot-password` responde
+  sempre o mesmo 202 — inclusive para e-mail não cadastrado —, para não virar um oráculo de
+  quem tem conta na plataforma.
 
 ## Criptografia
 

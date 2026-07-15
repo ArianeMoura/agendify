@@ -23,8 +23,16 @@ namespace api.Services
             _logger = logger;
         }
 
-        public async Task SendInvitationAsync(
-            string toEmail, string acceptLink, DateTime expiresAt, CancellationToken ct = default)
+        public Task SendInvitationAsync(
+            string toEmail, string acceptLink, DateTime expiresAt, CancellationToken ct = default) =>
+            SendAsync(toEmail, "Seu convite para o Agendify", BuildHtml(acceptLink, expiresAt), ct);
+
+        public Task SendPasswordResetAsync(
+            string toEmail, string resetLink, DateTime expiresAt, CancellationToken ct = default) =>
+            SendAsync(toEmail, "Redefinir sua senha do Agendify",
+                BuildPasswordResetHtml(resetLink, expiresAt), ct);
+
+        private async Task SendAsync(string toEmail, string subject, string html, CancellationToken ct)
         {
             using var req = new HttpRequestMessage(HttpMethod.Post, "https://api.resend.com/emails");
             req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _settings.ApiKey);
@@ -32,17 +40,17 @@ namespace api.Services
             {
                 from = $"{_settings.FromName} <{_settings.FromAddress}>",
                 to = new[] { toEmail },
-                subject = "Seu convite para o Agendify",
-                html = BuildHtml(acceptLink, expiresAt),
+                subject,
+                html,
             });
 
             var res = await _http.SendAsync(req, ct);
             if (!res.IsSuccessStatusCode)
             {
                 var body = await res.Content.ReadAsStringAsync(ct);
-                // Best-effort: o InvitationsService não falha o convite; aqui só registramos.
+                // Best-effort: quem chama não falha a operação por causa do e-mail; só registramos.
                 _logger.LogWarning(
-                    "Falha ao enviar convite via Resend ({Status}): {Body}", (int)res.StatusCode, body);
+                    "Falha ao enviar e-mail via Resend ({Status}): {Body}", (int)res.StatusCode, body);
             }
         }
 
@@ -55,5 +63,15 @@ namespace api.Services
             <p>Ou abra o app e cole este link na tela de aceite:</p>
             <p><code>{acceptLink}</code></p>
             <p>O convite expira em {expiresAt:dd/MM/yyyy}.</p>";
+
+        // Diferente do convite, o link do reset é uma URL https do painel (App:BaseUrl): quem
+        // esqueceu a senha costuma abrir o e-mail no computador, onde agendify:// não abre nada.
+        private static string BuildPasswordResetHtml(string resetLink, DateTime expiresAt) => $@"
+            <p>Recebemos um pedido para redefinir a sua senha do <strong>Agendify</strong>.</p>
+            <p><a href=""{resetLink}"">Criar uma nova senha</a></p>
+            <p>Ou copie e cole este endereço no navegador:</p>
+            <p><code>{resetLink}</code></p>
+            <p>O link vale até {expiresAt:HH:mm} de {expiresAt:dd/MM/yyyy} e só pode ser usado uma vez.</p>
+            <p>Se não foi você quem pediu, ignore este e-mail: a sua senha continua a mesma.</p>";
     }
 }

@@ -90,7 +90,7 @@ public class UsersController : ControllerBase
         {
             Name = request.Name,
             Email = request.Email,
-            Password = BCrypt.Net.BCrypt.HashPassword(request.Password),
+            Password = PasswordHasher.Hash(request.Password),
             Role = request.Role,
             CreatedAt = DateTime.UtcNow
         };
@@ -140,7 +140,7 @@ public class UsersController : ControllerBase
         }
 
         if (!string.IsNullOrEmpty(request.Password))
-            user.Password = BCrypt.Net.BCrypt.HashPassword(request.Password);
+            user.Password = PasswordHasher.Hash(request.Password);
 
         if (request.Role.HasValue)
         {
