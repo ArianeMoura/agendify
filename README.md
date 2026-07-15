@@ -8,6 +8,8 @@
 
 Agendify lets organizations publish a catalog of bookable spaces and lets users reserve them in real time from **web** (admin) and **mobile**. Its core guarantee — no two confirmed reservations may overlap in the same space — is enforced **atomically in PostgreSQL**, which makes double-booking impossible even under high concurrency (a naive check-then-insert cannot promise this).
 
+The backend is **multi-tenant**: each organization signs up, invites its members by e-mail, and has its data isolated both at the application layer and by PostgreSQL Row-Level Security.
+
 One backend is the single source of truth; every client talks to it over HTTPS/JSON. Deep documentation lives in [`docs/`](docs/).
 
 ## Tech stack
@@ -64,7 +66,7 @@ docs/      architecture, ADRs, testing, CI/CD, deployment, design system, produc
 
 ## License
 
-**Proprietary — All rights reserved.** © 2025–2026 Ariane Silveira Almeida Moura.
+**Proprietary — All rights reserved.** © 2025–2026 Ariane Moura.
 
 This repository is published for portfolio and evaluation purposes only. Viewing the code grants
 no right to use, copy, modify, distribute, or build a competing product from it. See

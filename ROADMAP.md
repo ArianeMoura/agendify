@@ -11,8 +11,13 @@ Direções de evolução do **Agendify**. Intencionalmente **sem datas** — a p
   [ADR-0002](docs/adr/0002-db-enforced-invariant.md).
 - **Teste de concorrência** (100 criações simultâneas no mesmo slot) como *gate*
   bloqueante de release na CI. Ver [Testing](docs/TESTING.md).
+- **Multi-tenancy (organizações)** — *self-signup* de organização, papéis `PlatformOwner` /
+  `OrgAdmin` / `Member`, convites por e-mail (Resend) e isolamento por *tenant* em duas camadas
+  (filtros do EF Core + **Row-Level Security** no PostgreSQL), com testes de integração
+  dedicados. Ver [Arquitetura](docs/ARCHITECTURE.md) e [Segurança](SECURITY.md).
 - **CI por camada** — GitHub Actions para API (build+test+secret scan), admin
-  (lint/typecheck/test/build), mobile (lint) e CodeQL (SAST). Ver [CI/CD](docs/CICD.md).
+  (lint/typecheck/test/build), mobile (lint/typecheck/format/test) e CodeQL (SAST).
+  Ver [CI/CD](docs/CICD.md).
 - **Deploy em produção** — API no Render + PostgreSQL no Neon. Ver [Deployment](docs/DEPLOYMENT.md).
 - **Refresh tokens com rotação** e armazenamento seguro no mobile (`expo-secure-store`).
 - **Redesign do painel admin** — nova identidade da marca, design system tokenizado (tema claro +
@@ -35,9 +40,9 @@ Direções de evolução do **Agendify**. Intencionalmente **sem datas** — a p
 
 ## Qualidade e testes
 
-- **Tier de testes unitários** distinto da integração.
-- **Testes de frontend do mobile** e **E2E** (Playwright/Detox). _(Admin já tem testes de
-  componente/acessibilidade: Vitest + Testing Library + vitest-axe.)_
+- **Tier de testes unitários** distinto da integração _(iniciado: `ResendEmailSenderTests`)_.
+- **E2E** (Playwright/Detox). _(Admin e mobile já têm testes de componente/tela: Vitest +
+  vitest-axe no admin, jest-expo + Testing Library no mobile.)_
 - **Padronização:** `.editorconfig`, analisadores .NET; **hooks** enforced (Husky/lint-staged).
   _(Admin já usa Prettier — `format`/`format:check`.)_
 

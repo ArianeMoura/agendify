@@ -4,8 +4,6 @@ A **interface** do Agendify foi projetada para oferecer uma experiência intuiti
 
 O **painel administrativo (web)** já está **implementado** em **Next.js 16 / React 19**, seguindo o [Design System](DESIGN-SYSTEM.md), com **acessibilidade WCAG 2.2 AA**, **responsivo** (desktop, tablet e mobile) e **tema claro/escuro**.
 
-> A **interatividade** do fluxo do usuário, incluindo a **transição entre telas**, pode ser explorada no protótipo interativo: [Protótipo Interativo — Agendify (Figma)]().
-
 As diretrizes de identidade visual (logo, paleta, tipografia) estão em [Design System](DESIGN-SYSTEM.md).
 
 ## Diagramas de fluxo
@@ -103,18 +101,76 @@ valor entre os temas **claro** e **escuro**. A experiência é acessível (papé
 de acessibilidade, alvos de toque ≥ 44 px, *Dynamic Type*) e responsiva (safe area por *insets*,
 breakpoints para tablet/landscape, listas virtualizadas).
 
-- **Login / Aceite de convite** — autenticação por e-mail e senha; convites por *deep link*
-  (`agendify://accept-invite?token=…`), com formulários acessíveis e teclado tratado.
-- **Início (dashboard)** — visão inicial personalizada por papel (Member × admin do *tenant*).
-- **Espaços** — catálogo reservável com imagem, status e capacidade; grade adaptativa (1 coluna no
-  celular, 2 no tablet); ações de reservar e de ver **avaliações**.
-- **Reservas** — criação, edição e cancelamento, com seleção de horários que respeita a regra de
-  conflito (RN-01).
-- **Avaliações do espaço (RF-013)** — nota por estrelas + comentário, listagem e média, ligadas ao
-  endpoint `/reviews`.
-- **Perfil** — edição de dados, troca de senha e **alternância de tema** (claro / sistema / escuro).
-- **Usuários** — gestão de acessos, **visível apenas para administradores** do *tenant*.
+### Login
+Autenticação por e-mail e senha, com o lockup da marca; quem recebeu um convite por *deep link*
+(`agendify://accept-invite?token=…`) ativa a conta na tela de aceite.
+
+<div align="center">
+<img width="300" alt="Tela de login do app Agendify" src="img/mobile/login.png" />
+</div>
+
+<br>
+
+### Início (Dashboard)
+Saudação, atalhos para reservas e espaços e os dados da conta, personalizados por papel
+(Member × admin do *tenant*).
+
+<div align="center">
+<img width="300" alt="Início do app — tema claro" src="img/mobile/home-light.png" />
+</div>
+
+<div align="center">
+<img width="300" alt="Início do app — tema escuro" src="img/mobile/home-dark.png" />
+</div>
+
+<h4 align="center">Tema claro e escuro</h4>
+
+<br>
+
+### Espaços
+Catálogo reservável com imagem, status e capacidade; grade adaptativa (1 coluna no celular,
+2 no tablet), com ações de reservar e de ver avaliações.
+
+<div align="center">
+<img width="300" alt="Catálogo de espaços no app" src="img/mobile/spaces.png" />
+</div>
+
+<br>
+
+### Reservas
+Criação, edição e cancelamento, com filtro por data e seleção de horários que respeita a regra
+de conflito (RN-01).
+
+<div align="center">
+<img width="300" alt="Lista de reservas no app" src="img/mobile/bookings.png" />
+</div>
+
+<br>
+
+### Avaliações do espaço
+Nota por estrelas + comentário (RF-013), com listagem e média por espaço.
+
+<div align="center">
+<img width="300" alt="Avaliações de um espaço no app" src="img/mobile/reviews.png" />
+</div>
+
+<br>
+
+### Perfil
+Dados do usuário, edição de perfil, troca de senha e alternância de tema (claro / sistema / escuro).
+
+<div align="center">
+<img width="300" alt="Perfil do usuário no app" src="img/mobile/profile.png" />
+</div>
+
+<br>
+
+### Usuários
+Gestão de acessos do *tenant*, visível apenas para administradores.
+
+<div align="center">
+<img width="300" alt="Gestão de usuários no app" src="img/mobile/users.png" />
+</div>
 
 > Nota: a **recuperação de senha (RF-003)** ainda não está disponível no app — ver
 > [Especificação → Requisitos](02-Especificação%20do%20Projeto.md) e o [Roadmap](../ROADMAP.md).
-> As capturas de tela do mobile serão adicionadas quando publicadas.

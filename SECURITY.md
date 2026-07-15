@@ -22,9 +22,14 @@ divulgue publicamente até que uma correção esteja disponível (*coordinated d
   *claims*. Nunca reconstrua um `ClaimsPrincipal` a partir de um token sem validar a assinatura.
 - **Tokens de curta duração** (expiração configurável — RNF-001). *Refresh tokens* com rotação
   já implementados; **MFA para administradores** previsto no [ROADMAP.md](ROADMAP.md).
-- **Autorização baseada em papéis** (`Administrator`, `Common`) aplicada nos *controllers*.
-  Endpoints seguem o princípio do **menor privilégio**; apenas o cadastro inicial de usuário é
-  anônimo.
+- **Autorização baseada em papéis** (`PlatformOwner`, `OrgAdmin`, `Member`) com políticas
+  hierárquicas aplicadas nos *controllers*. Endpoints seguem o princípio do **menor
+  privilégio**; os únicos pontos anônimos são o login, o *self-signup* de organização e o
+  aceite de convite.
+- **Isolamento por *tenant*** em duas camadas: filtros globais do EF Core restringem toda
+  leitura/escrita à organização do usuário autenticado, e **Row-Level Security** no PostgreSQL
+  repete a regra no próprio banco — mesmo um *bypass* da camada de aplicação não expõe dados
+  de outra organização (coberto por testes de integração dedicados).
 - Considerar **RS256** (chaves assimétricas) quando múltiplos serviços precisarem validar
   tokens de forma independente.
 

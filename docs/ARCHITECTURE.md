@@ -28,9 +28,10 @@ business rules live in services; persistence is isolated in the `AppDbContext`.
 | Layer | Responsibility | Representative types |
 | :--- | :--- | :--- |
 | Controllers | HTTP surface: routing, `[Authorize]`, status codes | `BookingsController`, `SpacesController`, `AuthController` (`/api/*`) |
-| Services (scoped) | Business rules and orchestration | `BookingsService`, `AuthService`, `PrivacyService`, `IdempotencyService`, `SpacesService`, `ReviewsService`, `AnalyticsService`, `UsersService`, `ResourcesService` |
+| Services (scoped) | Business rules and orchestration | `BookingsService`, `AuthService`, `OrganizationsService`, `InvitationsService`, `PrivacyService`, `IdempotencyService`, `SpacesService`, `ReviewsService`, `AnalyticsService`, `UsersService`, `ResourcesService`, `FileUploadService`, `IEmailSender` (`ResendEmailSender` / `LoggingEmailSender`) |
+| Tenancy | Multi-tenant isolation: resolves the tenant from JWT claims and scopes every query/write to it | `TenantResolutionMiddleware`, `ITenantContext`, `TenantConnectionInterceptor` (`Tenancy/`) |
 | Data | EF Core persistence; entities map to `snake_case` tables | `AppDbContext`, `Migrations/` |
-| Cross-cutting | Config binding, JWT validation, CORS, domain exceptions | `DatabaseSettings`, `JwtSettings`, `BookingConflictException` |
+| Cross-cutting | Config binding, JWT validation, CORS, domain exceptions | `DatabaseSettings`, `JwtSettings`, `EmailSettings`, `BookingConflictException` |
 
 Supporting patterns: **DTOs** for request shaping (e.g. `SpaceFormRequest` for multipart
 uploads), **custom domain exceptions** translated to HTTP status at the controller boundary,
@@ -46,11 +47,21 @@ Middleware order in `src/api/Program.cs` (execution order):
 4. `UseHttpsRedirection`.
 5. `UseCors("AllowWebApp")` — dev origins plus `CORS_ALLOWED_ORIGINS` (comma-separated).
 6. Static files for `/uploads`.
-7. `UseAuthentication` → `UseAuthorization`.
+7. `UseAuthentication` → `TenantResolutionMiddleware` → `UseAuthorization`.
 8. `MapControllers`.
 
 Authentication is JWT Bearer (validates issuer, audience, lifetime, signing key).
-Authorization uses roles (`Administrator`, `Common`) and an `AdminOnly` policy.
+Authorization uses roles (`PlatformOwner`, `OrgAdmin`, `Member`) with hierarchical policies —
+`OrgAdmin` also satisfies `Member`, and `PlatformOwner` satisfies everything.
+
+**Multi-tenancy.** Every request runs inside one organization (tenant): the middleware reads
+the `tenant_id` claim from the JWT into a scoped `ITenantContext`; EF global query filters
+scope reads, writes are auto-stamped with the tenant, and Postgres **Row-Level Security**
+enforces the same isolation at the database (the `TenantConnectionInterceptor` sets the
+tenant per connection), so a bug in the app layer cannot leak another tenant's rows.
+Anonymous requests carry no tenant and match nothing. Public self-signup
+(`POST /api/organizations`) creates the organization plus its first `OrgAdmin`; members join
+by invitation (`/api/invitations`) via an e-mailed accept link.
 
 ## 4. Core write path — a booking under contention
 
@@ -85,12 +96,16 @@ same key returns the original response instead of creating a duplicate (backed b
 
 ## 5. Data model
 
-PostgreSQL 16 via EF Core migrations (`InitialCreate`, `AddAuthAndLgpd`). Relationships are
-modeled through string foreign-key columns (no navigation properties).
+PostgreSQL 16 via EF Core migrations (six today, from `InitialCreate` to
+`EnableRowLevelSecurity`). Relationships are modeled through string foreign-key columns (no
+navigation properties). Tenant-scoped tables carry a `tenant_id` column (FK to
+`organizations`) protected by RLS policies.
 
 | Table | Purpose |
 | :--- | :--- |
-| `users` | Accounts; unique email; `profile` (role); `anonymized_at` for LGPD tombstoning |
+| `organizations` | Tenants; each row is one customer organization (with a URL `slug`) |
+| `users` | Accounts; unique email; `role`; `anonymized_at` for LGPD tombstoning |
+| `invitations` | Pending invites: hashed token, invited e-mail, expiry, accepted-at |
 | `spaces` | Bookable spaces; `available_hours` as `text[]`; embedded `resources` as `jsonb` |
 | `resources` | Space amenities (projector, A/C, …) |
 | `bookings` | Links user + space + time range; carries the anti-overlap constraint |
@@ -192,24 +207,20 @@ Only REST is implemented today; the rest are forward-looking design notes.
   the current solo MVP, direct send with retry is adequate; the outbox arrives with payments or
   external integrations.
 
-## 10. Quality attributes (ISO/IEC 25010)
+## 10. Quality attributes
 
-Prioritized quality subcharacteristics and how the system addresses them (the concrete
-non-functional requirements are catalogued in
-[02-Especificação](02-Especificação%20do%20Projeto.md)):
+What the architecture actually guarantees today (the non-functional requirements are
+catalogued in [02-Especificação](02-Especificação%20do%20Projeto.md)):
 
-- **Functional suitability** — completeness (full booking/management flows) and correctness
-  (availability, conflicts, and rules processed exactly, including under concurrency).
-- **Security** — confidentiality/integrity of personal and booking data; authenticity (every
-  action tied to an authenticated user, supporting audit). See [SECURITY.md](../SECURITY.md).
-- **Reliability** — maturity (rigorous integration tests), availability, fault tolerance.
-- **Usability** — learnability, operability, accessibility across web and mobile.
-- **Performance efficiency** — response time and resource use (targets RNF-005…010).
-- **Maintainability** — modularity, reusability, analysability (layered architecture, SOLID).
-- **Portability** — adaptability across devices/OSes and installability.
-
-Tracking metrics: user-satisfaction index (reviews), error/failure rate, mean response time,
-MTBF, usability index (SUS), security incidents, MTTR, resource use, accessibility rate.
+- **Correctness under concurrency** — the no-overlap invariant is enforced atomically in the
+  database (§6) and proven by a 100-way concurrency test in CI.
+- **Security & isolation** — JWT + BCrypt, tenant isolation enforced twice (EF filters and
+  Postgres RLS), LGPD export/erasure endpoints. See [SECURITY.md](../SECURITY.md).
+- **Testability** — integration-first suite against a real Postgres ([TESTING.md](TESTING.md)).
+- **Accessibility** — WCAG 2.2 AA on the admin panel (checked with vitest-axe); accessible
+  roles/labels and touch targets on the mobile app.
+- **Maintainability** — thin controllers, business rules in services, persistence isolated in
+  `AppDbContext`; decisions recorded as [ADRs](adr/).
 
 ## Related
 

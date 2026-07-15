@@ -52,6 +52,8 @@ The container listens on port `8080`; Render terminates TLS at the edge.
 | `JwtSettings__Secret` | a fresh secret, `openssl rand -base64 48` (distinct from dev) |
 | `ApplyMigrationsOnStartup` | `true` — runs EF migrations on boot |
 | `CORS_ALLOWED_ORIGINS` | the admin origin(s), set once the admin is deployed |
+| `Email__ApiKey` | Resend API key for invitation e-mails; when unset the API logs the accept link instead of sending (`LoggingEmailSender`) |
+| `Email__FromAddress` / `Email__FromName` | sender identity (defaults: `onboarding@resend.dev` / `Agendify`) |
 
 On boot the API applies migrations, creating the schema, `btree_gist`, and the `no_overlap`
 constraint. Verify with `GET /status` (200) and `GET /api/spaces` (401 without a token).
