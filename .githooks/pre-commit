@@ -11,7 +11,7 @@ if ! command -v gitleaks >/dev/null 2>&1; then
 fi
 
 echo "🔎 Verificando segredos com gitleaks (staged)..."
-if ! gitleaks protect --staged --verbose; then
+if ! gitleaks git --pre-commit --staged --verbose; then
   echo "❌ Commit bloqueado: possível segredo detectado. Remova-o antes de commitar."
   exit 1
 fi

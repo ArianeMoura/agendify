@@ -1,11 +1,22 @@
 version: 2
+
+# Só os *version updates* (atualizar porque saiu versão nova) são configurados aqui.
+# Os *security updates* (atualizar porque há vulnerabilidade) vêm dos Dependabot
+# alerts, são independentes deste arquivo e não sofrem limite nem cooldown — é
+# aquela camada que realmente protege. Aqui a régua é outra: o projeto é mantido
+# por uma pessoa, então PR que ninguém revisa é ruído, não higiene. Daí a cadência
+# mensal, um PR por ecossistema e majors de fora (exigem trabalho manual de qualquer
+# forma).
 updates:
-  # Backend .NET
+  # Backend .NET — as versões seguem o TFM (net9.0); um major traria .NET 10.
   - package-ecosystem: nuget
     directory: /src/api
     schedule:
-      interval: weekly
-    open-pull-requests-limit: 5
+      interval: monthly
+    open-pull-requests-limit: 2
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
       api-nuget:
         patterns:
@@ -13,8 +24,11 @@ updates:
   - package-ecosystem: nuget
     directory: /src/api.Tests
     schedule:
-      interval: weekly
-    open-pull-requests-limit: 5
+      interval: monthly
+    open-pull-requests-limit: 2
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
       api-tests-nuget:
         patterns:
@@ -24,29 +38,50 @@ updates:
   - package-ecosystem: npm
     directory: /src/admin
     schedule:
-      interval: weekly
-    open-pull-requests-limit: 5
+      interval: monthly
+    open-pull-requests-limit: 2
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
       admin-npm:
         patterns:
           - "*"
 
-  # Mobile (Expo)
+  # Mobile (Expo) — quem dita as versões do ecossistema Expo/React Native é o SDK,
+  # verificado por `npx expo install --check`. Subir esses pacotes por fora
+  # desalinha do SDK e quebra o build, então ficam ignorados aqui; o resto
+  # (axios, zod, date-fns…) segue atualizando.
   - package-ecosystem: npm
     directory: /src/mobile
     schedule:
-      interval: weekly
-    open-pull-requests-limit: 5
+      interval: monthly
+    open-pull-requests-limit: 2
+    ignore:
+      - dependency-name: "expo"
+      - dependency-name: "expo-*"
+      - dependency-name: "@expo/*"
+      - dependency-name: "jest-expo"
+      - dependency-name: "eslint-config-expo"
+      - dependency-name: "react"
+      - dependency-name: "react-dom"
+      - dependency-name: "react-native"
+      - dependency-name: "react-native-*"
+      - dependency-name: "@react-native-*"
+      - dependency-name: "@react-navigation/*"
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
       mobile-npm:
         patterns:
           - "*"
 
-  # Workflows do próprio CI
+  # Workflows do próprio CI — majors entram (ex.: actions/checkout v4 → v5).
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: weekly
+      interval: monthly
+    open-pull-requests-limit: 2
     groups:
       github-actions:
         patterns:
