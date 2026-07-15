@@ -208,6 +208,13 @@ namespace api.Controllers
 
                 return CreatedAtAction(nameof(Post), new { id = newSpace.Id }, newSpace);
             }
+            catch (JsonException)
+            {
+                // spaceData malformado é erro de quem chamou, não do servidor. Sem isto a
+                // JsonException caía no catch genérico e virava 500 — poluindo os logs de
+                // erro e escondendo do cliente que o problema era o corpo dele.
+                return BadRequest("Invalid space data");
+            }
             catch (InvalidOperationException ex)
             {
                 return BadRequest(ex.Message);
@@ -272,6 +279,13 @@ namespace api.Controllers
                 }
 
                 return Ok(dbSpace);
+            }
+            catch (JsonException)
+            {
+                // spaceData malformado é erro de quem chamou, não do servidor. Sem isto a
+                // JsonException caía no catch genérico e virava 500 — poluindo os logs de
+                // erro e escondendo do cliente que o problema era o corpo dele.
+                return BadRequest("Invalid space data");
             }
             catch (InvalidOperationException ex)
             {
