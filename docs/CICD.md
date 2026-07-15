@@ -9,15 +9,17 @@ Four workflows under [`.github/workflows/`](../.github/workflows/):
 
 | Workflow | Trigger | What it does |
 | :--- | :--- | :--- |
-| `security.yml` | push / PR to `main` | Gitleaks secret scan; .NET 9 build; **concurrency gate** (100-way double-booking test, release-blocking); full test suite |
+| `security.yml` | push / PR to `main` | Gitleaks secret scan; .NET 9 build; **concurrency gate** (100-way double-booking test, release-blocking); full test suite with a **line-coverage gate** (≥ 60%, RNF-008) |
 | `admin.yml` | push / PR touching `src/admin/**` | `npm ci`, lint, typecheck, test (Vitest), build (Next.js) |
 | `mobile.yml` | push / PR touching `src/mobile/**` | `npm ci`, lint (`expo lint`), typecheck, format check (Prettier), test (jest-expo) |
 | `codeql.yml` | push / PR + weekly cron | CodeQL static analysis (C#, JS/TS) |
 
 The `security.yml` build-and-test job runs on `ubuntu-latest` (which provides Docker for
 Testcontainers): it restores and builds in Release, runs the concurrency gate
-(`--filter "Name~Concurrent"`) as a merge blocker, then the full suite. See
-[TESTING.md](TESTING.md).
+(`--filter "Name~Concurrent"`) as a merge blocker, then the full suite — which also collects
+coverage and fails the build below 60% line coverage (RNF-008). Coverage rides along with the
+suite instead of getting its own step because every `dotnet test` spins up a fresh PostgreSQL
+container. The Cobertura XML is uploaded as a build artifact. See [TESTING.md](TESTING.md).
 
 ## Continuous Delivery (Implemented)
 
@@ -31,7 +33,7 @@ live in [DEPLOYMENT.md](DEPLOYMENT.md).
 
 - Promote CD into a versioned pipeline (build → test gate → deploy) so releases are gated on
   the test suite.
-- Enforce a **coverage threshold** in CI (currently coverage is a local script only).
+- Gate **branch coverage** too (line coverage is already enforced at ≥ 60%; branch sits at ~45%).
 
 ## Related
 

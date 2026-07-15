@@ -36,7 +36,8 @@ Direções de evolução do **Agendify**. Intencionalmente **sem datas** — a p
   (RFC 7807)**; **health checks** reais com *probe* do PostgreSQL; **logs estruturados**
   (Serilog) com *correlation IDs*; **OpenTelemetry** (traces/métricas).
 - **Corrigir vazamento de detalhes internos** em respostas `500` (mensagens de exceção).
-- **Gate de cobertura na CI** (hoje a cobertura é um script local).
+- **Gate de cobertura de branch na CI** — a de linha já bloqueia o merge abaixo de 60%
+  (RNF-008); a de branch está em ~45% e por isso ainda não é gate.
 
 ## Qualidade e testes
 

@@ -38,5 +38,26 @@ jobs:
         # Bloqueio de release: N=100 criações simultâneas do mesmo slot → exatamente
         # uma persiste. Se este teste falhar, o build falha e o merge é barrado.
         run: dotnet test src/api.Tests/api.Tests.csproj --configuration Release --filter "Name~Concurrent"
-      - name: Suíte completa
-        run: dotnet test src/api.Tests/api.Tests.csproj --configuration Release
+      # Roda a suíte inteira e, de quebra, aplica o gate de cobertura (RNF-008 — mínimo de
+      # 60% de linhas). Os dois no mesmo passo de propósito: cada `dotnet test` sobe um
+      # PostgreSQL novo via Testcontainers, e separar dobraria o tempo do build à toa.
+      # O gate é por LINHA: a cobertura de branch hoje está bem abaixo disso e travá-la
+      # aqui barraria todo merge — está anotado no ROADMAP como trabalho à parte.
+      - name: Suíte completa + gate de cobertura (RNF-008 ≥ 60% de linhas)
+        run: |
+          dotnet test src/api.Tests/api.Tests.csproj --configuration Release \
+            /p:CollectCoverage=true \
+            /p:CoverletOutputFormat=cobertura \
+            /p:CoverletOutput=./TestResults/coverage.cobertura.xml \
+            /p:Exclude="[*.Tests]*" \
+            /p:Threshold=60 \
+            /p:ThresholdType=line \
+            /p:ThresholdStat=total
+
+      - name: Publicar o relatório de cobertura
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: src/api.Tests/TestResults/coverage.cobertura.xml
+          if-no-files-found: warn

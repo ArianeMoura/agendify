@@ -53,7 +53,7 @@ automated proof of RN-01.
 
 | Control | Status |
 | :--- | :--- |
-| Code coverage (Coverlet), target ≥ 60% (RNF-008) | Implemented — via `src/api.Tests/generate-coverage-report.sh`; **not yet enforced in CI** |
+| Code coverage (Coverlet), target ≥ 60% (RNF-008) | Enforced in CI — the full-suite step fails the build when **line** coverage drops below 60% (currently ~87%). Branch coverage (~45%) is not gated; see [Roadmap](../ROADMAP.md) |
 | ESLint (admin: `next/core-web-vitals`+`typescript`; mobile: `eslint-config-expo`) | Implemented |
 | Gitleaks secret scanning (CI + opt-in local hook) | Implemented |
 | CodeQL SAST (C#, JS/TS) | Implemented |
