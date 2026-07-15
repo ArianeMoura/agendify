@@ -1,5 +1,8 @@
 namespace api.Services
 {
+    // Salva imagens de espaço no disco do próprio serviço, servidas em /uploads.
+    // Atenção: no Render o filesystem é efêmero — as imagens somem a cada deploy.
+    // Storage externo (S3/R2) está no ROADMAP; ver docs/DEPLOYMENT.md.
     public class FileUploadService
     {
         private readonly IWebHostEnvironment _environment;
@@ -13,25 +16,8 @@ namespace api.Services
         {
             _environment = environment;
             _logger = logger;
-            _uploadPath = GetUploadBasePath();
+            _uploadPath = Path.Combine(_environment.ContentRootPath, UploadFolder);
             EnsureUploadFolderExists();
-        }
-
-        private string GetUploadBasePath()
-        {
-            var websiteName = Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME");
-            if (!string.IsNullOrEmpty(websiteName))
-            {
-                var azurePath = Path.Combine("D:\\home", UploadFolder);
-                _logger.LogInformation("Running on Azure. Using persistent storage: {Path}", azurePath);
-                return azurePath;
-            }
-            else
-            {
-                var localPath = Path.Combine(_environment.ContentRootPath, UploadFolder);
-                _logger.LogInformation("Running locally. Using: {Path}", localPath);
-                return localPath;
-            }
         }
 
         private void EnsureUploadFolderExists()

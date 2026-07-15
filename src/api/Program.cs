@@ -205,9 +205,7 @@ app.UseHttpsRedirection();
 
 app.UseCors("AllowWebApp");
 
-var uploadPath = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME"))
-    ? Path.Combine("D:\\home", "uploads") 
-    : Path.Combine(builder.Environment.ContentRootPath, "uploads"); 
+var uploadPath = Path.Combine(builder.Environment.ContentRootPath, "uploads");
 
 if (!Directory.Exists(uploadPath))
 {
