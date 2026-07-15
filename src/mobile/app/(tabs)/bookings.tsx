@@ -19,6 +19,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { DateFilter } from '@/components/ui/DateFilter';
 import { useAuth } from '@/lib/contexts/AuthContext';
 import { bookingsApi } from '@/lib/api/bookings';
+import { spaceEmoji } from '@/lib/utils/spaceEmoji';
 import { BookingWithDetails, Role } from '@/lib/types';
 
 export default function BookingsScreen() {
@@ -160,7 +161,9 @@ export default function BookingsScreen() {
     <Card style={styles.bookingCard}>
       <View style={styles.bookingHeader}>
         <View style={styles.bookingInfo}>
-          <Ionicons name="business" size={20} color={colors.primary} />
+          <Text style={styles.spaceEmoji} accessible={false}>
+            {spaceEmoji(item.space?.name)}
+          </Text>
           <Text style={styles.spaceName}>{item.space?.name || 'Espaço'}</Text>
         </View>
         <View style={styles.bookingActions}>
@@ -294,6 +297,9 @@ const createStyles = (colors: ThemeColors) =>
       flexDirection: 'row',
       alignItems: 'center',
       flex: 1,
+    },
+    spaceEmoji: {
+      fontSize: 20,
     },
     spaceName: {
       ...typography.h5,

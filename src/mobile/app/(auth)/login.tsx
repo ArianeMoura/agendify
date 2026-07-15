@@ -18,10 +18,11 @@ import {
   spacing,
   typography,
   borderRadius,
-  fontFamily,
   type ThemeColors,
 } from '@/constants/theme';
+import { Logo } from '@/components/brand';
 import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { useAuth } from '@/lib/contexts/AuthContext';
 import { useTheme } from '@/lib/theme/ThemeProvider';
@@ -79,14 +80,11 @@ export default function LoginScreen() {
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.header}>
-          <Text style={styles.brandTitle} accessibilityRole="header">
-            Agendify
-          </Text>
-          <Text style={styles.subtitle}>Sistema de Reservas de Espaços</Text>
-        </View>
-
-        <View style={styles.form}>
+        <Card style={styles.card}>
+          <View style={styles.header}>
+            <Logo orientation="vertical" iconSize={48} />
+            <Text style={styles.subtitle}>Sistema de Reservas de Espaços</Text>
+          </View>
           <Controller
             control={control}
             name="email"
@@ -100,13 +98,6 @@ export default function LoginScreen() {
                 error={errors.email?.message}
                 keyboardType="email-address"
                 autoCapitalize="none"
-                leftIcon={
-                  <Ionicons
-                    name="mail-outline"
-                    size={20}
-                    color={colors.inkMuted}
-                  />
-                }
               />
             )}
           />
@@ -123,13 +114,6 @@ export default function LoginScreen() {
                 onBlur={onBlur}
                 error={errors.password?.message}
                 secureTextEntry={!showPassword}
-                leftIcon={
-                  <Ionicons
-                    name="lock-closed-outline"
-                    size={20}
-                    color={colors.inkMuted}
-                  />
-                }
                 rightIcon={
                   <Pressable
                     onPress={() => setShowPassword(!showPassword)}
@@ -169,7 +153,7 @@ export default function LoginScreen() {
               <Text style={styles.registerTextBold}>Aceitar</Text>
             </Text>
           </Pressable>
-        </View>
+        </Card>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -179,7 +163,7 @@ const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: colors.primary,
+      backgroundColor: colors.background,
     },
     scrollContent: {
       flexGrow: 1,
@@ -189,26 +173,19 @@ const createStyles = (colors: ThemeColors) =>
       width: '100%',
       alignSelf: 'center',
     },
-    header: {
-      alignItems: 'center',
-      marginBottom: spacing.xxl,
-    },
-    brandTitle: {
-      fontFamily: fontFamily.displayExtrabold,
-      color: colors.onPrimary,
-      fontSize: 48,
-      fontWeight: '800',
-      marginBottom: spacing.sm,
-    },
-    subtitle: {
-      ...typography.body,
-      color: colors.onPrimary,
-      opacity: 0.9,
-    },
-    form: {
-      backgroundColor: colors.surface,
+    // Mesmo desenho do login do admin: card centrado, lockup vertical + subtítulo.
+    card: {
       borderRadius: borderRadius.xl,
       padding: spacing.xl,
+    },
+    header: {
+      alignItems: 'center',
+      marginBottom: spacing.xl,
+      gap: spacing.sm,
+    },
+    subtitle: {
+      ...typography.bodySmall,
+      color: colors.textMuted,
     },
     loginButton: {
       marginTop: spacing.md,
