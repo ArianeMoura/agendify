@@ -37,7 +37,7 @@ Direções de evolução do **Agendify**. Intencionalmente **sem datas** — a p
   (Serilog) com *correlation IDs*; **OpenTelemetry** (traces/métricas).
 - **Corrigir vazamento de detalhes internos** em respostas `500` (mensagens de exceção).
 - **Gate de cobertura de branch na CI** — a de linha já bloqueia o merge abaixo de 60%
-  (RNF-008); a de branch está em ~45% e por isso ainda não é gate.
+  (RNF-008); a de branch está em ~59% — perto do limiar, mas ainda não é gate.
 
 ## Qualidade e testes
 

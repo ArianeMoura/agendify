@@ -33,7 +33,7 @@ live in [DEPLOYMENT.md](DEPLOYMENT.md).
 
 - Promote CD into a versioned pipeline (build → test gate → deploy) so releases are gated on
   the test suite.
-- Gate **branch coverage** too (line coverage is already enforced at ≥ 60%; branch sits at ~45%).
+- Gate **branch coverage** too (line coverage is already enforced at ≥ 60%; branch sits at ~59%).
 
 ## Related
 
