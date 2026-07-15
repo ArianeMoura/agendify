@@ -62,7 +62,7 @@ export default function DashboardScreen() {
       contentContainerStyle={styles.scrollContent}
     >
       <View style={styles.header}>
-        <Text style={styles.greeting}>Bem-vindo,</Text>
+        <Text style={styles.greeting}>Bem-vindo(a),</Text>
         <Text style={styles.userName}>{user?.name}!</Text>
       </View>
 
