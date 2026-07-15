@@ -54,6 +54,10 @@ The container listens on port `8080`; Render terminates TLS at the edge.
 | `CORS_ALLOWED_ORIGINS` | the admin origin(s), set once the admin is deployed |
 | `Email__ApiKey` | Resend API key for invitation e-mails; when unset the API logs the accept link instead of sending (`LoggingEmailSender`) |
 | `Email__FromAddress` / `Email__FromName` | sender identity (defaults: `onboarding@resend.dev` / `Agendify`) |
+| `Storage__ServiceUrl` | `https://<account_id>.r2.cloudflarestorage.com` |
+| `Storage__Bucket` | the R2 bucket name — **this is the switch**: set it and images go to R2, leave it empty and they go to the container's ephemeral disk |
+| `Storage__AccessKeyId` / `Storage__SecretAccessKey` | R2 API token credentials |
+| `Storage__PublicBaseUrl` | the bucket's public `r2.dev` domain or a custom one; it is what gets stored in `Space.ImageUrl`, so it must be reachable by the clients |
 
 On boot the API applies migrations, creating the schema, `btree_gist`, and the `no_overlap`
 constraint. Verify with `GET /status` (200) and `GET /api/spaces` (401 without a token).
@@ -95,11 +99,12 @@ Before opening to the public:
 
 - **Cold start:** the free Render instance sleeps after ~15 min idle; the first request then
   takes ~30–50 s. A paid/always-on tier removes this.
-- **Uploaded images are ephemeral.** `FileUploadService` writes space images to the container's
-  own filesystem (served at `/uploads`), and Render's disk does not survive a deploy or restart —
-  so those images are lost while the database keeps pointing at them. Fine for the current
-  walking skeleton; before real use, move to external storage (S3/R2) or a paid persistent disk.
-  Tracked in the [Roadmap](../ROADMAP.md).
+- **Uploaded images need `Storage__*` set.** With `Storage__Bucket` configured, images go to
+  Cloudflare R2 and survive deploys. Leave it empty and `LocalImageStorage` writes to the
+  container's own filesystem (served at `/uploads`) — which on Render does **not** survive a
+  deploy or restart, so the images vanish while the database keeps pointing at them. That is
+  fine locally and broken in production, so set the variables before uploading anything real.
+  Images uploaded before this was configured are already gone; re-upload them via the admin.
 - **Secrets hygiene:** never commit secrets; if a credential appears in a log, rotate it
   (e.g. reset the Neon password and update the Render variable). See [SECURITY.md](../SECURITY.md).
 - **CORS:** stays empty until a browser client is deployed; then list the exact origins.

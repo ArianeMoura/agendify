@@ -11,6 +11,10 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.0" />
+    <!-- Os dois Testcontainers têm de andar na MESMA versão: a major 4 mudou o
+         ContainerConfiguration e, misturada com a 3.10, compila mas estoura
+         MissingMethodException ao subir qualquer container. -->
+    <PackageReference Include="Testcontainers.Minio" Version="3.10.0" />
     <PackageReference Include="Testcontainers.PostgreSql" Version="3.10.0" />
     <!-- Alinha a versão do EF Core Relational com a do projeto api (evita MSB3277). -->
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.9" />

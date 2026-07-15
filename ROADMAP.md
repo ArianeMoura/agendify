@@ -63,9 +63,7 @@ Direções de evolução do **Agendify**. Intencionalmente **sem datas** — a p
 
 ## Arquitetura e desempenho
 
-- **Storage externo para as imagens dos espaços** (S3/R2/Cloudinary). Hoje o `FileUploadService`
-  grava no disco do próprio contêiner e o Render é efêmero: as imagens se perdem a cada deploy,
-  enquanto o banco segue apontando para elas. Ver [Deployment](docs/DEPLOYMENT.md).
+- **Cache** de leituras frequentes (catálogo de espaços).
 - **Cache** de leituras frequentes (catálogo de espaços).
 - Versionamento explícito do contrato REST (`/api/v1`).
 - Escala do PostgreSQL: *read replicas* e *connection pooling* conforme a carga crescer.

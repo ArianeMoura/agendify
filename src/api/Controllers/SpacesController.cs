@@ -292,7 +292,7 @@ namespace api.Controllers
 
             if (space != null && !string.IsNullOrWhiteSpace(space.ImageUrl))
             {
-                _fileUploadService.DeleteImage(space.ImageUrl);
+                await _fileUploadService.DeleteImageAsync(space.ImageUrl);
             }
 
             await _spacesService.Delete(id);

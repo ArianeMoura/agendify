@@ -1,35 +1,21 @@
 namespace api.Services
 {
-    // Salva imagens de espaço no disco do próprio serviço, servidas em /uploads.
-    // Atenção: no Render o filesystem é efêmero — as imagens somem a cada deploy.
-    // Storage externo (S3/R2) está no ROADMAP; ver docs/DEPLOYMENT.md.
+    // Valida a imagem enviada e delega a gravação ao IImageStorage (disco em dev, R2 em
+    // produção). A validação vive aqui, e não no storage, para valer igual nos dois destinos.
     public class FileUploadService
     {
-        private readonly IWebHostEnvironment _environment;
+        private readonly IImageStorage _storage;
         private readonly ILogger<FileUploadService> _logger;
-        private const string UploadFolder = "uploads";
-        private readonly string[] AllowedExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
         private const long MaxFileSize = 5 * 1024 * 1024; // 5MB
-        private readonly string _uploadPath;
 
-        public FileUploadService(IWebHostEnvironment environment, ILogger<FileUploadService> logger)
+        public FileUploadService(IImageStorage storage, ILogger<FileUploadService> logger)
         {
-            _environment = environment;
+            _storage = storage;
             _logger = logger;
-            _uploadPath = Path.Combine(_environment.ContentRootPath, UploadFolder);
-            EnsureUploadFolderExists();
         }
 
-        private void EnsureUploadFolderExists()
-        {
-            if (!Directory.Exists(_uploadPath))
-            {
-                Directory.CreateDirectory(_uploadPath);
-                _logger.LogInformation("Created uploads folder at: {UploadPath}", _uploadPath);
-            }
-        }
-
-        public async Task<string?> SaveImageAsync(IFormFile? file, string? oldImageUrl = null)
+        public async Task<string?> SaveImageAsync(
+            IFormFile? file, string? oldImageUrl = null, CancellationToken ct = default)
         {
             if (file == null || file.Length == 0)
             {
@@ -41,60 +27,33 @@ namespace api.Services
                 throw new InvalidOperationException($"File size exceeds maximum allowed size of {MaxFileSize / (1024 * 1024)}MB");
             }
 
-            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-            if (!AllowedExtensions.Contains(extension))
-            {
-                throw new InvalidOperationException($"File type {extension} is not allowed. Allowed types: {string.Join(", ", AllowedExtensions)}");
-            }
+            // O formato sai dos bytes, não do nome do arquivo: a extensão é escolhida pelo
+            // cliente e mentir nela é trivial.
+            await using var content = file.OpenReadStream();
+            var imageType = await ImageSignature.DetectAsync(content, ct)
+                ?? throw new InvalidOperationException(
+                    "File is not a valid image. Allowed types: JPEG, PNG, GIF, WEBP");
 
+            var imageUrl = await _storage.SaveAsync(content, imageType.Extension, imageType.ContentType, ct);
+
+            // A antiga só sai depois que a nova está gravada. Na ordem inversa, uma falha na
+            // escrita deixava o banco apontando para um arquivo já apagado.
             if (!string.IsNullOrWhiteSpace(oldImageUrl))
             {
-                DeleteImage(oldImageUrl);
+                await _storage.DeleteAsync(oldImageUrl, ct);
             }
 
-            var fileName = $"{Guid.NewGuid()}{extension}";
-            var filePath = Path.Combine(_uploadPath, fileName);
-
-            try
-            {
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream);
-                }
-
-                _logger.LogInformation("Image saved successfully: {FileName}", fileName);
-                return $"/{UploadFolder}/{fileName}";
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error saving image: {FileName}", fileName);
-                throw;
-            }
+            return imageUrl;
         }
 
-        public void DeleteImage(string? imageUrl)
+        public async Task DeleteImageAsync(string? imageUrl, CancellationToken ct = default)
         {
             if (string.IsNullOrWhiteSpace(imageUrl))
             {
                 return;
             }
 
-            try
-            {
-                var fileName = Path.GetFileName(imageUrl);
-                var filePath = Path.Combine(_uploadPath, fileName);
-
-                if (File.Exists(filePath))
-                {
-                    File.Delete(filePath);
-                    _logger.LogInformation("Deleted image: {FileName}", fileName);
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error deleting image: {ImageUrl}", imageUrl);
-            }
+            await _storage.DeleteAsync(imageUrl, ct);
         }
     }
 }
-

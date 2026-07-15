@@ -1,4 +1,6 @@
 using System.Text;
+using Amazon.Runtime;
+using Amazon.S3;
 using api.Data;
 using api.Models;
 using api.Services;
@@ -102,7 +104,30 @@ else
 {
     builder.Services.AddScoped<IEmailSender, LoggingEmailSender>();
 }
-// FileUploadService só toca o filesystem — pode continuar Singleton.
+// Storage das imagens de espaço. Com a seção Storage preenchida → R2 (bucket S3-compatível,
+// sobrevive a deploy); sem ela → disco local (dev/testes), que no Render é efêmero e perde as
+// imagens a cada restart. Mesma seleção condicional do IEmailSender acima.
+builder.Services.Configure<StorageSettings>(builder.Configuration.GetSection("Storage"));
+var storageSettings = builder.Configuration.GetSection("Storage").Get<StorageSettings>();
+if (!string.IsNullOrWhiteSpace(storageSettings?.Bucket))
+{
+    // Fail-fast: bucket sem credencial ou sem URL pública gravaria ImageUrl inalcançável.
+    if (string.IsNullOrWhiteSpace(storageSettings.ServiceUrl)
+        || string.IsNullOrWhiteSpace(storageSettings.AccessKeyId)
+        || string.IsNullOrWhiteSpace(storageSettings.SecretAccessKey)
+        || string.IsNullOrWhiteSpace(storageSettings.PublicBaseUrl))
+        throw new InvalidOperationException(
+            "Storage:Bucket configurado, mas faltam Storage:ServiceUrl, Storage:AccessKeyId, Storage:SecretAccessKey ou Storage:PublicBaseUrl. Configure via User Secrets (dev) ou Storage__* (prod).");
+
+    builder.Services.AddSingleton<IAmazonS3>(_ => S3ClientFactory.Create(storageSettings));
+    builder.Services.AddSingleton<IImageStorage, R2ImageStorage>();
+}
+else
+{
+    builder.Services.AddSingleton<IImageStorage, LocalImageStorage>();
+}
+
+// Só valida e delega ao IImageStorage — sem estado, pode ser Singleton.
 builder.Services.AddSingleton<FileUploadService>();
 
 builder.Services.AddControllers()
