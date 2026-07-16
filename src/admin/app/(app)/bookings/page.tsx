@@ -46,7 +46,7 @@ export default function BookingsPage() {
         title="Reservas"
         description="Acompanhe e crie reservas de espaços."
         action={
-          <Button onClick={form.onOpen}>
+          <Button onClick={openCreate}>
             <Plus className="size-4" aria-hidden />
             Nova reserva
           </Button>
