@@ -28,6 +28,7 @@ import { DatePickerPopover } from '@/components/ui/DatePickerPopover';
 import { TimeSlotPicker } from '@/components/ui/TimeSlotPicker';
 import { spacesApi } from '@/lib/api/spaces';
 import { bookingsApi } from '@/lib/api/bookings';
+import { areSlotsContiguous } from '@/lib/utils/timeSlots';
 import { getImageUrl } from '@/lib/api/config';
 import { format, isSameDay, set as setDate } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -188,6 +189,14 @@ export default function EditBookingScreen() {
 
     if (selectedTimeSlots.length === 0) {
       Alert.alert('Erro', 'Selecione pelo menos um horário.');
+      return;
+    }
+
+    if (!areSlotsContiguous(selectedTimeSlots)) {
+      Alert.alert(
+        'Horários não sequenciais',
+        'A reserva é de um intervalo único: selecione apenas horários consecutivos.',
+      );
       return;
     }
 
