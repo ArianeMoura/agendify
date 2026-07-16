@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace api.Models;
 
@@ -18,7 +19,11 @@ public class User : ITenantScoped
     [EmailAddress]
     public string Email { get; set; } = string.Empty;
 
+    // [JsonIgnore] é rede de segurança: nenhuma resposta deve carregar o hash, e a
+    // entidade não é bindada de corpo nenhum (os requests usam DTOs próprios). Sem
+    // isto, qualquer projeção que embuta User volta a vazar a credencial pela API.
     [Required]
+    [JsonIgnore]
     public string Password { get; set; } = string.Empty;
 
     [Required]
