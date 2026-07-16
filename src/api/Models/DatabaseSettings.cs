@@ -1,8 +1,7 @@
-namespace api.Models
+namespace api.Models;
+
+public class DatabaseSettings
 {
-    public class DatabaseSettings
-    {
-        // Connection string do PostgreSQL (fonte de verdade).
-        public string ConnectionString { get; set; } = string.Empty;
-    }
+    // Connection string do PostgreSQL (fonte de verdade).
+    public string ConnectionString { get; set; } = string.Empty;
 }

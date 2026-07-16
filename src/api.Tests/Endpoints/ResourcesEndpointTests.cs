@@ -5,114 +5,113 @@ using System.Text.Json;
 using api.Models;
 using NUnit.Framework;
 
-namespace api.Tests.Endpoints
+namespace api.Tests.Endpoints;
+
+// Testes do pipeline HTTP de /api/resources. Nenhum cliente consome estes endpoints hoje,
+// então esta é a única cobertura que eles têm — e a única forma de flagrar o 400 do
+// TenantId, que os testes de service não alcançam.
+[TestFixture]
+public class ResourcesEndpointTests
 {
-    // Testes do pipeline HTTP de /api/resources. Nenhum cliente consome estes endpoints hoje,
-    // então esta é a única cobertura que eles têm — e a única forma de flagrar o 400 do
-    // TenantId, que os testes de service não alcançam.
-    [TestFixture]
-    public class ResourcesEndpointTests
+    private const string AdminId = "55555555-5555-5555-5555-555555555555";
+    private const string MemberId = "11111111-1111-1111-1111-111111111111";
+    private const string Tenant = Organization.DefaultOrganizationId;
+
+    private ApiFactory _factory = null!;
+
+    [OneTimeSetUp]
+    public void OneTimeSetUp()
     {
-        private const string AdminId = "55555555-5555-5555-5555-555555555555";
-        private const string MemberId = "11111111-1111-1111-1111-111111111111";
-        private const string Tenant = Organization.DefaultOrganizationId;
+        ApiFactory.SetEnvironment();
+        _factory = new ApiFactory();
+    }
 
-        private ApiFactory _factory = null!;
+    [OneTimeTearDown]
+    public void OneTimeTearDown() => _factory.Dispose();
 
-        [OneTimeSetUp]
-        public void OneTimeSetUp()
-        {
-            ApiFactory.SetEnvironment();
-            _factory = new ApiFactory();
-        }
+    [SetUp]
+    public async Task SetUp() => await TestDatabaseFixture.ResetAsync();
 
-        [OneTimeTearDown]
-        public void OneTimeTearDown() => _factory.Dispose();
+    private HttpClient ClientAs(string userId, string role)
+    {
+        var client = _factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", ApiFactory.Token(userId, role, Tenant));
+        return client;
+    }
 
-        [SetUp]
-        public async Task SetUp() => await TestDatabaseFixture.ResetAsync();
+    private static StringContent Json(string body) =>
+        new(body, Encoding.UTF8, "application/json");
 
-        private HttpClient ClientAs(string userId, string role)
-        {
-            var client = _factory.CreateClient();
-            client.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", ApiFactory.Token(userId, role, Tenant));
-            return client;
-        }
+    [Test]
+    public async Task Post_SemTenantId_Retorna201()
+    {
+        var client = ClientAs(AdminId, "OrgAdmin");
 
-        private static StringContent Json(string body) =>
-            new(body, Encoding.UTF8, "application/json");
+        var response = await client.PostAsync("/api/resources",
+            Json(@"{""name"":""Projetor"",""description"":""Full HD""}"));
 
-        [Test]
-        public async Task Post_SemTenantId_Retorna201()
-        {
-            var client = ClientAs(AdminId, "OrgAdmin");
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created),
+            await response.Content.ReadAsStringAsync());
+    }
 
-            var response = await client.PostAsync("/api/resources",
-                Json(@"{""name"":""Projetor"",""description"":""Full HD""}"));
+    [Test]
+    public async Task Post_CarimbaTenantDoToken()
+    {
+        var client = ClientAs(AdminId, "OrgAdmin");
 
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created),
-                await response.Content.ReadAsStringAsync());
-        }
+        await client.PostAsync("/api/resources", Json(@"{""name"":""Projetor""}"));
 
-        [Test]
-        public async Task Post_CarimbaTenantDoToken()
-        {
-            var client = ClientAs(AdminId, "OrgAdmin");
+        await using var db = TestDatabaseFixture.CreateContext();
+        Assert.That(db.Resources.Single().TenantId, Is.EqualTo(Tenant));
+    }
 
-            await client.PostAsync("/api/resources", Json(@"{""name"":""Projetor""}"));
+    [Test]
+    public async Task Post_SemNome_Retorna400()
+    {
+        var client = ClientAs(AdminId, "OrgAdmin");
 
-            await using var db = TestDatabaseFixture.CreateContext();
-            Assert.That(db.Resources.Single().TenantId, Is.EqualTo(Tenant));
-        }
+        var response = await client.PostAsync("/api/resources", Json(@"{""description"":""sem nome""}"));
 
-        [Test]
-        public async Task Post_SemNome_Retorna400()
-        {
-            var client = ClientAs(AdminId, "OrgAdmin");
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+    }
 
-            var response = await client.PostAsync("/api/resources", Json(@"{""description"":""sem nome""}"));
+    [Test]
+    public async Task Post_ComoMember_Retorna403()
+    {
+        var client = ClientAs(MemberId, "Member");
 
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
-        }
+        var response = await client.PostAsync("/api/resources", Json(@"{""name"":""Projetor""}"));
 
-        [Test]
-        public async Task Post_ComoMember_Retorna403()
-        {
-            var client = ClientAs(MemberId, "Member");
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Forbidden));
+    }
 
-            var response = await client.PostAsync("/api/resources", Json(@"{""name"":""Projetor""}"));
+    [Test]
+    public async Task Put_SemTenantId_Retorna200()
+    {
+        var client = ClientAs(AdminId, "OrgAdmin");
+        var created = await client.PostAsync("/api/resources",
+            Json(@"{""name"":""Projetor"",""description"":""Full HD""}"));
+        var id = JsonDocument.Parse(await created.Content.ReadAsStringAsync())
+            .RootElement.GetProperty("id").GetString()!;
 
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Forbidden));
-        }
+        var response = await client.PutAsync("/api/resources",
+            Json($@"{{""id"":""{id}"",""name"":""Projetor 4K"",""description"":""4K""}}"));
 
-        [Test]
-        public async Task Put_SemTenantId_Retorna200()
-        {
-            var client = ClientAs(AdminId, "OrgAdmin");
-            var created = await client.PostAsync("/api/resources",
-                Json(@"{""name"":""Projetor"",""description"":""Full HD""}"));
-            var id = JsonDocument.Parse(await created.Content.ReadAsStringAsync())
-                .RootElement.GetProperty("id").GetString()!;
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK),
+            await response.Content.ReadAsStringAsync());
+        await using var db = TestDatabaseFixture.CreateContext();
+        Assert.That(db.Resources.Single().Name, Is.EqualTo("Projetor 4K"));
+    }
 
-            var response = await client.PutAsync("/api/resources",
-                Json($@"{{""id"":""{id}"",""name"":""Projetor 4K"",""description"":""4K""}}"));
+    [Test]
+    public async Task Put_Inexistente_Retorna404()
+    {
+        var client = ClientAs(AdminId, "OrgAdmin");
 
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK),
-                await response.Content.ReadAsStringAsync());
-            await using var db = TestDatabaseFixture.CreateContext();
-            Assert.That(db.Resources.Single().Name, Is.EqualTo("Projetor 4K"));
-        }
+        var response = await client.PutAsync("/api/resources",
+            Json(@"{""id"":""00000000-0000-0000-0000-000000000000"",""name"":""Fantasma""}"));
 
-        [Test]
-        public async Task Put_Inexistente_Retorna404()
-        {
-            var client = ClientAs(AdminId, "OrgAdmin");
-
-            var response = await client.PutAsync("/api/resources",
-                Json(@"{""id"":""00000000-0000-0000-0000-000000000000"",""name"":""Fantasma""}"));
-
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
-        }
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
     }
 }

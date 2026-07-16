@@ -1,83 +1,82 @@
-using api.Services;
 using api.Models;
-using Microsoft.AspNetCore.Mvc;
+using api.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
-namespace api.Controllers
+namespace api.Controllers;
+
+[ApiController]
+[Route("api/resources")]
+[Authorize]
+public class ResourcesController : ControllerBase
 {
-    [ApiController]
-    [Route("api/resources")]
-    [Authorize]
-    public class ResourcesController : ControllerBase
+    private readonly ResourcesService _resourcesService;
+
+    public ResourcesController(ResourcesService resourcesService)
     {
-        private readonly ResourcesService _resourcesService;
+        _resourcesService = resourcesService;
+    }
 
-        public ResourcesController(ResourcesService resourcesService)
+    [HttpGet("{id}")]
+    [Authorize(Policy = "OrgAdmin")]
+    public async Task<IActionResult> Get(string id)
+    {
+        var resource = await _resourcesService.GetById(id);
+
+        if (resource == null)
         {
-            _resourcesService = resourcesService;
+            return NotFound();
         }
 
-        [HttpGet("{id}")]
-        [Authorize(Policy = "OrgAdmin")]
-        public async Task<IActionResult> Get(string id)
+        return Ok(resource);
+    }
+
+    [HttpGet]
+    [Authorize(Policy = "OrgAdmin")]
+    public async Task<List<Resource>> Get() => await _resourcesService.GetAsync();
+
+    [HttpPost]
+    [Authorize(Policy = "OrgAdmin")]
+    public async Task<IActionResult> Post(CreateResourceRequest request)
+    {
+        var newResource = new Resource
         {
-            var resource = await _resourcesService.GetById(id);
+            Id = Guid.NewGuid().ToString(),
+            Name = request.Name,
+            Description = request.Description,
+        };
 
-            if (resource == null)
-            {
-                return NotFound();
-            }
+        await _resourcesService.Create(newResource);
 
-            return Ok(resource);
+        return CreatedAtAction(nameof(Post), new { Id = newResource.Id.ToString() }, newResource);
+    }
+
+    [HttpPut()]
+    [Authorize(Policy = "OrgAdmin")]
+    public async Task<IActionResult> Put(UpdateResourceRequest request)
+    {
+        var dbResource = await _resourcesService.GetById(request.Id);
+
+        if (dbResource == null)
+        {
+            return NotFound();
         }
 
-        [HttpGet]
-        [Authorize(Policy = "OrgAdmin")]
-        public async Task<List<Resource>> Get() => await _resourcesService.GetAsync();
+        dbResource.Name = request.Name;
+        dbResource.Description = request.Description;
+        dbResource.UpdatedAt = DateTime.UtcNow;
 
-        [HttpPost]
-        [Authorize(Policy = "OrgAdmin")]
-        public async Task<IActionResult> Post(CreateResourceRequest request)
-        {
-            var newResource = new Resource
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = request.Name,
-                Description = request.Description,
-            };
+        await _resourcesService.Update(request.Id, dbResource);
 
-            await _resourcesService.Create(newResource);
+        return Ok(dbResource);
+    }
 
-            return CreatedAtAction(nameof(Post), new { Id = newResource.Id.ToString() }, newResource);
-        }
+    [HttpDelete("{id}")]
+    [Authorize(Policy = "OrgAdmin")]
+    public async Task<IActionResult> Delete(string id)
+    {
+        await _resourcesService.Delete(id);
 
-        [HttpPut()]
-        [Authorize(Policy = "OrgAdmin")]
-        public async Task<IActionResult> Put(UpdateResourceRequest request)
-        {
-            var dbResource = await _resourcesService.GetById(request.Id);
-
-            if (dbResource == null)
-            {
-                return NotFound();
-            }
-
-            dbResource.Name = request.Name;
-            dbResource.Description = request.Description;
-            dbResource.UpdatedAt = DateTime.UtcNow;
-
-            await _resourcesService.Update(request.Id, dbResource);
-
-            return Ok(dbResource);
-        }
-
-        [HttpDelete("{id}")]
-        [Authorize(Policy = "OrgAdmin")]
-        public async Task<IActionResult> Delete(string id)
-        {
-            await _resourcesService.Delete(id);
-
-            return NoContent();
-        }
+        return NoContent();
     }
 }
