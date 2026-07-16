@@ -83,7 +83,10 @@ export default function LoginPage() {
 
           <p className="text-ink-muted text-center text-sm">
             Ainda não tem uma organização?{" "}
-            <Link href="/signup" className="font-medium underline underline-offset-4 hover:opacity-80">
+            <Link
+              href="/signup"
+              className="font-medium underline underline-offset-4 hover:opacity-80"
+            >
               Criar organização
             </Link>
           </p>

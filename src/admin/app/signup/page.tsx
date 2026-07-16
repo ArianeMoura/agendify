@@ -108,7 +108,10 @@ export default function SignupPage() {
 
           <p className="text-ink-muted text-center text-sm">
             Já tem uma conta?{" "}
-            <Link href="/login" className="font-medium underline underline-offset-4 hover:opacity-80">
+            <Link
+              href="/login"
+              className="font-medium underline underline-offset-4 hover:opacity-80"
+            >
               Entrar
             </Link>
           </p>
