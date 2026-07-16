@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -277,6 +278,56 @@ public class BookingsEndpointTests
         Assert.That(payload, Does.Not.Contain("anonymizedAt").IgnoreCase);
         // A projeção tem de continuar entregando o que os clientes de fato consomem.
         Assert.That(payload, Does.Contain("joao@exemplo.com.br"));
+    }
+
+    // Trava o formato do instante no fio: o admin agora faz new Date(iso) para converter
+    // UTC -> hora local de parede, e isso só está correto se a API sufixar o "Z". Sem o Z,
+    // o JS interpretaria o instante como horário local e o horário voltaria a deslizar.
+    [Test]
+    public async Task Get_SerializaDatasEmUtcComSufixoZ()
+    {
+        var id = await SeedBookingAsync(MemberId, 12);
+        var client = ClientAs(MemberId, "Member");
+
+        var response = await client.GetAsync($"/api/bookings/{id}");
+        var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        var start = json.RootElement.GetProperty("startDateTime").GetString()!;
+
+        Assert.That(start, Does.EndWith("Z"), $"startDateTime sem Z: {start}");
+        Assert.That(DateTime.Parse(start, null, DateTimeStyles.RoundtripKind).Kind,
+            Is.EqualTo(DateTimeKind.Utc));
+    }
+
+    // O PUT só passava pela exclusion constraint (que arbitra SOBREPOSIÇÃO) e pulava as
+    // regras de negócio do Create: dava para mover a reserva para o passado.
+    [Test]
+    public async Task Put_MovendoReservaParaOPassado_Retorna400()
+    {
+        var id = await SeedBookingAsync(MemberId, 10);
+        var client = ClientAs(MemberId, "Member");
+        var body = $@"{{""id"":""{id}"",""spaceId"":""{SpaceId}"",
+                ""startDateTime"":""{Iso(Future(-3, 10))}"",""endDateTime"":""{Iso(Future(-3, 11))}""}}";
+
+        var response = await client.PutAsync("/api/bookings", Json(body));
+
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest),
+            await response.Content.ReadAsStringAsync());
+    }
+
+    // start >= end estourava a generated column tstzrange (SQLSTATE 22000), que não casa
+    // com nenhum catch do SaveArbitratingOverlapAsync → escapava como 500.
+    [Test]
+    public async Task Put_ComInicioDepoisDoFim_Retorna400EmVezDe500()
+    {
+        var id = await SeedBookingAsync(MemberId, 11);
+        var client = ClientAs(MemberId, "Member");
+        var body = $@"{{""id"":""{id}"",""spaceId"":""{SpaceId}"",
+                ""startDateTime"":""{Iso(Future(11, 16))}"",""endDateTime"":""{Iso(Future(11, 9))}""}}";
+
+        var response = await client.PutAsync("/api/bookings", Json(body));
+
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest),
+            await response.Content.ReadAsStringAsync());
     }
 
     [Test]
