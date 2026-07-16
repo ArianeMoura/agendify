@@ -40,7 +40,10 @@ export default function ForgotPasswordPage() {
               vale por 30 minutos.
             </Alert>
             <p className="text-ink-muted text-center text-sm">
-              <Link href="/login" className="font-medium underline underline-offset-4 hover:opacity-80">
+              <Link
+                href="/login"
+                className="font-medium underline underline-offset-4 hover:opacity-80"
+              >
                 Voltar para o login
               </Link>
             </p>
@@ -70,7 +73,10 @@ export default function ForgotPasswordPage() {
 
             <p className="text-ink-muted text-center text-sm">
               Lembrou a senha?{" "}
-              <Link href="/login" className="font-medium underline underline-offset-4 hover:opacity-80">
+              <Link
+                href="/login"
+                className="font-medium underline underline-offset-4 hover:opacity-80"
+              >
                 Entrar
               </Link>
             </p>
