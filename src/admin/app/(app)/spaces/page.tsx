@@ -13,6 +13,7 @@ import {
   Card,
   ConfirmDialog,
   EmptyState,
+  ErrorState,
   PageHeader,
   Table,
   TableSkeleton,
@@ -48,7 +49,7 @@ function SpaceThumb({ src }: { src?: string }) {
 
 export default function SpacesPage() {
   const qc = useQueryClient();
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["spaces"],
     queryFn: () => apiFetch<Space[]>("/spaces"),
   });
@@ -94,6 +95,12 @@ export default function SpacesPage() {
       <Card className="overflow-hidden">
         {isLoading ? (
           <TableSkeleton />
+        ) : isError ? (
+          <ErrorState
+            title="Não foi possível carregar os espaços"
+            description={error instanceof Error ? error.message : undefined}
+            onRetry={() => refetch()}
+          />
         ) : spaces.length === 0 ? (
           <EmptyState
             icon={MapPin}

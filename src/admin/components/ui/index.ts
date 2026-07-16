@@ -25,4 +25,5 @@ export { Switch } from "./Switch";
 export { Avatar } from "./Avatar";
 export { Alert, type AlertTone } from "./Alert";
 export { EmptyState } from "./EmptyState";
+export { ErrorState } from "./ErrorState";
 export { Toaster, toast } from "./Toaster";

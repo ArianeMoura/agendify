@@ -12,6 +12,7 @@ import {
   Button,
   Card,
   EmptyState,
+  ErrorState,
   PageHeader,
   Table,
   TableSkeleton,
@@ -56,6 +57,12 @@ export default function BookingsPage() {
       <Card className="overflow-hidden">
         {bookings.isLoading ? (
           <TableSkeleton />
+        ) : bookings.isError ? (
+          <ErrorState
+            title="Não foi possível carregar as reservas"
+            description={bookings.error instanceof Error ? bookings.error.message : undefined}
+            onRetry={() => bookings.refetch()}
+          />
         ) : rows.length === 0 ? (
           <EmptyState
             icon={CalendarCheck2}

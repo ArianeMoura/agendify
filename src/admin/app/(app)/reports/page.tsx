@@ -6,6 +6,7 @@ import { BarChart3 } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { PeakHour, Space } from "@/lib/types";
 import {
+  Alert,
   Card,
   EmptyState,
   Field,
@@ -23,10 +24,17 @@ export default function ReportsPage() {
   const [year, setYear] = useState(nowRef.getUTCFullYear());
   const [month, setMonth] = useState(nowRef.getUTCMonth() + 1);
 
+  // Limpar o input dá Number("") === 0, e ?month=0 é 400 na API. Sem esta guarda a
+  // requisição saía inválida e o erro virava "Sem dados para o período" na tela — o
+  // operador lia "não houve reserva nesse mês" no lugar de "o mês está vazio".
+  const isValidPeriod =
+    Number.isInteger(month) && month >= 1 && month <= 12 && Number.isInteger(year) && year >= 2000;
+
   const spaces = useQuery({ queryKey: ["spaces"], queryFn: () => apiFetch<Space[]>("/spaces") });
   const peaks = useQuery({
     queryKey: ["peak-hours", year, month],
     queryFn: () => apiFetch<PeakHour[]>(`/analytics/peak-hours?year=${year}&month=${month}`),
+    enabled: isValidPeriod,
   });
 
   const spaceName = useMemo(() => {
@@ -67,8 +75,16 @@ export default function ReportsPage() {
       </div>
 
       <Card className="overflow-hidden">
-        {peaks.isLoading ? (
+        {!isValidPeriod ? (
+          <Alert tone="warning" title="Período inválido" className="m-4">
+            Informe um mês entre 1 e 12 e um ano a partir de 2000.
+          </Alert>
+        ) : peaks.isLoading ? (
           <TableSkeleton rowClassName="h-10" />
+        ) : peaks.isError ? (
+          <Alert tone="danger" title="Não foi possível carregar o relatório" className="m-4">
+            {peaks.error instanceof Error ? peaks.error.message : "Tente novamente."}
+          </Alert>
         ) : rows.length === 0 ? (
           <EmptyState
             icon={BarChart3}
