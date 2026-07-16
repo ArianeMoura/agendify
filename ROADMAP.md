@@ -44,8 +44,9 @@ Direções de evolução do **Agendify**. Intencionalmente **sem datas** — a p
 - **Tier de testes unitários** distinto da integração _(iniciado: `ResendEmailSenderTests`)_.
 - **E2E** (Playwright/Detox). _(Admin e mobile já têm testes de componente/tela: Vitest +
   vitest-axe no admin, jest-expo + Testing Library no mobile.)_
-- **Padronização:** `.editorconfig`, analisadores .NET; **hooks** enforced (Husky/lint-staged).
-  _(Admin e mobile já usam Prettier — `format`/`format:check`, com checagem na CI.)_
+- **Padronização:** analisadores .NET; **hooks** enforced (Husky/lint-staged).
+  _(Já feito: `.editorconfig` com namespace file-scoped aplicado a toda a API; Prettier no
+  admin e no mobile — `format`/`format:check`, com checagem na CI.)_
 
 ## Segurança e conformidade
 

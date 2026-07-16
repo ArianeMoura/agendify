@@ -20,6 +20,24 @@ so that is where the tests are concentrated. The admin panel adds component/acce
 (Vitest + Testing Library + vitest-axe) and the mobile app adds screen and component tests with
 jest-expo + Testing Library; E2E remains planned (see below).
 
+### Where test files live
+
+The API mirrors the code: `src/api.Tests/Services/` for service tests, `src/api.Tests/Endpoints/`
+for tests that go through HTTP.
+
+The mobile app uses **two locations, on purpose** — the rule had never been written down, so
+here it is:
+
+- **Component tests sit next to the component** (`components/ui/Button.test.tsx`). They are read
+  and edited together with it, and a component that moves takes its test along.
+- **Screen tests live in `src/mobile/__tests__/`** (`login.test.tsx`, `reviews.test.tsx`,
+  `role-gating.test.tsx`). Screens live under `app/`, which expo-router treats as the route
+  tree — a `.test.tsx` in there is a file the router has to be told to ignore. Keeping screen
+  tests out of `app/` avoids that entirely.
+
+New tests follow whichever side of that line they fall on. The admin has no screen tests yet;
+when it does, the same reasoning applies (Next.js `app/` is also a route tree).
+
 ## Test inventory — Implemented
 
 NUnit tests in `src/api.Tests` — integration tests against a real PostgreSQL, except the
@@ -83,7 +101,8 @@ automated proof of RN-01.
 | Endpoint tests (`WebApplicationFactory`) | Implemented — all 10 controllers, exercising model binding, JWT auth and role policies |
 | Frontend/component tests | Implemented — admin (Vitest + RTL + vitest-axe, 2 files); mobile (jest-expo + Testing Library, 17 files / 47 cases: screens in `__tests__/`, components next to each component) |
 | E2E tests (Playwright/Cypress/Detox) | Planned (none today) |
-| Prettier (`format`/`format:check`); `.editorconfig`, .NET analyzers | Implemented (admin & mobile Prettier); Planned (rest) |
+| Prettier (`format`/`format:check`); `.editorconfig` | Implemented — Prettier on admin & mobile (checked in CI); `.editorconfig` covers the API (`dotnet format`) |
+| .NET analyzers | Planned |
 | Enforced Git hooks (Husky/lint-staged) | Planned (only an opt-in gitleaks hook exists) |
 
 Coverage report (HTML, local):

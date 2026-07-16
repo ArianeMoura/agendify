@@ -63,6 +63,23 @@ The container listens on port `8080`; Render terminates TLS at the edge.
 On boot the API applies migrations, creating the schema, `btree_gist`, and the `no_overlap`
 constraint. Verify with `GET /status` (200) and `GET /api/spaces` (401 without a token).
 
+### Setting up the R2 bucket
+
+One-time, in the Cloudflare dashboard:
+
+1. **R2 → Create bucket** (e.g. `agendify-uploads`).
+2. In the bucket, **Settings → Public Development URL → Enable** → this is `Storage__PublicBaseUrl`.
+   Note that `r2.dev` is **rate limited and meant for development**, with no cache or WAF in
+   front of it; a custom domain is the production answer once there is a domain to use.
+3. **R2 → Account details → API Tokens → Manage → Create Account API token**, permission
+   **Object Read and Write**, scoped to that bucket. It returns the **Access Key ID** and the
+   **Secret Access Key** — the secret is shown **once only**, so copy it right away.
+4. The **Account ID** is on the same R2 page and forms the endpoint:
+   `Storage__ServiceUrl = https://<ACCOUNT_ID>.r2.cloudflarestorage.com`.
+
+`Storage__Bucket` is the switch: with it set, images go to R2; empty, they go to the
+container's ephemeral disk.
+
 ## Admin (Vercel) — planned
 
 Vercel auto-detects Next.js. In the project (dashboard or `vercel` CLI):
@@ -71,7 +88,10 @@ Vercel auto-detects Next.js. In the project (dashboard or `vercel` CLI):
 2. **Environment variable:** `NEXT_PUBLIC_API_URL = https://agendify-api-j6da.onrender.com`.
 3. Deploy (push to `main`, or `vercel --prod`).
 
-Once the admin URL is known, add it to the API's `CORS_ALLOWED_ORIGINS` (see the Render env vars).
+Once the admin URL is known, set **both** of the API's variables to it: `CORS_ALLOWED_ORIGINS`
+and `App__BaseUrl`. Order matters for `App__BaseUrl` — it is the base of the password-reset
+link, so pointing it anywhere else means sending people a dead link. Until the panel is
+published, password reset still works through the app, which accepts a pasted token.
 
 ## Mobile (Expo EAS) — planned
 
