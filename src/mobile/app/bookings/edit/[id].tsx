@@ -29,7 +29,7 @@ import { TimeSlotPicker } from '@/components/ui/TimeSlotPicker';
 import { spacesApi } from '@/lib/api/spaces';
 import { bookingsApi } from '@/lib/api/bookings';
 import { getImageUrl } from '@/lib/api/config';
-import { format, set as setDate } from 'date-fns';
+import { format, isSameDay, set as setDate } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useAuth } from '@/lib/contexts/AuthContext';
 import { SpaceAvailability, TimeSlot } from '@/lib/types';
@@ -98,11 +98,29 @@ export default function EditBookingScreen() {
         dateStr,
         timezone,
       );
+      // Os slots da PRÓPRIA reserva não podem aparecer como ocupados — senão, ao editar,
+      // o usuário não conseguiria manter o horário que já é dele (trocar só o espaço, p.ex.).
+      // É só isso que precisa ser reescrito: o isBooked dos DEMAIS já vem correto da API.
+      // (Antes: `id === booking.id ? false : slot.isAvailable` — como `booking` é buscado
+      // POR `id`, a condição era sempre verdadeira e zerava o isBooked de TODO mundo,
+      // mostrando como livre o horário já reservado por outra pessoa. O usuário só
+      // descobria no submit, com um 409 sem explicação.)
+      const ownSlots = new Set<string>();
+      const bookingStart = new Date(booking.startDateTime);
+      const bookingEnd = new Date(booking.endDateTime);
+      if (isSameDay(bookingStart, selectedDate)) {
+        const cursor = new Date(bookingStart);
+        while (cursor < bookingEnd) {
+          ownSlots.add(format(cursor, 'HH:mm'));
+          cursor.setHours(cursor.getHours() + 1);
+        }
+      }
+
       setAvailability({
         ...availabilityData,
         timeSlots: availabilityData.timeSlots.map((slot: TimeSlot) => ({
           ...slot,
-          isBooked: id === booking.id ? false : slot.isAvailable,
+          isBooked: slot.isBooked && !ownSlots.has(slot.startTime),
         })),
       });
     } catch (error: any) {
