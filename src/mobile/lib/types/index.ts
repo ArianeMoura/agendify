@@ -134,12 +134,14 @@ export interface TimeSlot {
   isBooked: boolean;
 }
 
+// Espelha SpaceAvailabilityDto da API. NÃO tem allDayStartTime/allDayEndTime: o DTO não os
+// envia. Declará-los aqui fazia o TypeScript aprovar `availability.allDayStartTime`, que
+// vinha undefined em runtime e virava "Disponível de undefined até undefined" na tela.
+// Esses horários moram no objeto Space (selectedSpace.allDayStartTime).
 export interface SpaceAvailability {
   spaceId: string;
   spaceName: string;
   date: string;
   timeSlots: TimeSlot[];
   isAllDayBooking: boolean;
-  allDayStartTime?: string;
-  allDayEndTime?: string;
 }

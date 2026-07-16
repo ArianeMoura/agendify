@@ -336,8 +336,8 @@ export default function EditBookingScreen() {
               selectedSlots={selectedTimeSlots}
               onSelectSlot={handleTimeSlotSelect}
               isAllDayBooking={availability.isAllDayBooking}
-              allDayStartTime={availability.allDayStartTime}
-              allDayEndTime={availability.allDayEndTime}
+              allDayStartTime={selectedSpace?.allDayStartTime}
+              allDayEndTime={selectedSpace?.allDayEndTime}
               isUser={false}
             />
           )}
