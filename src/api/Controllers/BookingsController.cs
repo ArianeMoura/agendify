@@ -166,6 +166,9 @@ public class BookingsController : ControllerBase
             Id = dbBooking.Id,
             // Dono preservado: o PUT não reatribui a reserva a outro usuário.
             UserId = dbBooking.UserId,
+            // Tenant preservado: sem isto o StampTenant carimbaria o tenant de quem edita
+            // e um PlatformOwner moveria a reserva de outra organização para a dele.
+            TenantId = dbBooking.TenantId,
             SpaceId = request.SpaceId,
             StartDateTime = ToUtc(request.StartDateTime!.Value),
             EndDateTime = ToUtc(request.EndDateTime!.Value),

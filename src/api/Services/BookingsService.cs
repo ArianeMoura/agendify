@@ -59,6 +59,11 @@ public class BookingsService
         Id = b.Id,
         UserId = b.UserId,
         SpaceId = b.SpaceId,
+        // TenantId copiado de propósito: o PUT reconstrói a Booking a partir desta
+        // projeção e, com o campo nulo, o StampTenant carimbava o tenant de QUEM edita.
+        // Para um PlatformOwner (que enxerga todos os tenants) isso movia a reserva de
+        // outra organização para a dele.
+        TenantId = b.TenantId,
         StartDateTime = b.StartDateTime,
         EndDateTime = b.EndDateTime,
         Status = b.Status,
@@ -115,6 +120,13 @@ public class BookingsService
     public async Task Update(string id, Booking booking)
     {
         booking.Id = id;
+
+        // As MESMAS regras do Create. A exclusion constraint arbitra só a SOBREPOSIÇÃO;
+        // sem esta chamada o PUT aceitava mover a reserva para o passado ou para um espaço
+        // indisponível/inexistente, e um start >= end estourava a generated column
+        // (SQLSTATE 22000, fora dos catches) virando 500 em vez de 400.
+        await ValidateSpaceRulesAsync(booking);
+
         // A alteração também passa pela exclusion constraint: editar o horário
         // para um slot ocupado é rejeitado pelo banco (fecha a lacuna do PUT).
         _db.Bookings.Update(booking);
