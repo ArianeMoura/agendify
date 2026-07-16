@@ -64,7 +64,14 @@ public class BookingsService
         Status = b.Status,
         CreatedAt = b.CreatedAt,
         UpdatedAt = b.UpdatedAt,
-        User = user,
+        User = user is null ? null : new UserDto
+        {
+            Id = user.Id!,
+            Name = user.Name,
+            Email = user.Email,
+            Role = user.Role,
+            CreatedAt = user.CreatedAt,
+        },
         Space = space,
     };
 

@@ -260,6 +260,25 @@ public class BookingsEndpointTests
         Assert.That(db.Bookings.Single().StartDateTime, Is.EqualTo(Future(5, 14)));
     }
 
+    // GET /api/bookings embutia a entidade User inteira na projeção — e com ela o hash
+    // bcrypt da senha, o tenantId e o anonymizedAt de cada usuário do tenant. Um OrgAdmin
+    // abrindo a lista recebia a credencial de todos os membros.
+    [Test]
+    public async Task Get_NaoVazaOHashDaSenhaNemOTenantDoUsuario()
+    {
+        await SeedBookingAsync(MemberId, 9);
+        var client = ClientAs(AdminId, "OrgAdmin");
+
+        var response = await client.GetAsync("/api/bookings");
+        var payload = await response.Content.ReadAsStringAsync();
+
+        Assert.That(payload, Does.Not.Contain("password").IgnoreCase);
+        Assert.That(payload, Does.Not.Contain("$2"), "hash bcrypt no corpo da resposta");
+        Assert.That(payload, Does.Not.Contain("anonymizedAt").IgnoreCase);
+        // A projeção tem de continuar entregando o que os clientes de fato consomem.
+        Assert.That(payload, Does.Contain("joao@exemplo.com.br"));
+    }
+
     [Test]
     public async Task Put_DeOutroMember_Retorna403()
     {
