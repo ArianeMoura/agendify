@@ -5,21 +5,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ApiError, apiFetch } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { Booking, Space } from "@/lib/types";
+import { toLocalInput, toUtcIso } from "@/lib/utils/date";
 import { Alert, Dialog, DialogFooter, Field, Input, Select, toast } from "@/components/ui";
-
-// datetime-local (sem timezone) tratado como UTC — casa com a normalização da API.
-function toUtcIso(local: string): string {
-  if (!local) return local;
-  const withSeconds = local.length === 16 ? `${local}:00` : local;
-  return `${withSeconds}Z`;
-}
-
-// Inverso do toUtcIso: o ISO UTC da API volta ao formato que o datetime-local aceita
-// (YYYY-MM-DDTHH:mm). Sem isso o input abre vazio na edição.
-function toLocalInput(iso: string): string {
-  if (!iso) return "";
-  return iso.replace("Z", "").slice(0, 16);
-}
 
 interface BookingFormDialogProps {
   open: boolean;
