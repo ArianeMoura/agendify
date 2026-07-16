@@ -1,5 +1,6 @@
 using api.Models;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using NUnit.Framework;
 
 namespace api.Tests.Services;
@@ -66,6 +67,58 @@ public class RowLevelSecurityTests
 
         // O WITH CHECK do RLS rejeita o INSERT (a app está no tenant A).
         Assert.ThrowsAsync<DbUpdateException>(async () => await dbA.SaveChangesAsync());
+    }
+
+    // Deriva a lista do MODELO, não de uma constante: é o que impede uma entidade
+    // ITenantScoped nova de entrar sem policy no Postgres. Hoje a cobertura está completa,
+    // mas repartida entre migrations — a EnableRowLevelSecurity cobriu 8 tabelas e a
+    // AddPasswordResetTokens retrofitou as 2 que faltavam (invitations e a própria
+    // password_reset_tokens). Ler só a primeira dá a impressão de que há um buraco; é
+    // justamente esse tipo de conclusão (num sentido ou no outro) que este teste tira do
+    // campo da leitura de migration e põe no do fato observado no banco.
+    [Test]
+    public async Task TodaTabelaTenantScoped_TemRlsForcadoEPolicy()
+    {
+        await using var db = TestDatabaseFixture.CreateContext();
+
+        var tables = db.Model.GetEntityTypes()
+            .Where(e => typeof(ITenantScoped).IsAssignableFrom(e.ClrType))
+            .Select(e => e.GetTableName()!)
+            .Distinct()
+            .OrderBy(t => t)
+            .ToList();
+
+        Assert.That(tables, Is.Not.Empty, "nenhuma entidade ITenantScoped no modelo?");
+
+        await using var conn = new NpgsqlConnection(TestDatabaseFixture.ConnectionString);
+        await conn.OpenAsync();
+
+        foreach (var table in tables)
+        {
+            await using var cmd = conn.CreateCommand();
+            cmd.CommandText = @"
+                SELECT c.relrowsecurity,
+                       c.relforcerowsecurity,
+                       (SELECT count(*) FROM pg_policies p
+                         WHERE p.schemaname = n.nspname
+                           AND p.tablename = c.relname
+                           AND p.policyname = 'tenant_isolation')
+                FROM pg_class c
+                JOIN pg_namespace n ON n.oid = c.relnamespace
+                WHERE c.relname = @t AND n.nspname = 'public';";
+            cmd.Parameters.AddWithValue("t", table);
+
+            await using var reader = await cmd.ExecuteReaderAsync();
+            Assert.That(await reader.ReadAsync(), Is.True, $"tabela '{table}' não existe");
+            Assert.Multiple(() =>
+            {
+                Assert.That(reader.GetBoolean(0), Is.True, $"'{table}': RLS não habilitado");
+                Assert.That(reader.GetBoolean(1), Is.True,
+                    $"'{table}': RLS sem FORCE (o dono da tabela escaparia da policy)");
+                Assert.That(reader.GetInt64(2), Is.EqualTo(1),
+                    $"'{table}': sem a policy tenant_isolation");
+            });
+        }
     }
 
     [Test]
