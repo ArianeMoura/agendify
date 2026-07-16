@@ -15,6 +15,7 @@ import {
   Card,
   ConfirmDialog,
   EmptyState,
+  ErrorState,
   PageHeader,
   Table,
   TableSkeleton,
@@ -29,7 +30,7 @@ import { InviteMemberDialog } from "./InviteMemberDialog";
 export default function UsersPage() {
   const qc = useQueryClient();
   const { user: me } = useAuth();
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["users"],
     queryFn: () => apiFetch<User[]>("/users"),
   });
@@ -82,6 +83,12 @@ export default function UsersPage() {
       <Card className="overflow-hidden">
         {isLoading ? (
           <TableSkeleton />
+        ) : isError ? (
+          <ErrorState
+            title="Não foi possível carregar os usuários"
+            description={error instanceof Error ? error.message : undefined}
+            onRetry={() => refetch()}
+          />
         ) : users.length === 0 ? (
           <EmptyState
             icon={UsersIcon}
