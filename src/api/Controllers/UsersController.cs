@@ -142,13 +142,30 @@ public class UsersController : ControllerBase
         if (!string.IsNullOrEmpty(request.Password))
             user.Password = PasswordHasher.Hash(request.Password);
 
-        if (request.Role.HasValue)
+        if (request.Role.HasValue && request.Role.Value != user.Role)
         {
             // Só um admin do tenant pode alterar papel (evita autoescalonamento).
             if (!IsAdmin())
             {
                 return Forbid();
             }
+
+            // Ninguém promove ninguém a PlatformOwner por aqui — mesma regra do Create.
+            // Sem isto o OrgAdmin (que qualquer um obtém pelo self-signup anônimo de
+            // organização) se auto-promovia e ganhava BypassTenantFilter + bypass_rls,
+            // desligando as DUAS camadas de isolamento e enxergando todos os tenants.
+            if (request.Role.Value == Role.PlatformOwner)
+            {
+                return Forbid();
+            }
+
+            // Trocar o PRÓPRIO papel nunca é legítimo: um OrgAdmin só se rebaixaria, e
+            // permitir isso deixaria o tenant sem admin. Alterar papel é ação sobre outro.
+            if (currentUserId == id)
+            {
+                return Forbid();
+            }
+
             user.Role = request.Role.Value;
         }
 

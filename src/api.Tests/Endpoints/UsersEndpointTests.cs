@@ -180,6 +180,45 @@ public class UsersEndpointTests
         Assert.That(db.Users.Single(u => u.Id == MemberId).Role, Is.EqualTo(Role.Member));
     }
 
+    // O buraco que estes dois testes fecham: o Create barrava PlatformOwner, o Update não.
+    // Como o self-signup de organização é anônimo e cria um OrgAdmin, QUALQUER pessoa da
+    // internet virava OrgAdmin, se auto-promovia a PlatformOwner e ganhava
+    // BypassTenantFilter + bypass_rls — as duas camadas de isolamento desligadas de uma vez.
+    [Test]
+    public async Task Update_OrgAdminTentandoVirarPlatformOwner_Retorna403()
+    {
+        var response = await ClientAs(AdminId, "OrgAdmin").PutAsync($"/api/users/{AdminId}",
+            Json(@"{""role"":""PlatformOwner""}"));
+
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Forbidden));
+        await using var db = TestDatabaseFixture.CreateContext();
+        Assert.That(db.Users.Single(u => u.Id == AdminId).Role, Is.EqualTo(Role.OrgAdmin));
+    }
+
+    [Test]
+    public async Task Update_OrgAdminPromovendoOutroAPlatformOwner_Retorna403()
+    {
+        var response = await ClientAs(AdminId, "OrgAdmin").PutAsync($"/api/users/{MemberId}",
+            Json(@"{""role"":""PlatformOwner""}"));
+
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Forbidden));
+        await using var db = TestDatabaseFixture.CreateContext();
+        Assert.That(db.Users.Single(u => u.Id == MemberId).Role, Is.EqualTo(Role.Member));
+    }
+
+    // O papel inalterado no corpo (o que o admin manda ao editar a si mesmo, com o <select>
+    // desabilitado) tem de continuar passando — o guard é sobre TROCAR de papel.
+    [Test]
+    public async Task Update_EditandoASiMesmoComPapelInalterado_Retorna204()
+    {
+        var response = await ClientAs(AdminId, "OrgAdmin").PutAsync($"/api/users/{AdminId}",
+            Json(@"{""name"":""Ana Admin Editada"",""role"":""OrgAdmin""}"));
+
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
+        await using var db = TestDatabaseFixture.CreateContext();
+        Assert.That(db.Users.Single(u => u.Id == AdminId).Name, Is.EqualTo("Ana Admin Editada"));
+    }
+
     [Test]
     public async Task Delete_ComoMember_Retorna403()
     {
