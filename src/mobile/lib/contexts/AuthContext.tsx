@@ -7,6 +7,7 @@ import React, {
   useCallback,
 } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useQueryClient } from '@tanstack/react-query';
 import { User, LoginResponse } from '../types';
 import { tokenStore } from '../storage/tokenStore';
 import { setOnSessionExpired } from '../api/config';
@@ -42,6 +43,7 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
 
   const logout = useCallback(async () => {
     try {
@@ -54,8 +56,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       await tokenStore.clear();
       await AsyncStorage.removeItem(USER_KEY);
       setUser(null);
+      // O QueryClient vive no módulo (dura o processo inteiro), então o cache sobrevivia
+      // ao logout: chaves como ['spaces']/['bookings'] são iguais para qualquer conta e o
+      // próximo login renderizava os dados do usuário ANTERIOR enquanto o refetch corria.
+      // Num produto multi-tenant isso é um flash de dados de outra organização.
+      queryClient.clear();
     }
-  }, []);
+  }, [queryClient]);
 
   const loadStoredData = useCallback(async () => {
     try {
